@@ -4,7 +4,6 @@ export default function Hero() {
   return (
     <section className="relative w-full h-[85vh] min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Background Video */}
-      {/* Note: Replace src with the actual video URL of Allegade 10 */}
       <video
         autoPlay
         loop
@@ -13,7 +12,7 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source
-          src="https://www.w3schools.com/html/mov_bbb.mp4"
+          src="https://cdn.sanity.io/files/b0bkhf04/production/bf5322023ca71a37f92e42f0607cfba31b760e04.mp4"
           type="video/mp4"
         />
         Your browser does not support the video tag.
