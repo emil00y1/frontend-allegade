@@ -19,6 +19,8 @@ const HOTEL_PAGE_QUERY = `*[_type == "hotelPage"][0]{
   body,
   catalogHeading,
   catalogDescription,
+  ctaText,
+  ctaUrl,
   galleryImages[]{_key, asset, alt}
 }`;
 
@@ -27,32 +29,39 @@ export default async function HotelPage() {
 
   const heroImageUrl = page?.heroImage
     ? urlFor(page.heroImage)?.width(2070).height(1380).url()
-    : "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2070&auto=format&fit=crop";
+    : null;
+
+  const ctaText = page?.ctaText ?? "Book Ophold";
+  const ctaUrl = page?.ctaUrl ?? "/book-ophold";
 
   return (
     <main className="min-h-screen bg-stone-50">
       {/* Hero Section */}
       <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 w-full h-full bg-stone-200">
-          <Image
-            src={heroImageUrl!}
-            alt={page?.heroTitle ?? "Allégade 10 Hotel"}
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="absolute inset-0 w-full h-full bg-stone-300">
+          {heroImageUrl && (
+            <Image
+              src={heroImageUrl}
+              alt={page?.heroTitle ?? "Allégade 10 Hotel"}
+              fill
+              className="object-cover"
+              priority
+            />
+          )}
         </div>
-        <div className="absolute inset-0 bg-black/30 z-0"></div>
+        <div className="absolute inset-0 bg-black/30 z-0" />
 
         <div className="relative z-10 flex flex-col items-center text-center px-4 mt-16 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-tight drop-shadow-sm">
-            {page?.heroTitle ?? "Hotel"}
-          </h1>
+          {page?.heroTitle && (
+            <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-tight drop-shadow-sm">
+              {page.heroTitle}
+            </h1>
+          )}
           <Link
-            href="/book-ophold"
+            href={ctaUrl}
             className="group px-8 py-3.5 text-sm tracking-widest uppercase font-medium text-white border border-white/80 rounded hover:bg-white hover:text-stone-900 transition-all duration-300 backdrop-blur-sm flex items-center gap-3"
           >
-            <span>Book Ophold</span>
+            <span>{ctaText}</span>
             <svg
               className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
@@ -71,62 +80,53 @@ export default async function HotelPage() {
       </section>
 
       {/* Intro Section */}
-      <section className="w-full py-24 px-6">
-        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
-          <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-10 tracking-tight">
-            {page?.introHeading ?? "Vores Værelser"}
-          </h2>
-          <div className="flex flex-col gap-6 text-base md:text-lg text-stone-600 font-light leading-relaxed prose prose-stone max-w-none">
-            {page?.body ? (
-              <PortableText value={page.body} />
-            ) : (
-              <>
-                <p>
-                  I hjertet af Frederiksberg Allégade ligger vores lille hotel i
-                  et stemningsfuldt hus fra 1780&apos;erne. Her mærker man
-                  historiens vingesus i de skæve gulve, de fine detaljer og den
-                  særlige ro, som kun tiden kan skabe. Atmosfæren er varm og
-                  hjemlig fra det øjeblik, du træder indenfor.
-                </p>
-                <p>
-                  Vores værelser forener klassisk charme og danner basen, uanset
-                  om du er på romantisk shoppingtur i København, på weekendtur,
-                  forretningsrejse eller blot trænger til en pause fra
-                  hverdagen. Som i den gamle tidsånd deler husets 12 værelser
-                  fem badeværelser. Alle værelser ligger tæt på et af disse. På
-                  den måde bevarer værelserne deres størrelse og personlighed.
-                </p>
-              </>
+      {(page?.introHeading || page?.body) && (
+        <section className="w-full py-24 px-6">
+          <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
+            {page?.introHeading && (
+              <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-10 tracking-tight">
+                {page.introHeading}
+              </h2>
             )}
+            {page?.body && (
+              <div className="flex flex-col gap-6 text-base md:text-lg text-stone-600 font-light leading-relaxed prose prose-stone max-w-none">
+                <PortableText value={page.body} />
+              </div>
+            )}
+            <div className="mt-12">
+              <Link
+                href={ctaUrl}
+                className="group inline-flex items-center gap-2 px-8 py-3 text-sm tracking-widest uppercase font-medium text-stone-900 border border-stone-300 rounded hover:bg-stone-900 hover:text-white transition-all duration-300"
+              >
+                <span>{ctaText}</span>
+              </Link>
+            </div>
           </div>
-          <div className="mt-12">
-            <Link
-              href="/book-ophold"
-              className="group inline-flex items-center gap-2 px-8 py-3 text-sm tracking-widest uppercase font-medium text-stone-900 border border-stone-300 rounded hover:bg-stone-900 hover:text-white transition-all duration-300"
-            >
-              <span>Book Ophold</span>
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Room Catalog Section */}
-      <section className="w-full bg-white py-24 px-6 border-t border-stone-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-6 tracking-tight">
-              {page?.catalogHeading ?? "Se Vores Katalog!"}
-            </h2>
-            {page?.catalogDescription && (
-              <p className="text-stone-500 font-light max-w-xl mx-auto">
-                {page.catalogDescription}
-              </p>
+      {(page?.catalogHeading || page?.galleryImages?.length > 0) && (
+        <section className="w-full bg-white py-24 px-6 border-t border-stone-100">
+          <div className="max-w-7xl mx-auto">
+            {(page?.catalogHeading || page?.catalogDescription) && (
+              <div className="text-center mb-16">
+                {page?.catalogHeading && (
+                  <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-6 tracking-tight">
+                    {page.catalogHeading}
+                  </h2>
+                )}
+                {page?.catalogDescription && (
+                  <p className="text-stone-500 font-light max-w-xl mx-auto">
+                    {page.catalogDescription}
+                  </p>
+                )}
+              </div>
             )}
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {page?.galleryImages?.length > 0
-              ? page.galleryImages.map(
+            {page?.galleryImages?.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {page.galleryImages.map(
                   (img: { _key: string; asset: SanityImageSource; alt?: string }) => (
                     <div
                       key={img._key}
@@ -140,24 +140,12 @@ export default async function HotelPage() {
                       />
                     </div>
                   )
-                )
-              : [1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-stone-100 cursor-pointer"
-                  >
-                    <Image
-                      src={`https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop&sig=${i}`}
-                      alt={`Værelse preview ${i}`}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                  </div>
-                ))}
+                )}
+              </div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </main>
   );
 }
