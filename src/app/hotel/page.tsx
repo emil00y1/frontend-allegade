@@ -1,79 +1,160 @@
 import Link from "next/link";
 import Image from "next/image";
+import imageUrlBuilder from "@sanity/image-url";
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import { PortableText } from "next-sanity";
+import { client } from "@/sanity/client";
+import { sanityFetch } from "@/sanity/lib/live";
 
-export default function HotelPage() {
+const { projectId, dataset } = client.config();
+const urlFor = (source: SanityImageSource) =>
+  projectId && dataset
+    ? imageUrlBuilder({ projectId, dataset }).image(source)
+    : null;
+
+const HOTEL_PAGE_QUERY = `*[_type == "hotelPage"][0]{
+  heroImage,
+  heroTitle,
+  introHeading,
+  body,
+  catalogHeading,
+  catalogDescription,
+  galleryImages[]{_key, asset, alt}
+}`;
+
+export default async function HotelPage() {
+  const { data: page } = await sanityFetch({ query: HOTEL_PAGE_QUERY });
+
+  const heroImageUrl = page?.heroImage
+    ? urlFor(page.heroImage)?.width(2070).height(1380).url()
+    : "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=2070&auto=format&fit=crop";
+
   return (
-    <main className="min-h-screen bg-white">
-      {/* 1. Page Hero Section */}
-      <section className="relative w-full h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        {/* Background Image - Using a placeholder until real image is available */}
-        <div className="absolute inset-0 w-full h-full bg-gray-200">
+    <main className="min-h-screen bg-stone-50">
+      {/* Hero Section */}
+      <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 w-full h-full bg-stone-200">
           <Image
-            src="https://cdn.sanity.io/images/b0bkhf04/production/1540f43217509341036104e9caa20c9be524ef22-2048x1365.jpg"
-            alt="Allégade 10 Hotel Room"
+            src={heroImageUrl!}
+            alt={page?.heroTitle ?? "Allégade 10 Hotel"}
             fill
             className="object-cover"
             priority
           />
         </div>
+        <div className="absolute inset-0 bg-black/30 z-0"></div>
 
-        {/* Dark Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-black/40 z-0"></div>
-
-        {/* Overlay Content */}
-        <div className="relative z-10 text-center text-white px-4 flex flex-col items-center mt-12 w-full max-w-4xl mx-auto">
-          {/* Main Title */}
-          <h1 className="text-5xl md:text-7xl font-serif font-medium mb-12 drop-shadow-lg">
-            Hotel
+        <div className="relative z-10 flex flex-col items-center text-center px-4 mt-16 max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-tight drop-shadow-sm">
+            {page?.heroTitle ?? "Hotel"}
           </h1>
-
-          {/* Call to Action */}
           <Link
             href="/book-ophold"
-            className="px-8 py-3 text-sm tracking-wider uppercase font-medium text-white bg-transparent border border-white rounded hover:bg-white hover:text-black hover:shadow-lg transition-all duration-300 backdrop-blur-sm flex items-center gap-3"
+            className="group px-8 py-3.5 text-sm tracking-widest uppercase font-medium text-white border border-white/80 rounded hover:bg-white hover:text-stone-900 transition-all duration-300 backdrop-blur-sm flex items-center gap-3"
           >
             <span>Book Ophold</span>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
-                fillRule="evenodd"
-                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                clipRule="evenodd"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 12h14M12 5l7 7-7 7"
               />
             </svg>
           </Link>
         </div>
       </section>
 
-      {/* 2. "Vores Værelser" Content Section */}
-      <section className="w-full bg-[#f4efe9] py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-medium text-gray-900 mb-12">
-            Vores værelser
+      {/* Intro Section */}
+      <section className="w-full py-24 px-6">
+        <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
+          <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-10 tracking-tight">
+            {page?.introHeading ?? "Vores Værelser"}
           </h2>
+          <div className="flex flex-col gap-6 text-base md:text-lg text-stone-600 font-light leading-relaxed prose prose-stone max-w-none">
+            {page?.body ? (
+              <PortableText value={page.body} />
+            ) : (
+              <>
+                <p>
+                  I hjertet af Frederiksberg Allégade ligger vores lille hotel i
+                  et stemningsfuldt hus fra 1780&apos;erne. Her mærker man
+                  historiens vingesus i de skæve gulve, de fine detaljer og den
+                  særlige ro, som kun tiden kan skabe. Atmosfæren er varm og
+                  hjemlig fra det øjeblik, du træder indenfor.
+                </p>
+                <p>
+                  Vores værelser forener klassisk charme og danner basen, uanset
+                  om du er på romantisk shoppingtur i København, på weekendtur,
+                  forretningsrejse eller blot trænger til en pause fra
+                  hverdagen. Som i den gamle tidsånd deler husets 12 værelser
+                  fem badeværelser. Alle værelser ligger tæt på et af disse. På
+                  den måde bevarer værelserne deres størrelse og personlighed.
+                </p>
+              </>
+            )}
+          </div>
+          <div className="mt-12">
+            <Link
+              href="/book-ophold"
+              className="group inline-flex items-center gap-2 px-8 py-3 text-sm tracking-widest uppercase font-medium text-stone-900 border border-stone-300 rounded hover:bg-stone-900 hover:text-white transition-all duration-300"
+            >
+              <span>Book Ophold</span>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          <div className="flex flex-col gap-8 text-base md:text-lg text-gray-800 font-light leading-relaxed max-w-3xl">
-            <p className="font-serif italic selection:bg-gray-200">
-              I hjertet af Frederiksberg Allégade, ligger vores lille hotel i et
-              stemningsfuldt hus fra 1780'erne. Her mærker man historiens
-              vingesus i de skæve gulve, de fine detaljer og den særlige ro, som
-              kun tiden kan skabe. Atmosfæren er varm og hjemlig fra det
-              øjeblik, du træder indenfor.
-            </p>
+      {/* Room Catalog Section */}
+      <section className="w-full bg-white py-24 px-6 border-t border-stone-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-6 tracking-tight">
+              {page?.catalogHeading ?? "Se Vores Katalog!"}
+            </h2>
+            {page?.catalogDescription && (
+              <p className="text-stone-500 font-light max-w-xl mx-auto">
+                {page.catalogDescription}
+              </p>
+            )}
+          </div>
 
-            <p className="selection:bg-gray-200">
-              Vores værelser forener klassisk charme og danner basen, uanset om
-              du er på romantisk shoppingtur i København, på weekendtur,
-              forretningsrejse eller blot trænger til en pause fra hverdagen.
-              Som i den gamle tidsånd deler husets 12 værelser fem badeværelser.
-              Alle værelser ligger tæt på et af disse. På den måde bevarer
-              værelserne deres størrelse og personlighed.
-            </p>
-
-            <p className="selection:bg-gray-200">
-              Gæster har adgang til et tekøkken, hvor der kan brygges en kop
-              kaffe eller te. I stueetagen finder du vores hyggelige restaurant
-              – faktisk den første på Frederiksberg, hvor historien...
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {page?.galleryImages?.length > 0
+              ? page.galleryImages.map(
+                  (img: { _key: string; asset: SanityImageSource; alt?: string }) => (
+                    <div
+                      key={img._key}
+                      className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"
+                    >
+                      <Image
+                        src={urlFor(img.asset)?.width(800).height(600).url()!}
+                        alt={img.alt ?? "Værelse billede"}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  )
+                )
+              : [1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-stone-100 cursor-pointer"
+                  >
+                    <Image
+                      src={`https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop&sig=${i}`}
+                      alt={`Værelse preview ${i}`}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </div>
+                ))}
           </div>
         </div>
       </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -34,7 +35,9 @@ export default function Header() {
             onClick={() => setDrawerOpen(true)}
             className="text-white hover:opacity-80 focus:outline-none transition-opacity drop-shadow-md"
             aria-label="Åbn menu"
-          ></button>
+          >
+            <Menu />
+          </button>
         </div>
       </header>
 
@@ -48,21 +51,21 @@ export default function Header() {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 z-50 h-full w-full max-w-sm flex flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
           drawerOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between px-6 h-20 border-b border-gray-100">
+        <div className="flex items-center justify-between px-8 h-24">
           <span className="font-serif text-xl font-medium tracking-tight text-gray-900">
             Allégade<span className="font-light italic ml-1">10</span>
           </span>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="text-gray-500 hover:text-gray-900 focus:outline-none transition-colors"
+            className="p-2 -mr-2 text-gray-400 hover:text-gray-900 hover:bg-gray-50 rounded-full focus:outline-none transition-all duration-300"
             aria-label="Luk menu"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -70,27 +73,32 @@ export default function Header() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={1.5}
+                strokeWidth={2}
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
         </div>
 
-        <nav className="flex flex-col px-6 py-8 gap-1">
+        <nav className="flex flex-col px-4 py-2 gap-1 overflow-y-auto">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
               onClick={() => setDrawerOpen(false)}
-              className="text-lg font-medium text-gray-700 hover:text-gray-900 py-3 border-b border-gray-50 transition-colors"
+              className="group relative flex items-center justify-between px-4 py-3.5 rounded-2xl hover:bg-gray-50 text-base font-medium text-gray-600 hover:text-gray-900 transition-all duration-300"
             >
-              {link.name}
+              <span>{link.name}</span>
+              <svg 
+                className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-gray-300" 
+                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           ))}
         </nav>
 
-        <div className="px-6 flex flex-col gap-3 mt-4">
+        <div className="px-8 flex flex-col gap-3 mt-auto pb-10 pt-6">
           <Link
             href="/book-bord"
             onClick={() => setDrawerOpen(false)}
