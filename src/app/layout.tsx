@@ -29,9 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <Header />
-        <div className="pt-20">
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );

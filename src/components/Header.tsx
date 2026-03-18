@@ -1,65 +1,112 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+
+const navLinks = [
+  { name: "Forside", href: "/" },
+  { name: "Hotel", href: "/hotel" },
+  { name: "Menukort", href: "/menukort" },
+  { name: "Selskaber", href: "/selskaber" },
+  { name: "Events", href: "/events" },
+  { name: "Om os", href: "/om-os" },
+  { name: "Kontakt", href: "/kontakt" },
+];
 
 export default function Header() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/75 backdrop-blur-lg border-b border-white/20 shadow-sm transition-all duration-300">
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Left: Logo */}
-        <div className="shrink-0">
-          <Link href="/" className="group flex items-center gap-2">
-            {/* Minimalist text logo. Can be replaced with actual SVG */}
-            <span className="font-serif text-2xl font-medium tracking-tight text-gray-900 group-hover:opacity-80 transition-opacity">
-              Allégade<span className="font-light italic ml-1">10</span>
-            </span>
-          </Link>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          {/* Logo */}
+          <div className="shrink-0">
+            <Link href="/" className="group flex items-center gap-2">
+              <span className="font-serif text-2xl font-medium tracking-tight text-white drop-shadow-md group-hover:opacity-80 transition-opacity">
+                Allégade<span className="font-light italic ml-1">10</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Menu button */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="text-white hover:opacity-80 focus:outline-none transition-opacity drop-shadow-md"
+            aria-label="Åbn menu"
+          ></button>
+        </div>
+      </header>
+
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setDrawerOpen(false)}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          drawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between px-6 h-20 border-b border-gray-100">
+          <span className="font-serif text-xl font-medium tracking-tight text-gray-900">
+            Allégade<span className="font-light italic ml-1">10</span>
+          </span>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="text-gray-500 hover:text-gray-900 focus:outline-none transition-colors"
+            aria-label="Luk menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
 
-        {/* Center: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          {[
-            { name: "Forside", href: "/" },
-            { name: "Hotel", href: "/hotel" },
-            { name: "Menukort", href: "/menukort" },
-            { name: "Selskaber", href: "/selskaber" },
-            { name: "Events", href: "/events" },
-            { name: "Om os", href: "/om-os" },
-            { name: "Kontakt", href: "/kontakt" },
-          ].map((link) => (
+        <nav className="flex flex-col px-6 py-8 gap-1">
+          {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-px after:bg-gray-900 hover:after:w-full after:transition-all after:duration-300"
+              onClick={() => setDrawerOpen(false)}
+              className="text-lg font-medium text-gray-700 hover:text-gray-900 py-3 border-b border-gray-50 transition-colors"
             >
               {link.name}
             </Link>
           ))}
         </nav>
 
-        {/* Right: CTAs */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="px-6 flex flex-col gap-3 mt-4">
           <Link
             href="/book-bord"
-            className="px-5 py-2.5 text-sm font-medium text-gray-900 bg-transparent border border-gray-300 rounded-full hover:border-gray-900 hover:bg-gray-50 transition-all duration-300"
+            onClick={() => setDrawerOpen(false)}
+            className="px-5 py-3 text-center text-sm font-medium text-gray-900 border border-gray-300 rounded-full hover:border-gray-900 transition-all duration-300"
           >
             Book bord
           </Link>
           <Link
             href="/book-ophold"
-            className="px-5 py-2.5 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-full hover:bg-black hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            onClick={() => setDrawerOpen(false)}
+            className="px-5 py-3 text-center text-sm font-medium text-white bg-gray-900 rounded-full hover:bg-black transition-all duration-300"
           >
             Book Ophold
           </Link>
         </div>
-
-        {/* Mobile menu button (placeholder for further dev) */}
-        <div className="md:hidden flex items-center">
-          <button className="text-gray-900 hover:text-gray-600 focus:outline-none">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
       </div>
-    </header>
+    </>
   );
 }
