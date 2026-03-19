@@ -1,6 +1,6 @@
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import type { SanityImageSource } from "@sanity/image-url";
 import { PortableText } from "next-sanity";
 import { client } from "@/sanity/client";
 import { sanityFetch } from "@/sanity/lib/live";

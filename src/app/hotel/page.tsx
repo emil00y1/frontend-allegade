@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import imageUrlBuilder from "@sanity/image-url";
-import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+import type { SanityImageSource } from "@sanity/image-url";
 import { PortableText } from "next-sanity";
 import { client } from "@/sanity/client";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -127,7 +127,11 @@ export default async function HotelPage() {
             {page?.galleryImages?.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {page.galleryImages.map(
-                  (img: { _key: string; asset: SanityImageSource; alt?: string }) => (
+                  (img: {
+                    _key: string;
+                    asset: SanityImageSource;
+                    alt?: string;
+                  }) => (
                     <div
                       key={img._key}
                       className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"
@@ -139,7 +143,7 @@ export default async function HotelPage() {
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     </div>
-                  )
+                  ),
                 )}
               </div>
             )}
