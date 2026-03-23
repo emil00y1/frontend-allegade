@@ -93,8 +93,9 @@ export default async function MenukortPage() {
   const description =
     menuPage?.headerDescription ??
     "Fra klassisk dansk smørrebrød til aftenmenu med sæsonens bedste råvarer — her finder du alle vores menukort.";
+  const defaultBookingUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
   const bookTableLabel = menuPage?.bookTableLabel ?? "Book bord";
-  const bookTableUrl = siteSettings?.ctaBookTableUrl ?? menuPage?.bookTableUrl ?? "/book-bord";
+  const bookTableUrl = menuPage?.bookTableUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl;
   const servingTimes = menuPage?.headerServingTimes ?? [
     { label: "Brunch", time: "Lør–Søn 10–13" },
     { label: "Frokost", time: "Man–Fre 11:30–16 / Lør–Søn 13–16" },
@@ -108,7 +109,7 @@ export default async function MenukortPage() {
     : null;
 
   return (
-    <main className="bg-warm-white min-h-screen">
+    <main className="bg-warm-white min-h-[calc(100vh-80px)]">
       {/* ── Compact Page Header ─────────────────────────────────────── */}
       <section className="grid lg:grid-cols-[3fr_2fr] min-h-[30vh] bg-warm-white border-b border-border-warm/30">
         {/* Left: text */}
@@ -178,6 +179,40 @@ export default async function MenukortPage() {
         menus={menus}
         bookTableUrl={bookTableUrl}
       />
+
+      {/* ── Bottom CTA Section ──────────────────────────────────────── */}
+      {(menuPage?.ctaHeading || menuPage?.ctaButtonLabel) && (
+        <section className="bg-dark-stone px-10 lg:px-16 min-h-[calc(100vh-80px)] flex items-center border-t-4 border-brand py-0">
+          <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8 w-full">
+            <h2 className="text-[clamp(2rem,5vw,3.5rem)] text-white font-newsreader font-extralight leading-tight">
+              {menuPage.ctaHeading ?? "Har du fundet noget?"}
+            </h2>
+            
+            <div className="flex flex-col items-center gap-6">
+              <Link
+                href={menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl}
+                target={(menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl).startsWith("http") ? "_blank" : undefined}
+                rel={(menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl).startsWith("http") ? "noopener noreferrer" : undefined}
+                className="px-12 py-5 text-[12px] tracking-[2.4px] uppercase font-bold text-white bg-brand hover:brightness-110 transition-all duration-300"
+              >
+                {menuPage.ctaButtonLabel ?? "Book bord"}
+              </Link>
+              
+              {menuPage.ctaPhone && (
+                <p className="text-white/60 font-light tracking-[1px] uppercase text-[11px]">
+                  {menuPage.ctaPhone}
+                </p>
+              )}
+            </div>
+
+            {menuPage.allergenNote && (
+              <p className="text-white/40 text-sm italic font-light max-w-lg mt-4">
+                {menuPage.allergenNote}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
       <Footer siteSettings={siteSettings} />

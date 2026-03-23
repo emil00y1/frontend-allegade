@@ -36,7 +36,7 @@ interface RoomCarouselProps {
 
 export default function RoomCarousel({
   rooms,
-  bookingCtaUrl = "#",
+  bookingCtaUrl = "https://allegade10.suitcasebooking.com/da",
   sectionHeading = "Udforsk",
   sectionHeadingItalic = "Værelserne",
 }: RoomCarouselProps) {
@@ -220,7 +220,7 @@ export default function RoomCarousel({
             </div>
 
             {/* Price + CTA */}
-            <div className="border-t border-border-warm/30 pt-8 flex items-center justify-between">
+            <div className="border-t border-border-warm/30 pt-8 flex flex-col gap-6">
               <div>
                 <p className="text-[10px] tracking-[1px] uppercase text-dark-stone opacity-60 mb-1">
                   {room.priceLabel ?? "Pris pr. nat"}
@@ -235,12 +235,20 @@ export default function RoomCarousel({
                   </p>
                 )}
               </div>
-              <Link
-                href={room.ctaUrl ?? bookingCtaUrl ?? "#"}
-                className="px-8 py-4 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-[#b45309] hover:bg-brand transition-colors duration-300"
-              >
-                {room.ctaLabel ?? "Reserver nu"}
-              </Link>
+              {(() => {
+                const finalUrl = room.ctaUrl ?? bookingCtaUrl ?? "https://allegade10.suitcasebooking.com/da";
+                const isExternal = finalUrl.startsWith("http");
+                return (
+                  <Link
+                    href={finalUrl}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className="px-8 py-4 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-[#b45309] hover:bg-brand transition-colors duration-300"
+                  >
+                    {room.ctaLabel ?? "Reserver nu"}
+                  </Link>
+                );
+              })()}
             </div>
           </div>
         </div>

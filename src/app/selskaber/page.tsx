@@ -34,7 +34,7 @@ export default async function SelskaberPage() {
   const email = page?.contactEmail;
 
   return (
-    <main className="min-h-screen bg-warm-white">
+    <main className="min-h-[calc(100vh-80px)] bg-warm-white">
       {/* Hero Section */}
       <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full bg-warm-gray">

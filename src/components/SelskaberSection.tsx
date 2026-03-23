@@ -19,7 +19,7 @@ export default function SelskaberSection({
   backgroundImage,
 }: SelskaberSectionProps) {
   return (
-    <section className="relative w-full h-[600px] flex items-center justify-center overflow-hidden">
+    <section className="relative w-full flex items-center justify-center overflow-hidden py-28">
       {/* Background */}
       {backgroundImage ? (
         <Image
@@ -37,15 +37,15 @@ export default function SelskaberSection({
 
       {/* Content */}
       <div className="relative z-20 text-center text-white flex flex-col items-center gap-6 px-6 max-w-3xl mx-auto">
-        <h2 className="text-[clamp(2.5rem,7vw,4.5rem)] text-white text-center leading-none font-newsreader font-extralight">
+        <h2 className="text-[clamp(2rem,5vw,3.5rem)] text-white text-center leading-none font-newsreader font-extralight">
           {heading}
         </h2>
-        <p className="text-lg font-light text-white/80 text-center max-w-xl leading-7">
+        <p className="text-base font-light text-white/80 text-center max-w-xl leading-7">
           {description}
         </p>
         <Link
           href={ctaUrl}
-          className="mt-2 bg-white text-dark-stone text-[14px] tracking-[1.4px] uppercase font-light px-12 py-5 hover:bg-warm-white transition-colors duration-300"
+          className="mt-2 bg-white text-dark-stone text-[12px] tracking-[1.4px] uppercase font-light px-10 py-4 hover:bg-warm-white transition-colors duration-300"
         >
           {ctaLabel}
         </Link>

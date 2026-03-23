@@ -23,8 +23,8 @@ export default function WelcomeSection({
   image,
 }: WelcomeSectionProps) {
   return (
-    <section className="bg-warm-white px-8 lg:px-20 py-24">
-      <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+    <section className="bg-warm-white px-8 lg:px-20 min-h-[calc(100vh-80px)] flex items-center py-0">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center w-full">
         {/* Text column */}
         <div className="lg:col-span-7 flex flex-col gap-8">
           <span className="text-brand text-2xl font-cormorant font-light italic">
@@ -61,7 +61,7 @@ export default function WelcomeSection({
           {/* Decorative offset square */}
           <div className="absolute bottom-[-24px] left-[-24px] w-24 h-24 bg-[rgba(144,63,0,0.1)] z-0 pointer-events-none" />
 
-          <div className="relative z-10 bg-warm-gray overflow-hidden aspect-[5/7]">
+          <div className="relative z-10 bg-warm-gray overflow-hidden aspect-[4/5]">
             {image ? (
               <Image
                 src={urlFor(image).width(800).url()}

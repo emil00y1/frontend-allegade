@@ -177,7 +177,7 @@ export default async function HotelPage() {
     ? urlFor(page.heroImage).width(1400).height(1800).auto("format").url()
     : null;
 
-  const primaryCtaUrl = page?.heroPrimaryCtaUrl ?? page?.bookingCtaUrl ?? "#";
+  const primaryCtaUrl = page?.heroPrimaryCtaUrl ?? page?.bookingCtaUrl ?? "https://allegade10.suitcasebooking.com/da";
   const primaryCtaLabel = page?.heroPrimaryCtaLabel ?? "Book ophold";
   const secondaryCtaUrl = page?.heroSecondaryCtaUrl ?? "#vaerelser";
   const secondaryCtaLabel = page?.heroSecondaryCtaLabel ?? "Se værelser";
@@ -185,9 +185,9 @@ export default async function HotelPage() {
   return (
     <main>
       {/* ── Section 1: Hero (Split Asymmetric) ─────────────────────────── */}
-      <section className="relative grid lg:grid-cols-[5fr_7fr] min-h-screen bg-warm-white">
+      <section className="relative grid lg:grid-cols-[5fr_7fr] min-h-[calc(100vh-80px)] bg-warm-white py-0">
         {/* Left: Content */}
-        <div className="flex flex-col justify-center px-10 lg:px-16 pt-32 pb-16 lg:py-40">
+        <div className="flex flex-col justify-center px-10 lg:px-16 w-full">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 mb-8 text-[10px] tracking-[1px] uppercase text-warm-brown/60">
             <Link href="/" className="hover:text-brand transition-colors">
@@ -248,6 +248,8 @@ export default async function HotelPage() {
           <div className="flex flex-wrap gap-4">
             <Link
               href={primaryCtaUrl}
+              target={primaryCtaUrl?.startsWith("http") ? "_blank" : undefined}
+              rel={primaryCtaUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
               className="px-10 py-[18px] text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-brand hover:brightness-105 transition-all duration-300"
             >
               {primaryCtaLabel}
@@ -262,7 +264,7 @@ export default async function HotelPage() {
         </div>
 
         {/* Right: Image */}
-        <div className="relative hidden lg:block min-h-screen overflow-hidden">
+        <div className="relative hidden lg:block min-h-[calc(100vh-80px)] overflow-hidden">
           {heroImageUrl ? (
             <Image
               src={heroImageUrl}
@@ -292,41 +294,6 @@ export default async function HotelPage() {
               )}
             </div>
           )}
-        </div>
-      </section>
-
-      {/* ── Section 2: Booking Strip ────────────────────────────────────── */}
-      <section
-        id="book"
-        className="bg-[#e5e2e1] border-t-4 border-brand px-10 lg:px-16 py-10"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] tracking-[1px] uppercase text-dark-stone">
-                Check-ind
-              </label>
-              <input
-                type="date"
-                className="border border-border-warm bg-transparent px-3 py-2.5 text-dark-stone text-sm focus:outline-none focus:border-brand transition-colors w-full"
-              />
-            </div>
-            <div className="flex flex-col gap-3">
-              <label className="text-[10px] tracking-[1px] uppercase text-dark-stone">
-                Check-ud
-              </label>
-              <input
-                type="date"
-                className="border border-border-warm bg-transparent px-3 py-2.5 text-dark-stone text-sm focus:outline-none focus:border-brand transition-colors w-full"
-              />
-            </div>
-            <Link
-              href={page?.bookingCtaUrl ?? "#"}
-              className="px-10 py-3 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-brand hover:bg-brand-dark transition-colors duration-300 text-center whitespace-nowrap"
-            >
-              {page?.bookingCtaLabel ?? "Søg ledige værelser"}
-            </Link>
-          </div>
         </div>
       </section>
 

@@ -6,7 +6,6 @@ interface HeroProps {
   tagline?: string;
   heading?: string;
   headingItalic?: string;
-  description?: string;
   ctaPrimaryLabel?: string;
   ctaPrimaryUrl?: string;
   ctaSecondaryLabel?: string;
@@ -21,9 +20,8 @@ export default function Hero({
   tagline = "Kulturel perle i Frederiksbergs centrum",
   heading = "Velkommen til",
   headingItalic = "Allégade 10",
-  description = "Hvor historiens vingesus møder nutidens gastronomi i hjertet af det gamle Frederiksberg.",
   ctaPrimaryLabel = "Find dit bord",
-  ctaPrimaryUrl = "/book-bord",
+  ctaPrimaryUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
   ctaSecondaryLabel = "Se vores værelser",
   ctaSecondaryUrl = "/hotel",
   sideText = "Siden 1780 — Frederiksberg",
@@ -39,7 +37,11 @@ export default function Hero({
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        poster={backgroundImage ? urlFor(backgroundImage).width(1600).url() : undefined}
+        poster={
+          backgroundImage
+            ? urlFor(backgroundImage).width(1600).url()
+            : undefined
+        }
       >
         <source src={backgroundVideoUrl} type="video/mp4" />
       </video>
@@ -66,14 +68,14 @@ export default function Hero({
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto flex flex-col items-center mt-20">
+      <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto flex flex-col items-center my-16">
         {/* Tagline */}
         <span className="text-brand-light text-[12px] tracking-[3.6px] uppercase font-light mb-8 block">
           {tagline}
         </span>
 
         {/* Heading */}
-        <h1 className="mb-8 text-center leading-none [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
+        <h1 className="mb-16 text-center leading-none [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
           <span className="block text-[clamp(3rem,8vw,6rem)] text-white font-newsreader font-extralight">
             {heading}
           </span>
@@ -82,25 +84,28 @@ export default function Hero({
           </span>
         </h1>
 
-        {/* Description */}
-        <p className="text-lg font-light text-white/80 text-center mb-12 max-w-xl tracking-[0.45px] leading-7 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
-          {description}
-        </p>
-
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href={ctaPrimaryUrl}
-            target={ctaPrimaryUrl.startsWith("http") ? "_blank" : undefined}
-            rel={ctaPrimaryUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+            target={ctaPrimaryUrl?.startsWith("http") ? "_blank" : undefined}
+            rel={
+              ctaPrimaryUrl?.startsWith("http")
+                ? "noopener noreferrer"
+                : undefined
+            }
             className="px-10 py-4 text-[14px] tracking-[1.4px] uppercase font-light text-white bg-brand hover:brightness-110 transition-all duration-300"
           >
             {ctaPrimaryLabel}
           </Link>
           <Link
             href={ctaSecondaryUrl}
-            target={ctaSecondaryUrl.startsWith("http") ? "_blank" : undefined}
-            rel={ctaSecondaryUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+            target={ctaSecondaryUrl?.startsWith("http") ? "_blank" : undefined}
+            rel={
+              ctaSecondaryUrl?.startsWith("http")
+                ? "noopener noreferrer"
+                : undefined
+            }
             className="px-10 py-4 text-[14px] tracking-[1.4px] uppercase font-light text-white border border-white/40 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
           >
             {ctaSecondaryLabel}
@@ -128,3 +133,4 @@ export default function Hero({
     </section>
   );
 }
+

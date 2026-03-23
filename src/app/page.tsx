@@ -1,4 +1,4 @@
-import { type SanityDocument, createDataAttribute } from "next-sanity";
+import { createDataAttribute } from "next-sanity";
 import { draftMode } from "next/headers";
 import Hero from "@/components/Hero";
 import WelcomeSection from "@/components/WelcomeSection";
@@ -11,7 +11,7 @@ const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
   _id,
   _type,
   hero{
-    tagline, heading, headingItalic, description,
+    tagline, heading, headingItalic,
     ctaPrimaryLabel, ctaPrimaryUrl,
     ctaSecondaryLabel, ctaSecondaryUrl,
     sideText,
@@ -23,7 +23,7 @@ const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
     image{ ..., asset-> }
   },
   eventsSection{
-    eyebrow, heading, allEventsLabel, allEventsUrl, eventCtaLabel
+    eyebrow, heading, description, allEventsLabel, allEventsUrl, eventCtaLabel
   },
   selskaberTeaser{
     heading, description, ctaLabel, ctaUrl,
@@ -32,22 +32,24 @@ const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
 }`;
 
 const EVENTS_QUERY = `*[_type == "event" && defined(slug.current)]
-  | order(startDate asc)[0...3]{
+  | order(startDate asc)[0...4]{
     _id, title, slug, startDate, category,
     image{ ..., asset-> }
   }`;
-
 const SITE_SETTINGS_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   address, phone, email, footerDescription, socialLinks,
-  restaurantHours, kitchenHours
+  restaurantHours, kitchenHours, ctaBookTableUrl
 }`;
 
 export default async function IndexPage() {
   const [{ data: homepage }, { data: events }, { data: siteSettings }] =
     await Promise.all([
-      sanityFetch<SanityDocument>({ query: HOMEPAGE_QUERY }),
-      sanityFetch<SanityDocument[]>({ query: EVENTS_QUERY }),
-      sanityFetch<SanityDocument>({ query: SITE_SETTINGS_QUERY }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sanityFetch<any>({ query: HOMEPAGE_QUERY }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sanityFetch<any>({ query: EVENTS_QUERY }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sanityFetch<any>({ query: SITE_SETTINGS_QUERY }),
     ]);
 
   const { isEnabled: isDraft } = await draftMode();
@@ -57,13 +59,17 @@ export default async function IndexPage() {
   const eventsSection = homepage?.eventsSection;
   const selskaber = homepage?.selskaberTeaser;
 
+  const globalBookTableUrl =
+    siteSettings?.ctaBookTableUrl ||
+    "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+
   // Creates a data-sanity attribute for visual editing overlays (draft mode only)
   function attr(path: string) {
     if (!isDraft || !homepage?._id) return {};
     return {
       "data-sanity": createDataAttribute({
-        id: homepage._id,
-        type: homepage._type ?? "homepage",
+        id: homepage._id as string,
+        type: (homepage._type ?? "homepage") as string,
         path,
       })(),
     };
@@ -76,9 +82,8 @@ export default async function IndexPage() {
           tagline={hero?.tagline}
           heading={hero?.heading}
           headingItalic={hero?.headingItalic}
-          description={hero?.description}
           ctaPrimaryLabel={hero?.ctaPrimaryLabel}
-          ctaPrimaryUrl={hero?.ctaPrimaryUrl}
+          ctaPrimaryUrl={hero?.ctaPrimaryUrl || globalBookTableUrl}
           ctaSecondaryLabel={hero?.ctaSecondaryLabel}
           ctaSecondaryUrl={hero?.ctaSecondaryUrl}
           sideText={hero?.sideText}
@@ -104,6 +109,7 @@ export default async function IndexPage() {
           events={events || []}
           eyebrow={eventsSection?.eyebrow}
           heading={eventsSection?.heading}
+          description={eventsSection?.description}
           allEventsLabel={eventsSection?.allEventsLabel}
           allEventsUrl={eventsSection?.allEventsUrl}
           eventCtaLabel={eventsSection?.eventCtaLabel}
@@ -124,3 +130,4 @@ export default async function IndexPage() {
     </main>
   );
 }
+

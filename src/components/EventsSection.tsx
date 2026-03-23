@@ -17,6 +17,7 @@ interface EventsSectionProps {
   events: Event[];
   eyebrow?: string;
   heading?: string;
+  description?: string;
   allEventsLabel?: string;
   allEventsUrl?: string;
   eventCtaLabel?: string;
@@ -34,6 +35,7 @@ export default function EventsSection({
   events = [],
   eyebrow = "Oplevelser",
   heading = "Events på Allégade 10",
+  description,
   allEventsLabel = "Se alle events",
   allEventsUrl = "/events",
   eventCtaLabel = "Bestil billet",
@@ -41,17 +43,22 @@ export default function EventsSection({
   if (events.length === 0) return null;
 
   return (
-    <section className="bg-warm-gray px-8 lg:px-20 py-24">
-      <div className="max-w-[1280px] mx-auto flex flex-col gap-16">
+    <section className="bg-warm-gray px-8 lg:px-20 min-h-[calc(100vh-80px)] flex items-center py-0">
+      <div className="max-w-[1280px] mx-auto flex flex-col gap-6 lg:gap-12 w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             <span className="text-warm-brown text-[12px] tracking-[1.2px] uppercase font-light">
               {eyebrow}
             </span>
             <h2 className="text-dark-stone text-5xl font-newsreader font-extralight">
               {heading}
             </h2>
+            {description && (
+              <p className="text-warm-brown text-sm font-light max-w-md leading-relaxed">
+                {description}
+              </p>
+            )}
           </div>
           <Link
             href={allEventsUrl}
@@ -62,14 +69,14 @@ export default function EventsSection({
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
           {events.map((event) => (
             <div key={event._id} className="bg-warm-white flex flex-col">
               {/* Image */}
-              <div className="relative h-[264px] overflow-hidden bg-warm-gray">
+              <div className="relative h-[180px] overflow-hidden bg-warm-gray">
                 {event.image ? (
                   <Image
-                    src={urlFor(event.image).width(600).height(400).url()}
+                    src={urlFor(event.image).width(600).height(360).url()}
                     alt={event.image.alt || event.title}
                     fill
                     className="object-cover transition-transform duration-500 hover:scale-105"
@@ -80,24 +87,27 @@ export default function EventsSection({
               </div>
 
               {/* Content */}
-              <div className="flex flex-col gap-4 p-8 flex-1">
+              <div className="flex flex-col gap-3 p-5 flex-1">
                 {event.category && (
                   <span className="text-brand text-[10px] tracking-[1px] uppercase font-light">
                     {event.category}
                   </span>
                 )}
-                <h3 className="text-dark-stone text-2xl font-newsreader font-extralight">
+                <h3 className="text-dark-stone text-lg font-newsreader font-extralight leading-snug">
                   {event.title}
                 </h3>
                 <div className="flex items-center gap-2 py-2 border-b border-border-warm">
-                  <CalendarDays className="w-4 h-4 text-warm-brown shrink-0" strokeWidth={1.5} />
-                  <span className="text-warm-brown text-sm font-light">
+                  <CalendarDays
+                    className="w-3.5 h-3.5 text-warm-brown shrink-0"
+                    strokeWidth={1.5}
+                  />
+                  <span className="text-warm-brown text-xs font-light">
                     {formatDate(event.startDate)}
                   </span>
                 </div>
                 <Link
                   href={`/events/${event.slug.current}`}
-                  className="mt-auto border border-border-warm text-dark-stone text-[10px] tracking-[1px] uppercase font-light text-center py-4 hover:border-brand hover:text-brand transition-colors duration-300"
+                  className="mt-auto border border-border-warm text-dark-stone text-[10px] tracking-[1px] uppercase font-light text-center py-3 hover:border-brand hover:text-brand transition-colors duration-300"
                 >
                   {eventCtaLabel}
                 </Link>

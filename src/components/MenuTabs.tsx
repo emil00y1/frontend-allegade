@@ -306,7 +306,7 @@ function BrunchTab({ menu, bookTableUrl, onSwitchToDrinks }: { menu: MenuCard; b
               )}
             </div>
             <Link
-              href={menu.ctaUrl ?? bookTableUrl ?? "/book-bord"}
+              href={menu.ctaUrl ?? bookTableUrl ?? "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10"}
               className="px-8 py-4 text-[11px] tracking-[2px] uppercase font-light text-white bg-brand hover:opacity-90 transition-opacity"
             >
               {menu.ctaLabel ?? "Book brunch"}
@@ -420,7 +420,7 @@ function BeveragesTab({ menu }: { menu: MenuCard }) {
 export default function MenuTabs({
   tabs,
   menus,
-  bookTableUrl = "/book-bord",
+  bookTableUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
 }: MenuTabsProps) {
   const [activeTab, setActiveTab] = useState<string>(tabs[0]?.menuType ?? "lunch");
 

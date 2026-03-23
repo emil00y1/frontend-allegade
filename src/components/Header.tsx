@@ -35,9 +35,9 @@ const DEFAULT_NAV_LINKS: NavLink[] = [
 export default function Header({
   navLinks,
   ctaBookTableLabel = "Book bord",
-  ctaBookTableUrl = "/book-bord",
+  ctaBookTableUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
   ctaBookStayLabel = "Book ophold",
-  ctaBookStayUrl = "/book-ophold",
+  ctaBookStayUrl = "https://allegade10.suitcasebooking.com/da",
 }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -45,8 +45,8 @@ export default function Header({
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const resolvedNavLinks = navLinks && navLinks.length > 0 ? navLinks : DEFAULT_NAV_LINKS;
-  const resolvedTableUrl = ctaBookTableUrl ?? "/book-bord";
-  const resolvedStayUrl = ctaBookStayUrl ?? "/book-ophold";
+  const resolvedTableUrl = ctaBookTableUrl ?? "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+  const resolvedStayUrl = ctaBookStayUrl ?? "https://allegade10.suitcasebooking.com/da";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
