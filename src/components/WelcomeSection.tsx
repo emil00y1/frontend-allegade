@@ -27,21 +27,11 @@ export default function WelcomeSection({
       <div className="max-w-[1280px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
         {/* Text column */}
         <div className="lg:col-span-7 flex flex-col gap-8">
-          <span
-            className="text-brand text-2xl"
-            style={{
-              fontFamily: "var(--font-cormorant)",
-              fontStyle: "italic",
-              fontWeight: 300,
-            }}
-          >
+          <span className="text-brand text-2xl font-cormorant font-light italic">
             {eyebrow}
           </span>
 
-          <h2
-            className="text-dark-stone text-5xl leading-tight"
-            style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
-          >
+          <h2 className="text-dark-stone text-5xl leading-tight font-newsreader font-extralight">
             {heading}
           </h2>
 

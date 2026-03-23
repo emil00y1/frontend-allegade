@@ -7,6 +7,7 @@ import { DisableDraftMode } from "@/components/DisableDraftMode";
 import { SanityLive } from "@/sanity/lib/live";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { cn } from "@/lib/utils";
+import { sanityFetch } from "@/sanity/lib/live";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,17 +40,33 @@ export const metadata: Metadata = {
   description: "Hotel, restaurant og selskabslokaler på Frederiksberg",
 };
 
+const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
+  navigation[]{ name, href },
+  ctaBookTableLabel,
+  ctaBookTableUrl,
+  ctaBookStayLabel,
+  ctaBookStayUrl
+}`;
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { data: navSettings } = await sanityFetch({ query: NAV_QUERY });
+
   return (
     <html lang="da" className={cn("font-sans", inter.variable, newsreader.variable, cormorantGaramond.variable)}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
-        <Header />
+        <Header
+          navLinks={navSettings?.navigation}
+          ctaBookTableLabel={navSettings?.ctaBookTableLabel}
+          ctaBookTableUrl={navSettings?.ctaBookTableUrl}
+          ctaBookStayLabel={navSettings?.ctaBookStayLabel}
+          ctaBookStayUrl={navSettings?.ctaBookStayUrl}
+        />
         {children}
         <SanityLive />
         {(await draftMode()).isEnabled && (

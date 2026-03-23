@@ -56,20 +56,11 @@ export default function Hero({
       )}
 
       {/* Gradient overlay */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%)",
-        }}
-      />
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.65)_100%)]" />
 
       {/* Vertical side text */}
       <div className="absolute left-8 top-1/2 -translate-y-1/2 z-10 hidden md:block">
-        <span
-          className="text-white/30 text-[10px] tracking-[5px] uppercase font-light block"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
+        <span className="text-white/30 text-[10px] tracking-[5px] uppercase font-light block [writing-mode:vertical-rl] rotate-180">
           {sideText}
         </span>
       </div>
@@ -82,27 +73,17 @@ export default function Hero({
         </span>
 
         {/* Heading */}
-        <h1 className="mb-8 text-center leading-none">
-          <span
-            className="block text-[clamp(3rem,8vw,6rem)] text-white"
-            style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
-          >
+        <h1 className="mb-8 text-center leading-none [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
+          <span className="block text-[clamp(3rem,8vw,6rem)] text-white font-newsreader font-extralight">
             {heading}
           </span>
-          <span
-            className="block text-[clamp(3rem,8vw,6rem)] text-white/90"
-            style={{
-              fontFamily: "var(--font-cormorant)",
-              fontWeight: 300,
-              fontStyle: "italic",
-            }}
-          >
+          <span className="block text-[clamp(3rem,8vw,6rem)] text-white/90 font-cormorant font-light italic">
             {headingItalic}
           </span>
         </h1>
 
         {/* Description */}
-        <p className="text-lg font-light text-white/75 text-center mb-12 max-w-xl tracking-[0.45px] leading-7">
+        <p className="text-lg font-light text-white/80 text-center mb-12 max-w-xl tracking-[0.45px] leading-7 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
           {description}
         </p>
 
@@ -110,12 +91,16 @@ export default function Hero({
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href={ctaPrimaryUrl}
-            className="px-10 py-4 text-[14px] tracking-[1.4px] uppercase font-light text-[#331200] bg-brand-light hover:brightness-105 transition-all duration-300"
+            target={ctaPrimaryUrl.startsWith("http") ? "_blank" : undefined}
+            rel={ctaPrimaryUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+            className="px-10 py-4 text-[14px] tracking-[1.4px] uppercase font-light text-white bg-brand hover:brightness-110 transition-all duration-300"
           >
             {ctaPrimaryLabel}
           </Link>
           <Link
             href={ctaSecondaryUrl}
+            target={ctaSecondaryUrl.startsWith("http") ? "_blank" : undefined}
+            rel={ctaSecondaryUrl.startsWith("http") ? "noopener noreferrer" : undefined}
             className="px-10 py-4 text-[14px] tracking-[1.4px] uppercase font-light text-white border border-white/40 backdrop-blur-sm hover:bg-white/10 transition-all duration-300"
           >
             {ctaSecondaryLabel}
@@ -124,11 +109,21 @@ export default function Hero({
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-4">
-        <span className="text-white/60 text-[10px] tracking-[1px] uppercase font-light">
-          Scroll
-        </span>
-        <div className="w-px h-16 bg-gradient-to-b from-white/60 to-transparent" />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-white/50"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
       </div>
     </section>
   );

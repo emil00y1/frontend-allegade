@@ -15,6 +15,11 @@ interface Event {
 
 interface EventsSectionProps {
   events: Event[];
+  eyebrow?: string;
+  heading?: string;
+  allEventsLabel?: string;
+  allEventsUrl?: string;
+  eventCtaLabel?: string;
 }
 
 function formatDate(dateString: string) {
@@ -25,7 +30,14 @@ function formatDate(dateString: string) {
   });
 }
 
-export default function EventsSection({ events = [] }: EventsSectionProps) {
+export default function EventsSection({
+  events = [],
+  eyebrow = "Oplevelser",
+  heading = "Events på Allégade 10",
+  allEventsLabel = "Se alle events",
+  allEventsUrl = "/events",
+  eventCtaLabel = "Bestil billet",
+}: EventsSectionProps) {
   if (events.length === 0) return null;
 
   return (
@@ -35,20 +47,17 @@ export default function EventsSection({ events = [] }: EventsSectionProps) {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex flex-col gap-4">
             <span className="text-warm-brown text-[12px] tracking-[1.2px] uppercase font-light">
-              Oplevelser
+              {eyebrow}
             </span>
-            <h2
-              className="text-dark-stone text-5xl"
-              style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
-            >
-              Events på Allégade 10
+            <h2 className="text-dark-stone text-5xl font-newsreader font-extralight">
+              {heading}
             </h2>
           </div>
           <Link
-            href="/events"
+            href={allEventsUrl}
             className="border-b border-[rgba(144,63,0,0.3)] pb-1 text-brand text-[12px] tracking-[1.2px] uppercase font-light hover:opacity-60 transition-opacity shrink-0 self-start sm:self-auto"
           >
-            Se alle events
+            {allEventsLabel}
           </Link>
         </div>
 
@@ -77,13 +86,7 @@ export default function EventsSection({ events = [] }: EventsSectionProps) {
                     {event.category}
                   </span>
                 )}
-                <h3
-                  className="text-dark-stone text-2xl"
-                  style={{
-                    fontFamily: "var(--font-newsreader)",
-                    fontWeight: 200,
-                  }}
-                >
+                <h3 className="text-dark-stone text-2xl font-newsreader font-extralight">
                   {event.title}
                 </h3>
                 <div className="flex items-center gap-2 py-2 border-b border-border-warm">
@@ -96,7 +99,7 @@ export default function EventsSection({ events = [] }: EventsSectionProps) {
                   href={`/events/${event.slug.current}`}
                   className="mt-auto border border-border-warm text-dark-stone text-[10px] tracking-[1px] uppercase font-light text-center py-4 hover:border-brand hover:text-brand transition-colors duration-300"
                 >
-                  Bestil billet
+                  {eventCtaLabel}
                 </Link>
               </div>
             </div>

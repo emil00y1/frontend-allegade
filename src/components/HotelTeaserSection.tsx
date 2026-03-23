@@ -31,23 +31,13 @@ export default function HotelTeaserSection({
             {eyebrow}
           </span>
 
-          <h2
-            className="text-dark-stone text-5xl"
-            style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
-          >
+          <h2 className="text-dark-stone text-5xl font-newsreader font-extralight">
             {heading}
           </h2>
 
           {/* Quote / pricing box */}
           <div className="bg-warm-gray border-l-4 border-brand pl-9 pr-8 py-8 flex flex-col gap-3">
-            <p
-              className="text-dark-stone text-2xl"
-              style={{
-                fontFamily: "var(--font-newsreader)",
-                fontWeight: 200,
-                fontStyle: "italic",
-              }}
-            >
+            <p className="text-dark-stone text-2xl font-newsreader font-extralight italic">
               {pricingText}
             </p>
             <p className="text-warm-brown text-sm font-light leading-5">

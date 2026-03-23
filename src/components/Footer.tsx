@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Instagram, Facebook } from "lucide-react";
+import NewsletterSection from "@/components/NewsletterSection";
 
 interface HourEntry {
   days?: string;
@@ -60,6 +61,8 @@ export default function Footer({ siteSettings }: FooterProps) {
     )?.url || "#";
 
   return (
+    <>
+    <NewsletterSection />
     <footer className="bg-warm-gray border-t border-[rgba(231,229,228,0.1)]">
       <div className="max-w-[1280px] mx-auto px-12 pt-20 pb-10">
         {/* 4-col grid */}
@@ -67,23 +70,10 @@ export default function Footer({ siteSettings }: FooterProps) {
           {/* Col 1 – Brand */}
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-baseline">
-              <span
-                className="text-xl text-[#292524]"
-                style={{
-                  fontFamily: "var(--font-newsreader)",
-                  fontWeight: 200,
-                }}
-              >
+              <span className="text-xl text-[#292524] font-newsreader font-extralight">
                 Allégade
               </span>
-              <span
-                className="text-xl ml-1 text-[#292524]"
-                style={{
-                  fontFamily: "var(--font-cormorant)",
-                  fontStyle: "italic",
-                  fontWeight: 300,
-                }}
-              >
+              <span className="text-xl ml-1 text-[#292524] font-cormorant font-light italic">
                 10
               </span>
             </Link>
@@ -217,5 +207,6 @@ export default function Footer({ siteSettings }: FooterProps) {
         </div>
       </div>
     </footer>
+    </>
   );
 }

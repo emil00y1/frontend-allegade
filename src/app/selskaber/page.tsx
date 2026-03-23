@@ -34,10 +34,10 @@ export default async function SelskaberPage() {
   const email = page?.contactEmail;
 
   return (
-    <main className="min-h-screen bg-stone-50">
+    <main className="min-h-screen bg-warm-white">
       {/* Hero Section */}
       <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 w-full h-full bg-stone-300">
+        <div className="absolute inset-0 w-full h-full bg-warm-gray">
           {heroImageUrl && (
             <Image
               src={heroImageUrl}
@@ -52,7 +52,7 @@ export default async function SelskaberPage() {
 
         <div className="relative z-10 flex flex-col items-center text-center px-4 mt-16 max-w-4xl mx-auto">
           {page?.heroTitle && (
-            <h1 className="text-5xl md:text-7xl font-light text-white mb-8 tracking-tight drop-shadow-sm">
+            <h1 className="text-[clamp(3rem,8vw,6rem)] font-newsreader font-extralight text-white mb-8 leading-none drop-shadow-sm">
               {page.heroTitle}
             </h1>
           )}
@@ -61,32 +61,32 @@ export default async function SelskaberPage() {
 
       {/* Info Section */}
       {(page?.mainHeading || page?.contentDK || page?.contentUK) && (
-        <section className="w-full py-24 px-6 bg-stone-50">
+        <section className="w-full py-24 px-6 bg-warm-white">
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
             {page?.mainHeading && (
-              <h2 className="text-3xl md:text-4xl font-light text-stone-900 mb-12 tracking-tight">
+              <h2 className="text-[clamp(1.75rem,3vw,2.5rem)] font-newsreader font-extralight text-dark-stone mb-12 leading-tight">
                 {page.mainHeading}
               </h2>
             )}
 
-            <div className="flex flex-col gap-12 text-base md:text-lg text-stone-600 font-light leading-relaxed">
+            <div className="flex flex-col gap-12 text-base text-warm-brown font-light leading-relaxed">
               {/* DK Section */}
               {page?.contentDK && (
                 <div>
-                  <h3 className="text-sm font-medium tracking-widest text-stone-400 uppercase mb-4">
+                  <h3 className="text-[11px] tracking-[1.5px] text-warm-brown/60 uppercase mb-4">
                     DK
                   </h3>
-                  <div className="prose prose-stone max-w-none">
+                  <div className="prose prose-stone max-w-none text-left">
                     <PortableText value={page.contentDK} />
                   </div>
                   {(phone || email) && (
-                    <p className="mt-4">
+                    <p className="mt-4 text-warm-brown">
                       {phone && (
                         <>
                           Ring til os på{" "}
                           <a
                             href={`tel:${phone.replace(/\s/g, "")}`}
-                            className="font-medium text-stone-900 hover:text-stone-600 transition-colors"
+                            className="font-medium text-dark-stone hover:text-brand transition-colors"
                           >
                             {phone}
                           </a>
@@ -96,7 +96,7 @@ export default async function SelskaberPage() {
                       {email && (
                         <a
                           href={`mailto:${email}`}
-                          className="font-medium text-amber-700 hover:text-amber-800 transition-colors"
+                          className="font-medium text-brand hover:opacity-70 transition-opacity"
                         >
                           {email}
                         </a>
@@ -109,26 +109,26 @@ export default async function SelskaberPage() {
               )}
 
               {page?.contentDK && page?.contentUK && (
-                <div className="w-12 h-px bg-stone-200 mx-auto" />
+                <div className="w-12 h-px bg-border-warm mx-auto" />
               )}
 
               {/* UK Section */}
               {page?.contentUK && (
                 <div>
-                  <h3 className="text-sm font-medium tracking-widest text-stone-400 uppercase mb-4">
+                  <h3 className="text-[11px] tracking-[1.5px] text-warm-brown/60 uppercase mb-4">
                     UK
                   </h3>
-                  <div className="prose prose-stone max-w-none">
+                  <div className="prose prose-stone max-w-none text-left">
                     <PortableText value={page.contentUK} />
                   </div>
                   {(phone || email) && (
-                    <p className="mt-4">
+                    <p className="mt-4 text-warm-brown">
                       {phone && (
                         <>
                           You are welcome to call us at{" "}
                           <a
                             href={`tel:+45${phone.replace(/\s/g, "")}`}
-                            className="font-medium text-stone-900 hover:text-stone-600 transition-colors"
+                            className="font-medium text-dark-stone hover:text-brand transition-colors"
                           >
                             +45 {phone}
                           </a>
@@ -138,7 +138,7 @@ export default async function SelskaberPage() {
                       {email && (
                         <a
                           href={`mailto:${email}`}
-                          className="font-medium text-amber-700 hover:text-amber-800 transition-colors"
+                          className="font-medium text-brand hover:opacity-70 transition-opacity"
                         >
                           {email}
                         </a>
@@ -156,11 +156,11 @@ export default async function SelskaberPage() {
 
       {/* Venues Gallery Section */}
       {(page?.galleryHeading || page?.galleryImages?.length > 0) && (
-        <section className="w-full bg-white py-24 px-6 border-t border-stone-100">
+        <section className="w-full bg-warm-gray py-24 px-6 border-t border-border-warm/30">
           <div className="max-w-7xl mx-auto">
             {page?.galleryHeading && (
               <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-light text-stone-900 tracking-tight uppercase">
+                <h2 className="text-[clamp(2rem,4vw,3rem)] font-newsreader font-extralight text-dark-stone leading-none">
                   {page.galleryHeading}
                 </h2>
               </div>
@@ -172,7 +172,7 @@ export default async function SelskaberPage() {
                   (img: { _key: string; asset: SanityImageSource; alt?: string }) => (
                     <div
                       key={img._key}
-                      className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"
+                      className="group relative aspect-[4/3] overflow-hidden bg-warm-gray"
                     >
                       <Image
                         src={urlFor(img.asset)?.width(800).height(600).url()!}

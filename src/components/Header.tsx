@@ -2,10 +2,28 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  href: string;
+}
+
+interface HeaderProps {
+  navLinks?: NavLink[];
+  ctaBookTableLabel?: string;
+  ctaBookTableUrl?: string;
+  ctaBookStayLabel?: string;
+  ctaBookStayUrl?: string;
+}
+
+function isExternal(url: string) {
+  return url.startsWith("http://") || url.startsWith("https://");
+}
+
+const DEFAULT_NAV_LINKS: NavLink[] = [
   { name: "Restaurant", href: "/menukort" },
   { name: "Hotel", href: "/hotel" },
   { name: "Menukort", href: "/menukort" },
@@ -13,20 +31,22 @@ const navLinks = [
   { name: "Events", href: "/events" },
 ];
 
-const allDrawerLinks = [
-  { name: "Forside", href: "/" },
-  { name: "Restaurant", href: "/menukort" },
-  { name: "Hotel", href: "/hotel" },
-  { name: "Menukort", href: "/menukort" },
-  { name: "Selskaber", href: "/selskaber" },
-  { name: "Events", href: "/events" },
-  { name: "Om os", href: "/om-os" },
-  { name: "Kontakt", href: "/kontakt" },
-];
 
-export default function Header() {
+export default function Header({
+  navLinks,
+  ctaBookTableLabel = "Book bord",
+  ctaBookTableUrl = "/book-bord",
+  ctaBookStayLabel = "Book ophold",
+  ctaBookStayUrl = "/book-ophold",
+}: HeaderProps) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const resolvedNavLinks = navLinks && navLinks.length > 0 ? navLinks : DEFAULT_NAV_LINKS;
+  const resolvedTableUrl = ctaBookTableUrl ?? "/book-bord";
+  const resolvedStayUrl = ctaBookStayUrl ?? "/book-ophold";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -39,10 +59,11 @@ export default function Header() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
-          scrolled
+          "top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
+          isHome ? "fixed" : "sticky bg-warm-white border-border-warm shadow-sm",
+          isHome && (scrolled
             ? "bg-warm-white border-border-warm shadow-sm"
-            : "bg-transparent border-transparent"
+            : "bg-transparent border-transparent")
         )}
       >
         <div className="max-w-[1280px] mx-auto px-8 h-20 flex items-center justify-between">
@@ -50,23 +71,17 @@ export default function Header() {
           <Link href="/" className="flex items-baseline shrink-0">
             <span
               className={cn(
-                "text-2xl transition-colors duration-300",
-                scrolled ? "text-dark-stone" : "text-white"
+                "text-2xl font-newsreader font-extralight transition-colors duration-300",
+                !isHome || scrolled ? "text-dark-stone" : "text-white"
               )}
-              style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
             >
               Allégade
             </span>
             <span
               className={cn(
-                "text-2xl ml-1 transition-colors duration-300",
-                scrolled ? "text-dark-stone" : "text-white"
+                "text-2xl ml-1 font-cormorant font-light italic transition-colors duration-300",
+                !isHome || scrolled ? "text-dark-stone" : "text-white"
               )}
-              style={{
-                fontFamily: "var(--font-cormorant)",
-                fontWeight: 300,
-                fontStyle: "italic",
-              }}
             >
               10
             </span>
@@ -74,13 +89,13 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {resolvedNavLinks.map((link) => (
               <Link
                 key={link.name}
-                href={link.href}
+                href={link.href ?? "/"}
                 className={cn(
                   "text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
-                  scrolled ? "text-dark-stone" : "text-white/90"
+                  !isHome || scrolled ? "text-dark-stone" : "text-white/90"
                 )}
               >
                 {link.name}
@@ -91,22 +106,23 @@ export default function Header() {
           {/* Right Actions */}
           <div className="flex items-center gap-6">
             <Link
-              href="/book-bord"
+              href={resolvedTableUrl}
+              target={isExternal(resolvedTableUrl) ? "_blank" : undefined}
+              rel={isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined}
               className={cn(
                 "hidden lg:block text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
-                scrolled ? "text-dark-stone" : "text-white/90"
+                !isHome || scrolled ? "text-dark-stone" : "text-white/90"
               )}
             >
-              Book bord
+              {ctaBookTableLabel}
             </Link>
             <Link
-              href="/book-ophold"
-              className="hidden lg:flex items-center text-[11px] tracking-[1.2px] uppercase font-light text-white px-6 py-3 hover:opacity-90 transition-opacity"
-              style={{
-                background: "linear-gradient(165deg, #903f00 0%, #b45309 100%)",
-              }}
+              href={resolvedStayUrl}
+              target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
+              rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
+              className="hidden lg:flex items-center text-[11px] tracking-[1.2px] uppercase font-light text-white px-6 py-3 hover:opacity-90 transition-opacity bg-[linear-gradient(165deg,#903f00_0%,#b45309_100%)]"
             >
-              Book ophold
+              {ctaBookStayLabel}
             </Link>
 
             {/* Mobile hamburger */}
@@ -114,7 +130,7 @@ export default function Header() {
               onClick={() => setDrawerOpen(true)}
               className={cn(
                 "lg:hidden hover:opacity-70 focus:outline-none transition-opacity",
-                scrolled ? "text-dark-stone" : "text-white"
+                !isHome || scrolled ? "text-dark-stone" : "text-white"
               )}
               aria-label="Åbn menu"
             >
@@ -143,20 +159,10 @@ export default function Header() {
       >
         <div className="flex items-center justify-between px-8 h-20">
           <Link href="/" className="flex items-baseline">
-            <span
-              className="text-xl text-dark-stone"
-              style={{ fontFamily: "var(--font-newsreader)", fontWeight: 200 }}
-            >
+            <span className="text-xl text-dark-stone font-newsreader font-extralight">
               Allégade
             </span>
-            <span
-              className="text-xl ml-1 text-dark-stone"
-              style={{
-                fontFamily: "var(--font-cormorant)",
-                fontWeight: 300,
-                fontStyle: "italic",
-              }}
-            >
+            <span className="text-xl ml-1 text-dark-stone font-cormorant font-light italic">
               10
             </span>
           </Link>
@@ -170,10 +176,10 @@ export default function Header() {
         </div>
 
         <nav className="flex flex-col px-4 py-2 gap-1 overflow-y-auto">
-          {allDrawerLinks.map((link) => (
+          {resolvedNavLinks.map((link) => (
             <Link
               key={link.name}
-              href={link.href}
+              href={link.href ?? "/"}
               onClick={() => setDrawerOpen(false)}
               className="flex items-center px-4 py-3.5 text-[11px] font-light tracking-[1.2px] uppercase text-warm-brown hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200"
             >
@@ -184,21 +190,22 @@ export default function Header() {
 
         <div className="px-8 flex flex-col gap-3 mt-auto pb-10 pt-6">
           <Link
-            href="/book-bord"
+            href={resolvedTableUrl}
+            target={isExternal(resolvedTableUrl) ? "_blank" : undefined}
+            rel={isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined}
             onClick={() => setDrawerOpen(false)}
             className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-dark-stone border border-border-warm rounded-full hover:border-brand transition-all duration-300"
           >
-            Book bord
+            {ctaBookTableLabel}
           </Link>
           <Link
-            href="/book-ophold"
+            href={resolvedStayUrl}
+            target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
+            rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
             onClick={() => setDrawerOpen(false)}
-            className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-white rounded-full hover:opacity-90 transition-all duration-300"
-            style={{
-              background: "linear-gradient(165deg, #903f00 0%, #b45309 100%)",
-            }}
+            className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-white rounded-full hover:opacity-90 transition-all duration-300 bg-[linear-gradient(165deg,#903f00_0%,#b45309_100%)]"
           >
-            Book ophold
+            {ctaBookStayLabel}
           </Link>
         </div>
       </div>
