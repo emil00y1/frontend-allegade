@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]`;
+const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{ backToPostsLabel }`;
 
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>
@@ -21,6 +22,11 @@ export default async function PostPage({
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const post = await client.fetch<any>(POST_QUERY, await params, options);
+  const siteSettings = await client.fetch<{ backToPostsLabel?: string } | null>(
+    SITE_SETTINGS_QUERY,
+    {},
+    options,
+  );
   const postImageUrl = post.image
     ? urlFor(post.image)?.width(550).height(310).url()
     : null;
@@ -28,7 +34,7 @@ export default async function PostPage({
   return (
     <main className="container mx-auto min-h-screen max-w-3xl p-8 flex flex-col gap-4">
       <Link href="/" className="hover:underline">
-        ← Back to posts
+        {siteSettings?.backToPostsLabel ?? "← Tilbage til opslag"}
       </Link>
       {postImageUrl && (
         <Image

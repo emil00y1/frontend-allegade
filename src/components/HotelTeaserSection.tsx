@@ -1,4 +1,5 @@
 import Image from "next/image";
+import SectionHeading from "@/components/SectionHeading";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -27,13 +28,7 @@ export default function HotelTeaserSection({
       <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row gap-16 items-center w-full">
         {/* Text column */}
         <div className="flex-1 flex flex-col gap-8">
-          <span className="text-brand text-[12px] tracking-[1.2px] uppercase font-light">
-            {eyebrow}
-          </span>
-
-          <h2 className="text-dark-stone text-5xl font-newsreader font-extralight">
-            {heading}
-          </h2>
+          <SectionHeading eyebrow={eyebrow} heading={heading} size="xl" />
 
           {/* Quote / pricing box */}
           <div className="bg-warm-gray border-l-4 border-brand pl-9 pr-8 py-8 flex flex-col gap-3">

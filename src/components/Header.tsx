@@ -17,6 +17,8 @@ interface HeaderProps {
   ctaBookTableUrl?: string;
   ctaBookStayLabel?: string;
   ctaBookStayUrl?: string;
+  menuOpenLabel?: string;
+  menuCloseLabel?: string;
 }
 
 function isExternal(url: string) {
@@ -38,6 +40,8 @@ export default function Header({
   ctaBookTableUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
   ctaBookStayLabel = "Book ophold",
   ctaBookStayUrl = "https://allegade10.suitcasebooking.com/da",
+  menuOpenLabel = "Åbn menu",
+  menuCloseLabel = "Luk menu",
 }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -120,7 +124,7 @@ export default function Header({
               href={resolvedStayUrl}
               target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
               rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
-              className="hidden lg:flex items-center text-[11px] tracking-[1.2px] uppercase font-light text-white px-6 py-3 hover:opacity-90 transition-opacity bg-[linear-gradient(165deg,#903f00_0%,#b45309_100%)]"
+              className="hidden lg:flex items-center text-[11px] tracking-[1.2px] uppercase font-light text-white px-6 py-3 hover:opacity-90 transition-opacity bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)]"
             >
               {ctaBookStayLabel}
             </Link>
@@ -132,7 +136,7 @@ export default function Header({
                 "lg:hidden hover:opacity-70 focus:outline-none transition-opacity",
                 !isHome || scrolled ? "text-dark-stone" : "text-white"
               )}
-              aria-label="Åbn menu"
+              aria-label={menuOpenLabel}
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -169,7 +173,7 @@ export default function Header({
           <button
             onClick={() => setDrawerOpen(false)}
             className="text-warm-brown hover:text-dark-stone transition-colors p-1"
-            aria-label="Luk menu"
+            aria-label={menuCloseLabel}
           >
             <X className="w-5 h-5" />
           </button>
@@ -203,7 +207,7 @@ export default function Header({
             target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
             rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
             onClick={() => setDrawerOpen(false)}
-            className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-white rounded-full hover:opacity-90 transition-all duration-300 bg-[linear-gradient(165deg,#903f00_0%,#b45309_100%)]"
+            className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-white rounded-full hover:opacity-90 transition-all duration-300 bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)]"
           >
             {ctaBookStayLabel}
           </Link>

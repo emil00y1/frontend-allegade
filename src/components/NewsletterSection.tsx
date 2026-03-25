@@ -2,7 +2,27 @@
 
 import { useState } from "react";
 
-export default function NewsletterSection() {
+interface NewsletterSectionProps {
+  label?: string;
+  subtext?: string;
+  buttonLabel?: string;
+  firstNameLabel?: string;
+  lastNameLabel?: string;
+  emailLabel?: string;
+  successMessage?: string;
+  errorMessage?: string;
+}
+
+export default function NewsletterSection({
+  label = "Nyhedsbrev",
+  subtext = "Hold dig opdateret på events og tilbud",
+  buttonLabel = "Tilmeld",
+  firstNameLabel = "Fornavn",
+  lastNameLabel = "Efternavn",
+  emailLabel = "E-mailadresse",
+  successMessage = "Tak! Du er nu tilmeldt vores nyhedsbrev.",
+  errorMessage = "Noget gik galt. Prøv igen.",
+}: NewsletterSectionProps) {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -22,11 +42,11 @@ export default function NewsletterSection() {
 
     if (res.ok) {
       setStatus("success");
-      setMessage("Tak! Du er nu tilmeldt vores nyhedsbrev.");
+      setMessage(successMessage);
       setForm({ firstName: "", lastName: "", email: "" });
     } else {
       setStatus("error");
-      setMessage(data.error || "Noget gik galt. Prøv igen.");
+      setMessage(data.error || errorMessage);
     }
   }
 
@@ -37,10 +57,10 @@ export default function NewsletterSection() {
           {/* Label */}
           <div className="shrink-0">
             <p className="text-[10px] tracking-[1.4px] uppercase font-light text-brand-light mb-1">
-              Nyhedsbrev
+              {label}
             </p>
             <p className="text-white/70 text-sm font-light">
-              Hold dig opdateret på events og tilbud
+              {subtext}
             </p>
           </div>
 
@@ -48,7 +68,7 @@ export default function NewsletterSection() {
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0">
             <input
               type="text"
-              placeholder="Fornavn"
+              placeholder={firstNameLabel}
               required
               value={form.firstName}
               onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
@@ -56,14 +76,14 @@ export default function NewsletterSection() {
             />
             <input
               type="text"
-              placeholder="Efternavn"
+              placeholder={lastNameLabel}
               value={form.lastName}
               onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
               className="bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-sm font-light px-4 py-2.5 flex-1 min-w-0 focus:outline-none focus:border-brand transition-colors"
             />
             <input
               type="email"
-              placeholder="E-mailadresse"
+              placeholder={emailLabel}
               required
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
@@ -74,7 +94,7 @@ export default function NewsletterSection() {
               disabled={status === "loading"}
               className="bg-brand text-white text-[11px] tracking-[1.2px] uppercase font-light px-7 py-2.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0"
             >
-              {status === "loading" ? "..." : "Tilmeld"}
+              {status === "loading" ? "..." : buttonLabel}
             </button>
           </form>
         </div>

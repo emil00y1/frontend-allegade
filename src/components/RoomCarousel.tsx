@@ -243,7 +243,7 @@ export default function RoomCarousel({
                     href={finalUrl}
                     target={isExternal ? "_blank" : undefined}
                     rel={isExternal ? "noopener noreferrer" : undefined}
-                    className="px-8 py-4 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-[#b45309] hover:bg-brand transition-colors duration-300"
+                    className="px-8 py-4 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-brand-mid hover:bg-brand transition-colors duration-300"
                   >
                     {room.ctaLabel ?? "Reserver nu"}
                   </Link>

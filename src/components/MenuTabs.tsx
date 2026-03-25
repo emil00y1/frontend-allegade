@@ -117,7 +117,7 @@ function MenuItemRow({ item }: { item: MenuItem }) {
   return (
     <div className="py-3.5 border-b border-border-warm/30 last:border-0">
       <div className="flex items-baseline gap-2">
-        <span className="font-newsreader font-extralight text-[1.05rem] text-dark-stone leading-snug">
+        <span className="font-newsreader font-light text-[1.05rem] text-dark-stone leading-snug">
           {item.name}
         </span>
         {item.badge && (
@@ -125,7 +125,7 @@ function MenuItemRow({ item }: { item: MenuItem }) {
             {item.badge}
           </span>
         )}
-        <span className="flex-1 border-b border-dashed border-warm-brown/20 mb-[3px] min-w-4" />
+        <span className="flex-1" />
         {price && (
           <span className="font-sans font-light text-sm text-dark-stone shrink-0 tabular-nums">
             {price}
@@ -192,9 +192,9 @@ function FeaturedSection({ section, bookTableUrl }: { section: MenuSection; book
               return (
                 <div
                   key={item._key}
-                  className="bg-[#fffbeb] border border-[#fcd34d]/30 p-6 flex flex-col gap-3"
+                  className="bg-brand-light/20 border border-brand/20 p-6 flex flex-col gap-3"
                 >
-                  <span className="text-[9px] tracking-[2px] uppercase font-light text-[#92400e] border border-[#92400e]/30 px-2 py-1 self-start">
+                  <span className="text-[9px] tracking-[2px] uppercase font-light text-brand border border-brand/30 px-2 py-1 self-start">
                     Sæt-menu
                   </span>
                   <h4 className="font-newsreader font-extralight text-xl text-dark-stone leading-snug">
@@ -209,14 +209,14 @@ function FeaturedSection({ section, bookTableUrl }: { section: MenuSection; book
                     <p className="text-[11px] text-warm-brown/60 font-light italic">{item.note}</p>
                   )}
                   {price && (
-                    <p className="font-newsreader font-extralight text-2xl text-[#92400e] mt-auto pt-2">
+                    <p className="font-newsreader font-extralight text-2xl text-brand mt-auto pt-2">
                       {price}
                     </p>
                   )}
                   {bookTableUrl && (
                     <Link
                       href={bookTableUrl}
-                      className="text-[10px] tracking-[1.5px] uppercase font-light text-[#92400e] border-b border-[#92400e]/40 pb-px self-start hover:opacity-70 transition-opacity"
+                      className="text-[10px] tracking-[1.5px] uppercase font-light text-brand border-b border-brand/40 pb-px self-start hover:opacity-70 transition-opacity"
                     >
                       Book bord
                     </Link>
@@ -257,7 +257,7 @@ function BrunchTab({ menu, bookTableUrl, onSwitchToDrinks }: { menu: MenuCard; b
         <div className="bg-warm-white border border-border-warm/40 p-10 lg:p-14">
           {/* Badge */}
           <div className="inline-flex mb-6">
-            <span className="bg-[#fffbeb] border border-[#fcd34d]/40 px-4 py-1.5 text-[9px] tracking-[3px] uppercase font-light text-[#92400e]">
+            <span className="bg-brand-light/30 border border-brand/30 px-4 py-1.5 text-[9px] tracking-[3px] uppercase font-light text-brand">
               Weekend Brunch
             </span>
           </div>
@@ -295,7 +295,7 @@ function BrunchTab({ menu, bookTableUrl, onSwitchToDrinks }: { menu: MenuCard; b
             <div>
               <p className="text-[10px] tracking-[1px] uppercase text-dark-stone/50 mb-1">Pris</p>
               {price && (
-                <p className="font-newsreader font-extralight text-3xl text-[#92400e] leading-none">
+                <p className="font-newsreader font-extralight text-3xl text-brand leading-none">
                   {price}
                   {menu.priceLabel && (
                     <span className="text-base text-warm-brown font-sans ml-2 font-light">
@@ -368,49 +368,20 @@ function StandardMenuTab({ menu, bookTableUrl, onSwitchToDrinks }: { menu: MenuC
 }
 
 function BeveragesTab({ menu }: { menu: MenuCard }) {
-  // Split sections into Drikkekort (non-wine) and Vinkort (wine) groups.
-  // Sections with displayStyle 'wine' are treated as the wine list.
-  const wineTypes = new Set(["wine"]);
-  const drinkSections = menu.sections?.filter((s) => !wineTypes.has(s.displayStyle ?? "list")) ?? [];
-  const wineSections = menu.sections?.filter((s) => wineTypes.has(s.displayStyle ?? "list")) ?? [];
-
   return (
-    <div className="py-12 lg:py-16">
-      <div className="grid lg:grid-cols-2 gap-16 items-start max-w-5xl mx-auto">
-        {/* Left: Drikkekort */}
-        {drinkSections.length > 0 && (
-          <div>
-            <h3 className="font-newsreader font-extralight text-2xl text-dark-stone mb-6 leading-none">
-              Drikkekort
-            </h3>
-            {drinkSections.map((section) => (
-              <div key={section._key}>
-                <SectionHeader title={section.sectionTitle} note={section.sectionNote} />
-                {section.items?.map((item) => (
-                  <MenuItemRow key={item._key} item={item} />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Right: Vinkort */}
-        {wineSections.length > 0 && (
-          <div>
-            <h3 className="font-newsreader font-extralight text-2xl text-dark-stone mb-6 leading-none">
-              Vinkort
-            </h3>
-            {wineSections.map((section) => (
-              <div key={section._key}>
-                <SectionHeader title={section.sectionTitle} note={section.sectionNote} />
-                {section.items?.map((item) => (
-                  <WineItemRow key={item._key} item={item} />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+    <div className="py-12 lg:py-16 max-w-2xl mx-auto">
+      {menu.sections?.map((section) => (
+        <div key={section._key}>
+          <SectionHeader title={section.sectionTitle} note={section.sectionNote} />
+          {section.items?.map((item) =>
+            section.displayStyle === "wine" ? (
+              <WineItemRow key={item._key} item={item} />
+            ) : (
+              <MenuItemRow key={item._key} item={item} />
+            )
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -451,7 +422,7 @@ export default function MenuTabs({
                   className={cn(
                     "flex flex-col items-center px-6 py-4 shrink-0 border-b-2 transition-all duration-200 focus:outline-none",
                     isActive
-                      ? "border-[#92400e] text-dark-stone"
+                      ? "border-brand text-dark-stone"
                       : "border-transparent text-warm-brown hover:text-dark-stone"
                   )}
                 >

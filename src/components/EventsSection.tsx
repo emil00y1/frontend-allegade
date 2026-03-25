@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
+import SectionHeading from "@/components/SectionHeading";
 
 interface Event {
   _id: string;
@@ -37,7 +38,7 @@ export default function EventsSection({
   heading = "Events på Allégade 10",
   description,
   allEventsLabel = "Se alle events",
-  allEventsUrl = "/events",
+  allEventsUrl = "/begivenheder",
   eventCtaLabel = "Bestil billet",
 }: EventsSectionProps) {
   if (events.length === 0) return null;
@@ -48,12 +49,12 @@ export default function EventsSection({
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex flex-col gap-3">
-            <span className="text-warm-brown text-[12px] tracking-[1.2px] uppercase font-light">
-              {eyebrow}
-            </span>
-            <h2 className="text-dark-stone text-5xl font-newsreader font-extralight">
-              {heading}
-            </h2>
+            <SectionHeading
+              eyebrow={eyebrow}
+              heading={heading}
+              size="xl"
+              eyebrowStyle="muted"
+            />
             {description && (
               <p className="text-warm-brown text-sm font-light max-w-md leading-relaxed">
                 {description}

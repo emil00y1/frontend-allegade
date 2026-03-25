@@ -4,7 +4,6 @@ import Hero from "@/components/Hero";
 import WelcomeSection from "@/components/WelcomeSection";
 import EventsSection from "@/components/EventsSection";
 import SelskaberSection from "@/components/SelskaberSection";
-import Footer from "@/components/Footer";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
@@ -38,7 +37,8 @@ const EVENTS_QUERY = `*[_type == "event" && defined(slug.current)]
   }`;
 const SITE_SETTINGS_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   address, phone, email, footerDescription, socialLinks,
-  restaurantHours, kitchenHours, ctaBookTableUrl
+  restaurantHours, kitchenHours, ctaBookTableUrl,
+  newsletterLabel, newsletterSubtext, newsletterButtonLabel
 }`;
 
 export default async function IndexPage() {
@@ -126,7 +126,6 @@ export default async function IndexPage() {
         />
       </div>
 
-      <Footer siteSettings={siteSettings} />
     </main>
   );
 }

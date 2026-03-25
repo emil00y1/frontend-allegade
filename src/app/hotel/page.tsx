@@ -4,9 +4,9 @@ import { draftMode } from "next/headers";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 import { HotelFaqAccordion } from "@/components/HotelFaqAccordion";
-import Footer from "@/components/Footer";
 import RoomCarousel, { type HotelRoom } from "@/components/RoomCarousel";
-import { createDataAttribute } from "@sanity/visual-editing";
+import { createDataAttribute } from "next-sanity";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -74,6 +74,8 @@ interface HotelPageDocument {
   neighborhoodCity?: string;
   neighborhoodMapUrl?: string;
   neighborhoodItems?: NeighborhoodItem[];
+  mapEyebrow?: string;
+  directionsLabel?: string;
   // Restaurant
   restaurantEyebrow?: string;
   restaurantHeading?: string;
@@ -92,6 +94,7 @@ interface SiteSettingsData {
   restaurantHours?: { days?: string; hours: string }[];
   kitchenHours?: { label?: string; hours: string }[];
   socialLinks?: { platform: string; url: string }[];
+  breadcrumbHomeLabel?: string;
 }
 
 interface QueryResult {
@@ -135,6 +138,8 @@ const HOTEL_PAGE_QUERY = `{
     neighborhoodCity,
     neighborhoodMapUrl,
     neighborhoodItems[]{ _key, title, walkTime, description },
+    mapEyebrow,
+    directionsLabel,
     restaurantEyebrow,
     restaurantHeading,
     restaurantHeadingItalic,
@@ -159,7 +164,9 @@ const HOTEL_PAGE_QUERY = `{
   },
   "siteSettings": *[_type == "siteSettings"][0]{
     address, phone, email, footerDescription, socialLinks,
-    restaurantHours, kitchenHours
+    restaurantHours, kitchenHours,
+    newsletterLabel, newsletterSubtext, newsletterButtonLabel,
+    breadcrumbHomeLabel
   }
 }`;
 
@@ -185,17 +192,10 @@ export default async function HotelPage() {
   return (
     <main>
       {/* ── Section 1: Hero (Split Asymmetric) ─────────────────────────── */}
-      <section className="relative grid lg:grid-cols-[5fr_7fr] min-h-[calc(100vh-80px)] bg-warm-white py-0">
+      <section className="relative grid lg:grid-cols-2 min-h-[calc(100vh-80px)] bg-warm-white py-0">
         {/* Left: Content */}
         <div className="flex flex-col justify-center px-10 lg:px-16 w-full">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 mb-8 text-[10px] tracking-[1px] uppercase text-warm-brown/60">
-            <Link href="/" className="hover:text-brand transition-colors">
-              Forside
-            </Link>
-            <span className="text-warm-brown/40">›</span>
-            <span className="text-brand">Hotel</span>
-          </nav>
+          <Breadcrumb current="Hotel" homeLabel={siteSettings?.breadcrumbHomeLabel} />
 
           {/* Badge */}
           {page?.heroBadge && (
@@ -307,7 +307,7 @@ export default async function HotelPage() {
                 <span className="font-newsreader font-extralight text-dark-stone">
                   {page.facilitiesHeading ?? "Faciliteter "}
                 </span>
-                <span className="font-cormorant font-light italic text-[#b45309]">
+                <span className="font-cormorant font-light italic text-brand-mid">
                   {page.facilitiesHeadingItalic ?? "& Bekvemmeligheder"}
                 </span>
               </h2>
@@ -380,110 +380,108 @@ export default async function HotelPage() {
         </section>
       )}
 
-      {/* ── Section 6: Neighborhood ─────────────────────────────────────── */}
-      <section className="bg-[#f5f2ed] grid lg:grid-cols-2">
-        {/* Left: Map */}
-        <div className="relative overflow-hidden bg-[#e5e2e1] flex items-center justify-center py-24 px-12 min-h-[500px]">
-          <div className="relative z-10 flex flex-col gap-4 items-center text-center w-full">
-            {/* Pin icon */}
+      {/* ── Section 6: Location ──────────────────────────────────────────── */}
+      <section className="bg-warm-gray grid lg:grid-cols-2">
+        {/* Left: Full-bleed map */}
+        <div className="relative overflow-hidden min-h-[500px]">
+          <iframe
+            src={
+              page?.neighborhoodMapUrl ??
+              "https://www.openstreetmap.org/export/embed.html?bbox=12.5229%2C55.6710%2C12.5429%2C55.6810&layer=mapnik&marker=55.67597%2C12.53295"
+            }
+            width="100%"
+            height="100%"
+            className="absolute inset-0 w-full h-full"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Kort over Allégade 10"
+          />
+        </div>
+
+        {/* Right: Location info */}
+        <div className="flex flex-col justify-center px-12 lg:px-24 py-24">
+          {/* Eyebrow */}
+          <p className="text-[10px] tracking-[2px] uppercase text-warm-brown mb-8">
+            {page?.mapEyebrow ?? "Beliggenhed"}
+          </p>
+
+          {/* Address as headline */}
+          <div className="mb-2">
+            <h2 className="font-newsreader font-extralight text-[clamp(2.5rem,4vw,3.5rem)] text-dark-stone leading-none">
+              {page?.neighborhoodAddress ?? "Allégade 10"}
+            </h2>
+            <p className="font-cormorant font-light italic text-brand text-xl mt-2">
+              {page?.neighborhoodCity ?? "2000 Frederiksberg"}
+            </p>
+          </div>
+
+          <div className="w-10 h-px bg-border-warm/40 my-8" />
+
+          {/* Neighborhood items (if populated in CMS) */}
+          {page?.neighborhoodItems && page.neighborhoodItems.length > 0 && (
+            <>
+              {(page.neighborhoodHeading || page.neighborhoodHeadingItalic) && (
+                <p className="text-[10px] tracking-[1.5px] uppercase text-warm-brown/70 mb-6">
+                  {page.neighborhoodHeading} {page.neighborhoodHeadingItalic}
+                </p>
+              )}
+              <ul className="flex flex-col gap-8 mb-10">
+                {page.neighborhoodItems.map((item: NeighborhoodItem) => (
+                  <li key={item._key} className="flex gap-6 items-start">
+                    <div className="mt-0.5 shrink-0 text-warm-brown/50">
+                      <svg width="14" height="18" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 0C3.589 0 0 3.589 0 8c0 5.25 8 12 8 12S16 13.25 16 8c0-4.411-3.589-8-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <div className="flex items-center gap-4">
+                        <h3 className="text-[11px] tracking-[1.2px] uppercase font-bold text-dark-stone shrink-0">
+                          {item.title}
+                        </h3>
+                        <div className="flex-1 h-px bg-border-warm/30" />
+                        {item.walkTime && (
+                          <span className="font-cormorant font-light italic text-sm text-dark-stone shrink-0">
+                            {item.walkTime}
+                          </span>
+                        )}
+                      </div>
+                      {item.description && (
+                        <p className="text-warm-brown text-sm leading-5 font-light">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* Directions CTA */}
+          <a
+            href="https://maps.google.com/?q=Allégade+10,+2000+Frederiksberg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 text-[11px] tracking-[1.5px] uppercase text-dark-stone border-b border-dark-stone/30 pb-0.5 w-fit hover:border-dark-stone transition-colors"
+          >
             <svg
-              width="38"
-              height="48"
-              viewBox="0 0 38 48"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="text-brand"
             >
               <path
-                d="M19 0C8.507 0 0 8.507 0 19c0 14.25 19 29 19 29S38 33.25 38 19C38 8.507 29.493 0 19 0Zm0 26a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"
+                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"
                 fill="currentColor"
-                fillOpacity="0.15"
-              />
-              <path
-                d="M19 2C9.611 2 2 9.611 2 19c0 13.25 17 27.5 17 27.5S36 32.25 36 19C36 9.611 28.389 2 19 2Zm0 23a6 6 0 1 1 0-12 6 6 0 0 1 0 12Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
               />
             </svg>
-
-            <h3 className="font-newsreader font-extralight text-3xl text-dark-stone">
-              {page?.neighborhoodAddress ?? "Find os på Allégade 10"}
-            </h3>
-            <p className="text-[10px] tracking-[1px] uppercase text-warm-brown">
-              {page?.neighborhoodCity ?? "2000 Frederiksberg, Danmark"}
-            </p>
-
-            {/* Map embed */}
-            {page?.neighborhoodMapUrl && (
-              <div className="w-full mt-6 border-4 border-white shadow-xl overflow-hidden">
-                <iframe
-                  src={page.neighborhoodMapUrl}
-                  width="100%"
-                  height="220"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Kort over Allégade 10"
-                />
-              </div>
-            )}
-          </div>
+            {page?.directionsLabel ?? "Få vejledning"}
+          </a>
         </div>
-
-        {/* Right: Highlights */}
-        {page?.neighborhoodItems && page.neighborhoodItems.length > 0 && (
-          <div className="flex flex-col justify-center px-12 lg:px-24 py-24">
-            <h2 className="text-[clamp(1.75rem,3vw,2.25rem)] mb-12 leading-none">
-              <span className="font-newsreader font-extralight text-dark-stone">
-                {page.neighborhoodHeading ?? "Nabolaget "}{" "}
-              </span>
-              <span className="font-cormorant font-light italic text-brand">
-                {page.neighborhoodHeadingItalic ?? "Højdepunkter"}
-              </span>
-            </h2>
-
-            <ul className="flex flex-col gap-12">
-              {page.neighborhoodItems.map((item: NeighborhoodItem) => (
-                <li key={item._key} className="flex gap-6 items-start">
-                  {/* Icon */}
-                  <div className="mt-1 shrink-0 text-warm-brown/60">
-                    <svg
-                      width="16"
-                      height="20"
-                      viewBox="0 0 16 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8 0C3.589 0 0 3.589 0 8c0 5.25 8 12 8 12S16 13.25 16 8c0-4.411-3.589-8-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col gap-2 flex-1">
-                    <div className="flex items-center gap-4">
-                      <h3 className="text-[12px] tracking-[1.2px] uppercase font-bold text-dark-stone shrink-0">
-                        {item.title}
-                      </h3>
-                      <div className="flex-1 h-px bg-border-warm/30" />
-                      {item.walkTime && (
-                        <span className="font-cormorant font-light italic text-sm text-dark-stone shrink-0">
-                          {item.walkTime}
-                        </span>
-                      )}
-                    </div>
-                    {item.description && (
-                      <p className="text-warm-brown text-sm leading-5 font-light">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </section>
 
       {/* ── Section 7: Restaurant Cross-Sell ────────────────────────────── */}
@@ -558,8 +556,6 @@ export default async function HotelPage() {
         </section>
       )}
 
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <Footer siteSettings={siteSettings} />
     </main>
   );
 }

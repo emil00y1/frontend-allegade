@@ -1,4 +1,8 @@
 @import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -8,6 +12,7 @@
   /* Brand colour utilities */
   --color-brand: var(--brand);
   --color-brand-light: var(--brand-light);
+  --color-brand-mid: var(--brand-mid);
   --color-warm-white: var(--warm-white);
   --color-warm-gray: var(--warm-gray);
   --color-warm-brown: var(--warm-brown);
@@ -63,6 +68,7 @@
   --brand: #903f00;
   --brand-light: #ffdbcb;
   --brand-dark: #331200;
+  --brand-mid: #b45309;
   --warm-white: #fcf9f8;
   --warm-gray: #f6f3f2;
   --warm-brown: #564338;

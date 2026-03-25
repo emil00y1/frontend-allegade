@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
-import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 import MenuTabs, { type MenuCard, type TabConfig } from "@/components/MenuTabs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -14,6 +14,7 @@ interface ServingTime {
 }
 
 interface MenuPageData {
+  breadcrumbLabel?: string;
   headerHeading?: string;
   headerDescription?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,11 +23,6 @@ interface MenuPageData {
   bookTableLabel?: string;
   bookTableUrl?: string;
   tabs?: TabConfig[];
-  ctaHeading?: string;
-  ctaButtonLabel?: string;
-  ctaButtonUrl?: string;
-  ctaPhone?: string;
-  allergenNote?: string;
 }
 
 interface SiteSettingsData {
@@ -38,24 +34,21 @@ interface SiteSettingsData {
   kitchenHours?: { label?: string; hours: string }[];
   socialLinks?: { platform: string; url: string }[];
   ctaBookTableUrl?: string;
+  breadcrumbHomeLabel?: string;
 }
 
 // ─── Query ────────────────────────────────────────────────────────────────────
 
 const MENUKORT_QUERY = `{
   "menuPage": *[_type == "menuPage"][0]{
+    breadcrumbLabel,
     headerHeading,
     headerDescription,
     headerImage{ ..., asset-> },
     headerServingTimes[]{ _key, label, time },
     bookTableLabel,
     bookTableUrl,
-    tabs[]{ _key, label, menuType, servingTime },
-    ctaHeading,
-    ctaButtonLabel,
-    ctaButtonUrl,
-    ctaPhone,
-    allergenNote
+    tabs[]{ _key, label, menuType, servingTime }
   },
   "menus": *[_type == "menuCard"] | order(order asc){
     _id, title, menuType, order, intro,
@@ -68,7 +61,9 @@ const MENUKORT_QUERY = `{
   },
   "siteSettings": *[_type == "siteSettings"][0]{
     address, phone, email, footerDescription, socialLinks,
-    restaurantHours, kitchenHours, ctaBookTableUrl
+    restaurantHours, kitchenHours, ctaBookTableUrl,
+    newsletterLabel, newsletterSubtext, newsletterButtonLabel,
+    breadcrumbHomeLabel
   }
 }`;
 
@@ -114,14 +109,7 @@ export default async function MenukortPage() {
       <section className="grid lg:grid-cols-[3fr_2fr] min-h-[30vh] bg-warm-white border-b border-border-warm/30">
         {/* Left: text */}
         <div className="flex flex-col justify-center px-10 lg:px-16 pt-32 pb-10 lg:pt-36 lg:pb-12">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 mb-6 text-[10px] tracking-[1px] uppercase text-warm-brown/60">
-            <Link href="/" className="hover:text-brand transition-colors">
-              Forside
-            </Link>
-            <span className="text-warm-brown/40">›</span>
-            <span className="text-brand">Menukort</span>
-          </nav>
+          <Breadcrumb current={menuPage?.breadcrumbLabel ?? "Menukort"} className="mb-6" homeLabel={siteSettings?.breadcrumbHomeLabel} />
 
           <h1 className="font-newsreader font-extralight text-[clamp(2rem,4vw,3.25rem)] text-dark-stone leading-none mb-4">
             {heading}
@@ -180,42 +168,7 @@ export default async function MenukortPage() {
         bookTableUrl={bookTableUrl}
       />
 
-      {/* ── Bottom CTA Section ──────────────────────────────────────── */}
-      {(menuPage?.ctaHeading || menuPage?.ctaButtonLabel) && (
-        <section className="bg-dark-stone px-10 lg:px-16 min-h-[calc(100vh-80px)] flex items-center border-t-4 border-brand py-0">
-          <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8 w-full">
-            <h2 className="text-[clamp(2rem,5vw,3.5rem)] text-white font-newsreader font-extralight leading-tight">
-              {menuPage.ctaHeading ?? "Har du fundet noget?"}
-            </h2>
-            
-            <div className="flex flex-col items-center gap-6">
-              <Link
-                href={menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl}
-                target={(menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl).startsWith("http") ? "_blank" : undefined}
-                rel={(menuPage.ctaButtonUrl || siteSettings?.ctaBookTableUrl || defaultBookingUrl).startsWith("http") ? "noopener noreferrer" : undefined}
-                className="px-12 py-5 text-[12px] tracking-[2.4px] uppercase font-bold text-white bg-brand hover:brightness-110 transition-all duration-300"
-              >
-                {menuPage.ctaButtonLabel ?? "Book bord"}
-              </Link>
-              
-              {menuPage.ctaPhone && (
-                <p className="text-white/60 font-light tracking-[1px] uppercase text-[11px]">
-                  {menuPage.ctaPhone}
-                </p>
-              )}
-            </div>
-
-            {menuPage.allergenNote && (
-              <p className="text-white/40 text-sm italic font-light max-w-lg mt-4">
-                {menuPage.allergenNote}
-              </p>
-            )}
-          </div>
-        </section>
-      )}
-
       {/* ── Footer ──────────────────────────────────────────────────── */}
-      <Footer siteSettings={siteSettings} />
     </main>
   );
 }
