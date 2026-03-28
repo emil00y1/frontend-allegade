@@ -77,7 +77,7 @@ export default function SelskaberInquiryForm({
 
   if (formState === "success") {
     return (
-      <section id="foresporgsel" className="bg-warm-gray py-24 lg:py-32">
+      <section id="foresporgsel" className="bg-warm-gray py-14 md:py-24 lg:py-32">
         <div className="max-w-6xl mx-auto px-10 lg:px-16">
           <div className="max-w-lg">
             <p className="text-[10px] tracking-[2px] uppercase text-brand mb-6">
@@ -101,13 +101,13 @@ export default function SelskaberInquiryForm({
   }
 
   return (
-    <section id="foresporgsel" className="bg-warm-gray py-24 lg:py-32">
+    <section id="foresporgsel" className="bg-warm-gray py-14 md:py-24 lg:py-32">
       <div className="max-w-6xl mx-auto px-10 lg:px-16">
         <div className="grid lg:grid-cols-[2fr_3fr] gap-16 lg:gap-24">
           {/* Left: heading + contact */}
           <div className="flex flex-col gap-6 lg:pt-2">
             <div>
-              <h2 className="font-newsreader font-extralight text-[clamp(2rem,3.5vw,2.75rem)] text-[#292524] leading-tight">
+              <h2 className="font-newsreader font-extralight text-[clamp(1.75rem,3vw,2.5rem)] text-[#292524] leading-tight">
                 {heading}
               </h2>
             </div>

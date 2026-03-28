@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { urlFor } from "@/sanity/lib/image";
@@ -19,6 +19,8 @@ export interface Occasion {
 interface SelskaberOccasionTabsProps {
   occasions: Occasion[];
 }
+
+const AUTO_ADVANCE_MS = 8000;
 
 const DEFAULT_OCCASIONS: Occasion[] = [
   {
@@ -73,9 +75,72 @@ export default function SelskaberOccasionTabs({
 }: SelskaberOccasionTabsProps) {
   const items = occasions.length > 0 ? occasions : DEFAULT_OCCASIONS;
   const [activeKey, setActiveKey] = useState(items[0]?._key ?? "");
+  const [visible, setVisible] = useState(true);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const pendingKeyRef = useRef<string | null>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef(0);
 
+  const activeIndex = items.findIndex((o) => o._key === activeKey);
+
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+  }, []);
+
+  const FADE_MS = 175;
+
+  const switchTo = useCallback(
+    (key: string) => {
+      if (key === activeKey) return;
+      pendingKeyRef.current = key;
+      setVisible(false);
+      setTimeout(() => {
+        setActiveKey(key);
+        setProgress(0);
+        startTimeRef.current = Date.now();
+        pendingKeyRef.current = null;
+        setVisible(true);
+      }, FADE_MS);
+    },
+    [activeKey],
+  );
+
+  const advanceTab = useCallback(() => {
+    const idx = items.findIndex((o) => o._key === activeKey);
+    const next = (idx + 1) % items.length;
+    switchTo(items[next]._key);
+  }, [items, activeKey, switchTo]);
+
+  // Auto-advance timer
+  useEffect(() => {
+    if (paused) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    startTimeRef.current = Date.now() - progress * AUTO_ADVANCE_MS;
+
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const pct = elapsed / AUTO_ADVANCE_MS;
+      if (pct >= 1) {
+        advanceTab();
+      } else {
+        setProgress(pct);
+      }
+    }, 50);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [paused, activeKey, advanceTab, progress]);
+
+  const handleTabClick = (key: string) => switchTo(key);
+
+  // Scroll hint
   useEffect(() => {
     const el = tabBarRef.current;
     if (!el) return;
@@ -87,54 +152,81 @@ export default function SelskaberOccasionTabs({
   const active = items.find((o) => o._key === activeKey) ?? items[0];
 
   const imageUrl = active?.image?.asset
-    ? urlFor(active.image).width(900).height(700).auto("format").url()
+    ? urlFor(active.image).width(800).height(530).auto("format").url()
     : null;
 
   return (
-    <section className="bg-warm-gray py-24">
+    <section
+      className="bg-warm-gray py-14 md:py-24"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div className="max-w-6xl mx-auto px-10 lg:px-16">
         {/* Tab bar */}
         <div className="relative mb-16">
-          <div ref={tabBarRef} className="border-b border-border-warm/30 flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {items.map((occasion) => {
-            const isActive = occasion._key === activeKey;
-            return (
-              <button
-                key={occasion._key}
-                onClick={() => setActiveKey(occasion._key)}
-                className={cn(
-                  "shrink-0 px-8 py-5 text-[11px] tracking-[1.5px] uppercase font-light border-b-2 transition-all duration-200 focus:outline-none",
-                  isActive
-                    ? "border-brand text-brand"
-                    : "border-transparent text-warm-brown/60 hover:text-dark-stone"
-                )}
-              >
-                {occasion.label ?? occasion._key}
-              </button>
-            );
-          })}
+          <div
+            ref={tabBarRef}
+            className="border-b border-border-warm/30 flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {items.map((occasion) => {
+              const isActive = occasion._key === activeKey;
+              return (
+                <button
+                  key={occasion._key}
+                  onClick={() => handleTabClick(occasion._key)}
+                  className={cn(
+                    "shrink-0 px-8 py-5 text-[11px] tracking-[1.5px] uppercase font-light border-b-2 transition-all duration-200 focus:outline-none",
+                    isActive
+                      ? "border-brand text-brand"
+                      : "border-transparent text-warm-brown/60 hover:text-dark-stone",
+                  )}
+                >
+                  {occasion.label ?? occasion._key}
+                </button>
+              );
+            })}
           </div>
 
           {/* Scroll hint — mobile only */}
           <div
             aria-hidden="true"
             className={cn(
-              "pointer-events-none absolute inset-y-0 right-0 w-16 flex items-center justify-end pr-2 transition-opacity duration-300 md:hidden",
-              showScrollHint ? "opacity-100" : "opacity-0"
+              "pointer-events-none absolute inset-y-0 right-0 w-16 flex items-center justify-end pr-2 transition-opacity duration-125 md:hidden",
+              showScrollHint ? "opacity-100" : "opacity-0",
             )}
-            style={{ background: "linear-gradient(to right, transparent, var(--warm-gray) 70%)" }}
+            style={{
+              background:
+                "linear-gradient(to right, transparent, var(--warm-gray) 70%)",
+            }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-warm-brown/50">
-              <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              className="text-warm-brown/50"
+            >
+              <path
+                d="M6 3l5 5-5 5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
         </div>
 
         {/* Content */}
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+        <div
+          className={cn(
+            "grid lg:grid-cols-2 gap-16 lg:gap-20 items-center min-h-[340px] transition-opacity duration-300 ease-in-out",
+            visible ? "opacity-100" : "opacity-0",
+          )}
+        >
           {/* Left: text */}
           <div className="flex flex-col gap-6">
-            <h2 className="font-newsreader font-extralight text-[clamp(1.75rem,3.5vw,2.75rem)] text-dark-stone leading-tight">
+            <h2 className="font-newsreader font-extralight text-[clamp(1.75rem,3vw,2.5rem)] text-dark-stone leading-tight">
               {active?.heading}
             </h2>
 
@@ -169,7 +261,7 @@ export default function SelskaberOccasionTabs({
           </div>
 
           {/* Right: image */}
-          <div className="relative aspect-[4/3] lg:aspect-[3/4] overflow-hidden bg-[#e5e2e1]">
+          <div className="relative aspect-[3/2] overflow-hidden bg-[#e5e2e1]">
             {imageUrl ? (
               <Image
                 src={imageUrl}
@@ -182,7 +274,33 @@ export default function SelskaberOccasionTabs({
             )}
           </div>
         </div>
+
+        {/* Timer bar */}
+        <div className="mt-10 flex gap-1.5">
+          {items.map((item, idx) => (
+            <button
+              key={item._key}
+              onClick={() => handleTabClick(item._key)}
+              className="relative h-[3px] flex-1 bg-border-warm/20 overflow-hidden cursor-pointer"
+              aria-label={item.label ?? item._key}
+            >
+              <div
+                className={cn(
+                  "absolute inset-y-0 left-0 bg-brand transition-none",
+                  idx < activeIndex && "w-full",
+                  idx > activeIndex && "w-0",
+                )}
+                style={
+                  idx === activeIndex
+                    ? { width: `${progress * 100}%` }
+                    : undefined
+                }
+              />
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+

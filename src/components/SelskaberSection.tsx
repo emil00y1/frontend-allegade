@@ -12,8 +12,8 @@ interface SelskaberSectionProps {
 }
 
 export default function SelskaberSection({
-  heading = "Hold Dit Selskab Hos Os",
-  description = "Fra intime barnedåb til store bryllupper. Vi skaber de perfekte rammer om jeres næste mindeværdige begivenhed.",
+  heading = "Hold Dit Selskab Hos Us",
+  description,
   ctaLabel = "Kontakt os",
   ctaUrl = "/kontakt",
   backgroundImage,
@@ -40,9 +40,11 @@ export default function SelskaberSection({
         <h2 className="text-[clamp(2rem,5vw,3.5rem)] text-white text-center leading-none font-newsreader font-extralight">
           {heading}
         </h2>
-        <p className="text-base font-light text-white/80 text-center max-w-xl leading-7">
-          {description}
-        </p>
+        {description && (
+          <p className="text-white/80 text-base font-light max-w-xl leading-relaxed">
+            {description}
+          </p>
+        )}
         <Link
           href={ctaUrl}
           className="mt-2 bg-white text-dark-stone text-[12px] tracking-[1.4px] uppercase font-light px-10 py-4 hover:bg-warm-white transition-colors duration-300"

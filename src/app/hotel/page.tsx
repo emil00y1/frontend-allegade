@@ -3,10 +3,18 @@ import Link from "next/link";
 import { draftMode } from "next/headers";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
+import dynamic from "next/dynamic";
 import { HotelFaqAccordion } from "@/components/HotelFaqAccordion";
-import RoomCarousel, { type HotelRoom } from "@/components/RoomCarousel";
+import { type HotelRoom } from "@/components/RoomCarousel";
+import { type SiteSettings } from "@/types/sanity";
+
+const RoomCarousel = dynamic(() => import("@/components/RoomCarousel"));
+const HotelMap = dynamic(() => import("@/components/HotelMap"));
 import { createDataAttribute } from "next-sanity";
 import Breadcrumb from "@/components/Breadcrumb";
+import { SectionRenderer } from "@/components/sections";
+import { buttonVariants } from "@/lib/button-variants";
+import { SECTIONS_QUERY_FRAGMENT } from "@/sanity/lib/sections-query";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,7 +49,6 @@ interface HotelPageDocument {
   _type: string;
   // Hero
   heroImage?: { asset?: { _ref: string } };
-  heroBadge?: string;
   heroHeading?: string;
   heroHeadingItalic?: string;
   heroDescription?: string;
@@ -62,7 +69,6 @@ interface HotelPageDocument {
   facilities?: Facility[];
   // Room Showcase
   roomShowcaseHeading?: string;
-  roomShowcaseHeadingItalic?: string;
   // Practical Info
   practicalInfoHeading?: string;
   practicalInfoHeadingItalic?: string;
@@ -84,22 +90,13 @@ interface HotelPageDocument {
   restaurantCtaLabel?: string;
   restaurantCtaUrl?: string;
   restaurantImage?: { asset?: { _ref: string } };
-}
-
-interface SiteSettingsData {
-  address?: string;
-  phone?: string;
-  email?: string;
-  footerDescription?: string;
-  restaurantHours?: { days?: string; hours: string }[];
-  kitchenHours?: { label?: string; hours: string }[];
-  socialLinks?: { platform: string; url: string }[];
-  breadcrumbHomeLabel?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sections?: any[];
 }
 
 interface QueryResult {
   page: HotelPageDocument | null;
-  siteSettings: SiteSettingsData | null;
+  siteSettings: SiteSettings | null;
   rooms: HotelRoom[];
 }
 
@@ -110,7 +107,6 @@ const HOTEL_PAGE_QUERY = `{
     _id,
     _type,
     heroImage{ ..., asset-> },
-    heroBadge,
     heroHeading,
     heroHeadingItalic,
     heroDescription,
@@ -128,7 +124,6 @@ const HOTEL_PAGE_QUERY = `{
     facilitiesDescription,
     facilities[]{ _key, icon{ ..., asset-> }, title, description },
     roomShowcaseHeading,
-    roomShowcaseHeadingItalic,
     practicalInfoHeading,
     practicalInfoHeadingItalic,
     faqItems[]{ _key, question, answer },
@@ -146,7 +141,8 @@ const HOTEL_PAGE_QUERY = `{
     restaurantDescription,
     restaurantCtaLabel,
     restaurantCtaUrl,
-    restaurantImage{ ..., asset-> }
+    restaurantImage{ ..., asset-> },
+    ${SECTIONS_QUERY_FRAGMENT}
   },
   "rooms": *[_type == "hotelRoom"] | order(order asc, title asc){
     _id,
@@ -184,7 +180,10 @@ export default async function HotelPage() {
     ? urlFor(page.heroImage).width(1400).height(1800).auto("format").url()
     : null;
 
-  const primaryCtaUrl = page?.heroPrimaryCtaUrl ?? page?.bookingCtaUrl ?? "https://allegade10.suitcasebooking.com/da";
+  const primaryCtaUrl =
+    page?.heroPrimaryCtaUrl ??
+    page?.bookingCtaUrl ??
+    "https://allegade10.suitcasebooking.com/da";
   const primaryCtaLabel = page?.heroPrimaryCtaLabel ?? "Book ophold";
   const secondaryCtaUrl = page?.heroSecondaryCtaUrl ?? "#vaerelser";
   const secondaryCtaLabel = page?.heroSecondaryCtaLabel ?? "Se værelser";
@@ -192,41 +191,31 @@ export default async function HotelPage() {
   return (
     <main>
       {/* ── Section 1: Hero (Split Asymmetric) ─────────────────────────── */}
-      <section className="relative grid lg:grid-cols-2 min-h-[calc(100vh-80px)] bg-warm-white py-0">
+      <section className="grid lg:grid-cols-2 min-h-[calc(100vh-80px)] bg-warm-white">
         {/* Left: Content */}
-        <div className="flex flex-col justify-center px-10 lg:px-16 w-full">
-          <Breadcrumb current="Hotel" homeLabel={siteSettings?.breadcrumbHomeLabel} />
-
-          {/* Badge */}
-          {page?.heroBadge && (
-            <div className="inline-flex mb-6">
-              <span className="border border-border-warm px-4 py-1.5 text-[10px] tracking-[3px] uppercase font-semibold text-dark-stone">
-                {page.heroBadge}
-              </span>
-            </div>
-          )}
+        <div className="flex flex-col justify-center px-10 lg:px-16 py-20">
+          <Breadcrumb
+            current="Hotel"
+            homeLabel={siteSettings?.breadcrumbHomeLabel}
+          />
 
           {/* Heading */}
           <div className="mb-8">
-            <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] text-dark-stone leading-none">
-              <span className="font-newsreader font-extralight block">
+            <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] leading-none">
+              <span className="font-newsreader font-extralight text-dark-stone block">
                 {page?.heroHeading ?? "Overnat i hjertet af"}
               </span>
-              <span className="font-cormorant font-light italic text-dark-stone block">
+              <span className="font-cormorant font-light italic text-brand block">
                 {page?.heroHeadingItalic ?? "Frederiksberg"}
               </span>
             </h1>
           </div>
 
-          {/* Divider */}
-          <div className="w-16 h-px bg-brand mb-8" />
-
           {/* Description */}
-          {page?.heroDescription && (
-            <p className="text-warm-brown text-lg leading-7 mb-10 max-w-md font-light">
-              {page.heroDescription}
-            </p>
-          )}
+          <p className="text-warm-brown font-light leading-7 text-base max-w-md mb-10">
+            {page?.heroDescription ??
+              "Oplev atmosfæren i en af Københavns ældste bygninger. Vores hotel kombinerer 1780'ernes historiske charme med moderne komfort."}
+          </p>
 
           {/* Stats grid */}
           {page?.heroStats && page.heroStats.length > 0 && (
@@ -249,14 +238,18 @@ export default async function HotelPage() {
             <Link
               href={primaryCtaUrl}
               target={primaryCtaUrl?.startsWith("http") ? "_blank" : undefined}
-              rel={primaryCtaUrl?.startsWith("http") ? "noopener noreferrer" : undefined}
-              className="px-10 py-[18px] text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-brand hover:brightness-105 transition-all duration-300"
+              rel={
+                primaryCtaUrl?.startsWith("http")
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              className={buttonVariants({ variant: "primary" })}
             >
               {primaryCtaLabel}
             </Link>
             <Link
               href={secondaryCtaUrl}
-              className="px-10 py-[18px] text-[11px] tracking-[2.2px] uppercase font-bold text-dark-stone border border-[#897267] hover:bg-warm-gray transition-colors duration-300"
+              className={buttonVariants({ variant: "secondary" })}
             >
               {secondaryCtaLabel}
             </Link>
@@ -270,6 +263,7 @@ export default async function HotelPage() {
               src={heroImageUrl}
               alt={page?.heroHeading ?? "Hotel"}
               fill
+              sizes="50vw"
               className="object-cover object-center"
               priority
             />
@@ -299,11 +293,11 @@ export default async function HotelPage() {
 
       {/* ── Section 3: Facilities ───────────────────────────────────────── */}
       {page?.facilities && page.facilities.length > 0 && (
-        <section className="bg-warm-white px-10 lg:px-16 py-24 lg:py-32">
+        <section className="bg-warm-white px-10 lg:px-16 py-14 md:py-24 lg:py-32">
           <div className="max-w-6xl mx-auto">
             {/* Heading row */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-20">
-              <h2 className="text-[clamp(2rem,4vw,3rem)] leading-none">
+              <h2 className="text-[clamp(1.75rem,3vw,2.5rem)] leading-none">
                 <span className="font-newsreader font-extralight text-dark-stone">
                   {page.facilitiesHeading ?? "Faciliteter "}
                 </span>
@@ -360,14 +354,13 @@ export default async function HotelPage() {
         rooms={rooms}
         bookingCtaUrl={page?.bookingCtaUrl}
         sectionHeading={page?.roomShowcaseHeading}
-        sectionHeadingItalic={page?.roomShowcaseHeadingItalic}
       />
 
       {/* ── Section 5: Practical Info (FAQ) ────────────────────────────── */}
       {page?.faqItems && page.faqItems.length > 0 && (
-        <section className="bg-warm-white px-10 lg:px-16 py-24 lg:py-32">
+        <section className="bg-warm-white px-10 lg:px-16 py-14 md:py-24 lg:py-32">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-[clamp(1.75rem,3vw,2.25rem)] text-center mb-16 leading-none">
+            <h2 className="text-[clamp(1.75rem,3vw,2.5rem)] text-center mb-16 leading-none">
               <span className="font-newsreader font-extralight text-dark-stone">
                 {page.practicalInfoHeading ?? "Godt at "}{" "}
               </span>
@@ -383,22 +376,12 @@ export default async function HotelPage() {
       {/* ── Section 6: Location ──────────────────────────────────────────── */}
       <section className="bg-warm-gray grid lg:grid-cols-2">
         {/* Left: Full-bleed map */}
-        <div className="relative overflow-hidden min-h-[500px]">
-          <iframe
-            src={
-              page?.neighborhoodMapUrl ??
-              "https://www.openstreetmap.org/export/embed.html?bbox=12.5229%2C55.6710%2C12.5429%2C55.6810&layer=mapnik&marker=55.67597%2C12.53295"
-            }
-            width="100%"
-            height="100%"
-            className="absolute inset-0 w-full h-full"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Kort over Allégade 10"
-          />
-        </div>
+        <HotelMap
+          src={
+            page?.neighborhoodMapUrl ??
+            "https://www.openstreetmap.org/export/embed.html?bbox=12.5229%2C55.6710%2C12.5429%2C55.6810&layer=mapnik&marker=55.67597%2C12.53295"
+          }
+        />
 
         {/* Right: Location info */}
         <div className="flex flex-col justify-center px-12 lg:px-24 py-24">
@@ -409,7 +392,7 @@ export default async function HotelPage() {
 
           {/* Address as headline */}
           <div className="mb-2">
-            <h2 className="font-newsreader font-extralight text-[clamp(2.5rem,4vw,3.5rem)] text-dark-stone leading-none">
+            <h2 className="font-newsreader font-extralight text-[clamp(1.75rem,3vw,2.5rem)] text-dark-stone leading-none">
               {page?.neighborhoodAddress ?? "Allégade 10"}
             </h2>
             <p className="font-cormorant font-light italic text-brand text-xl mt-2">
@@ -431,8 +414,17 @@ export default async function HotelPage() {
                 {page.neighborhoodItems.map((item: NeighborhoodItem) => (
                   <li key={item._key} className="flex gap-6 items-start">
                     <div className="mt-0.5 shrink-0 text-warm-brown/50">
-                      <svg width="14" height="18" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 0C3.589 0 0 3.589 0 8c0 5.25 8 12 8 12S16 13.25 16 8c0-4.411-3.589-8-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" fill="currentColor" />
+                      <svg
+                        width="14"
+                        height="18"
+                        viewBox="0 0 16 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8 0C3.589 0 0 3.589 0 8c0 5.25 8 12 8 12S16 13.25 16 8c0-4.411-3.589-8-8-8Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"
+                          fill="currentColor"
+                        />
                       </svg>
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1">
@@ -493,7 +485,7 @@ export default async function HotelPage() {
                 {/* Image */}
                 {page.restaurantImage?.asset && (
                   <div
-                    className="relative shrink-0 w-full md:w-72 aspect-square overflow-hidden"
+                    className="relative shrink-0 w-full md:w-72 aspect-[3/2] md:aspect-square overflow-hidden"
                     {...(isDraftMode && page._id
                       ? {
                           "data-sanity": createDataAttribute({
@@ -512,6 +504,7 @@ export default async function HotelPage() {
                         .url()}
                       alt="Restaurant"
                       fill
+                      sizes="(max-width: 768px) 100vw, 18rem"
                       className="object-cover"
                     />
                   </div>
@@ -556,6 +549,11 @@ export default async function HotelPage() {
         </section>
       )}
 
+      <SectionRenderer
+        documentId={page?._id ?? "hotelPage"}
+        documentType={page?._type ?? "hotelPage"}
+        sections={page?.sections}
+      />
     </main>
   );
 }

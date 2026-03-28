@@ -33,7 +33,6 @@ const DEFAULT_NAV_LINKS: NavLink[] = [
   { name: "Events", href: "/events" },
 ];
 
-
 export default function Header({
   navLinks,
   ctaBookTableLabel = "Book bord",
@@ -48,9 +47,24 @@ export default function Header({
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const resolvedNavLinks = navLinks && navLinks.length > 0 ? navLinks : DEFAULT_NAV_LINKS;
-  const resolvedTableUrl = ctaBookTableUrl ?? "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
-  const resolvedStayUrl = ctaBookStayUrl ?? "https://allegade10.suitcasebooking.com/da";
+  const rawLinks =
+    navLinks && navLinks.length > 0 ? navLinks : DEFAULT_NAV_LINKS;
+
+  // Desktop: filter out empty/home links
+  const desktopNavLinks = rawLinks.filter((l) => l.name && l.href !== "/");
+  // Mobile: ensure Forside is first, filter out empty-name or duplicate home links
+  const mobileNavLinks: NavLink[] = [
+    { name: "Forside", href: "/" },
+    ...rawLinks.filter((l) => l.name && l.href !== "/"),
+  ];
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const resolvedTableUrl =
+    ctaBookTableUrl ??
+    "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+  const resolvedStayUrl =
+    ctaBookStayUrl ?? "https://allegade10.suitcasebooking.com/da";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -64,10 +78,13 @@ export default function Header({
       <header
         className={cn(
           "top-0 left-0 right-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
-          isHome ? "fixed" : "sticky bg-warm-white border-border-warm shadow-sm",
-          isHome && (scrolled
-            ? "bg-warm-white border-border-warm shadow-sm"
-            : "bg-transparent border-transparent")
+          isHome
+            ? "fixed"
+            : "sticky bg-warm-white border-border-warm shadow-sm",
+          isHome &&
+            (scrolled
+              ? "bg-warm-white border-border-warm shadow-sm"
+              : "bg-transparent border-transparent"),
         )}
       >
         <div className="max-w-[1280px] mx-auto px-8 h-20 flex items-center justify-between">
@@ -76,7 +93,7 @@ export default function Header({
             <span
               className={cn(
                 "text-2xl font-newsreader font-extralight transition-colors duration-300",
-                !isHome || scrolled ? "text-dark-stone" : "text-white"
+                !isHome || scrolled ? "text-dark-stone" : "text-white",
               )}
             >
               Allégade
@@ -84,7 +101,7 @@ export default function Header({
             <span
               className={cn(
                 "text-2xl ml-1 font-cormorant font-light italic transition-colors duration-300",
-                !isHome || scrolled ? "text-dark-stone" : "text-white"
+                !isHome || scrolled ? "text-dark-stone" : "text-white",
               )}
             >
               10
@@ -93,13 +110,13 @@ export default function Header({
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            {resolvedNavLinks.map((link) => (
+            {desktopNavLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href ?? "/"}
                 className={cn(
                   "text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
-                  !isHome || scrolled ? "text-dark-stone" : "text-white/90"
+                  !isHome || scrolled ? "text-dark-stone" : "text-white/90",
                 )}
               >
                 {link.name}
@@ -112,10 +129,12 @@ export default function Header({
             <Link
               href={resolvedTableUrl}
               target={isExternal(resolvedTableUrl) ? "_blank" : undefined}
-              rel={isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined}
+              rel={
+                isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined
+              }
               className={cn(
                 "hidden lg:block text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
-                !isHome || scrolled ? "text-dark-stone" : "text-white/90"
+                !isHome || scrolled ? "text-dark-stone" : "text-white/90",
               )}
             >
               {ctaBookTableLabel}
@@ -123,7 +142,9 @@ export default function Header({
             <Link
               href={resolvedStayUrl}
               target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
-              rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
+              rel={
+                isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined
+              }
               className="hidden lg:flex items-center text-[11px] tracking-[1.2px] uppercase font-light text-white px-6 py-3 hover:opacity-90 transition-opacity bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)]"
             >
               {ctaBookStayLabel}
@@ -134,7 +155,7 @@ export default function Header({
               onClick={() => setDrawerOpen(true)}
               className={cn(
                 "lg:hidden hover:opacity-70 focus:outline-none transition-opacity",
-                !isHome || scrolled ? "text-dark-stone" : "text-white"
+                !isHome || scrolled ? "text-dark-stone" : "text-white",
               )}
               aria-label={menuOpenLabel}
             >
@@ -148,7 +169,7 @@ export default function Header({
       <div
         className={cn(
           "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
-          drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none",
         )}
         onClick={() => setDrawerOpen(false)}
       />
@@ -158,7 +179,7 @@ export default function Header({
         className={cn(
           "fixed top-0 right-0 z-50 h-full w-full max-w-sm flex flex-col shadow-2xl transition-transform duration-300 ease-in-out lg:hidden",
           "bg-warm-white",
-          drawerOpen ? "translate-x-0" : "translate-x-full"
+          drawerOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         <div className="flex items-center justify-between px-8 h-20">
@@ -180,23 +201,33 @@ export default function Header({
         </div>
 
         <nav className="flex flex-col px-4 py-2 gap-1 overflow-y-auto">
-          {resolvedNavLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href ?? "/"}
-              onClick={() => setDrawerOpen(false)}
-              className="flex items-center px-4 py-3.5 text-[11px] font-light tracking-[1.2px] uppercase text-warm-brown hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200"
-            >
-              {link.name}
-            </Link>
-          ))}
+          {mobileNavLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.name}
+                href={link.href ?? "/"}
+                onClick={() => setDrawerOpen(false)}
+                className={cn(
+                  "flex items-center px-4 py-3.5 text-[11px] font-light tracking-[1.2px] uppercase hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200",
+                  active
+                    ? "text-dark-stone underline underline-offset-4 decoration-brand/40"
+                    : "text-warm-brown",
+                )}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="px-8 flex flex-col gap-3 mt-auto pb-10 pt-6">
           <Link
             href={resolvedTableUrl}
             target={isExternal(resolvedTableUrl) ? "_blank" : undefined}
-            rel={isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined}
+            rel={
+              isExternal(resolvedTableUrl) ? "noopener noreferrer" : undefined
+            }
             onClick={() => setDrawerOpen(false)}
             className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-dark-stone border border-border-warm rounded-full hover:border-brand transition-all duration-300"
           >
@@ -205,7 +236,9 @@ export default function Header({
           <Link
             href={resolvedStayUrl}
             target={isExternal(resolvedStayUrl) ? "_blank" : undefined}
-            rel={isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined}
+            rel={
+              isExternal(resolvedStayUrl) ? "noopener noreferrer" : undefined
+            }
             onClick={() => setDrawerOpen(false)}
             className="px-5 py-3 text-center text-[11px] font-light tracking-[1.2px] uppercase text-white rounded-full hover:opacity-90 transition-all duration-300 bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)]"
           >

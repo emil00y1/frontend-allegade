@@ -24,8 +24,8 @@ export default function HotelTeaserSection({
   image,
 }: HotelTeaserSectionProps) {
   return (
-    <section className="bg-warm-white px-8 lg:px-20 min-h-[calc(100vh-80px)] flex items-center py-0">
-      <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row gap-16 items-center w-full">
+    <section className="bg-warm-white px-8 lg:px-20 lg:min-h-[calc(100vh-80px)] flex items-center py-16 lg:py-0">
+      <div className="max-w-[1280px] mx-auto flex flex-col md:flex-row gap-8 md:gap-16 items-center w-full">
         {/* Text column */}
         <div className="flex-1 flex flex-col gap-8">
           <SectionHeading eyebrow={eyebrow} heading={heading} size="xl" />

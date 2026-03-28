@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { Instagram, Facebook } from "lucide-react";
+import { Instagram, Facebook, Linkedin, Youtube, Twitter, Mail } from "lucide-react";
 import NewsletterSection from "@/components/NewsletterSection";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const FOOTER_QUERY = `*[_type == "siteSettings"][0]{
   address, phone, email, footerDescription, socialLinks,
-  restaurantHours, kitchenHours,
+  restaurantHours, kitchenClosingNote,
   newsletterLabel, newsletterSubtext, newsletterButtonLabel,
   newsletterFirstNameLabel, newsletterLastNameLabel, newsletterEmailLabel,
   newsletterSuccessMessage, newsletterErrorMessage,
-  footerRestaurantHoursLabel, footerKitchenHoursLabel, footerContactLabel,
+  footerRestaurantHoursLabel, footerContactLabel,
   footerLinks[]{ label, url }
 }`;
 
@@ -35,7 +35,7 @@ interface SiteSettings {
   email?: string;
   footerDescription?: string;
   restaurantHours?: HourEntry[];
-  kitchenHours?: HourEntry[];
+  kitchenClosingNote?: string;
   socialLinks?: SocialLink[];
   newsletterLabel?: string;
   newsletterSubtext?: string;
@@ -46,22 +46,25 @@ interface SiteSettings {
   newsletterSuccessMessage?: string;
   newsletterErrorMessage?: string;
   footerRestaurantHoursLabel?: string;
-  footerKitchenHoursLabel?: string;
   footerContactLabel?: string;
   footerLinks?: FooterLink[];
 }
 
 const defaultRestaurantHours: HourEntry[] = [
-  { days: "Mandag - Torsdag", hours: "11:30 - 23:00" },
-  { days: "Fredag - Lørdag", hours: "11:30 - 00:00" },
-  { days: "Søndag", hours: "11:30 - 22:00" },
+  { days: "Mandag til Fredag", hours: "11.00 - 22.00" },
+  { days: "Lørdag", hours: "10.00 - 22.00" },
+  { days: "Søndag", hours: "10.00 - 21.00" },
 ];
 
-const defaultKitchenHours: HourEntry[] = [
-  { label: "Frokost", hours: "11:30 - 16:00" },
-  { label: "Aften", hours: "17:00 - 21:30" },
-  { label: "Brunch (Lør-Søn)", hours: "10:00 - 13:00" },
-];
+const platformIcons: Record<string, any> = {
+  instagram: Instagram,
+  facebook: Facebook,
+  linkedin: Linkedin,
+  youtube: Youtube,
+  twitter: Twitter,
+  x: Twitter,
+  mail: Mail,
+};
 
 export default async function Footer() {
   const { data: siteSettings } = (await sanityFetch({
@@ -72,19 +75,7 @@ export default async function Footer() {
     ? siteSettings.restaurantHours
     : defaultRestaurantHours;
 
-  const kitchenHours = siteSettings?.kitchenHours?.length
-    ? siteSettings.kitchenHours
-    : defaultKitchenHours;
-
-  const instagramUrl =
-    siteSettings?.socialLinks?.find(
-      (l) => l.platform?.toLowerCase() === "instagram",
-    )?.url || "#";
-
-  const facebookUrl =
-    siteSettings?.socialLinks?.find(
-      (l) => l.platform?.toLowerCase() === "facebook",
-    )?.url || "#";
+  const socialLinks = siteSettings?.socialLinks || [];
 
   return (
     <>
@@ -99,9 +90,9 @@ export default async function Footer() {
         errorMessage={siteSettings?.newsletterErrorMessage ?? undefined}
       />
       <footer className="bg-warm-gray border-t border-[rgba(231,229,228,0.1)]">
-        <div className="max-w-[1280px] mx-auto px-12 pt-20 pb-10">
+        <div className="max-w-7xl mx-auto px-12 pt-16 pb-6">
           {/* 4-col grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pb-12">
             {/* Col 1 – Brand */}
             <div className="flex flex-col gap-6">
               <Link href="/" className="flex items-baseline">
@@ -120,72 +111,56 @@ export default async function Footer() {
 
               {/* Social icons */}
               <div className="flex gap-4">
-                <a
-                  href={instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="w-8 h-8 border border-[#d6d3d1] rounded-full flex items-center justify-center text-[#78716c] hover:border-brand hover:text-brand transition-colors"
-                >
-                  <Instagram className="w-3.5 h-3.5" strokeWidth={1.5} />
-                </a>
-                <a
-                  href={facebookUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="w-8 h-8 border border-[#d6d3d1] rounded-full flex items-center justify-center text-[#78716c] hover:border-brand hover:text-brand transition-colors"
-                >
-                  <Facebook className="w-3.5 h-3.5" strokeWidth={1.5} />
-                </a>
+                {socialLinks.map((link, i) => {
+                  const Icon = platformIcons[link.platform?.toLowerCase()] || Instagram;
+                  return (
+                    <a
+                      key={i}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.platform}
+                      className="w-8 h-8 border border-[#d6d3d1] rounded-full flex items-center justify-center text-[#78716c] hover:border-brand hover:text-brand transition-colors"
+                    >
+                      <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
+                    </a>
+                  );
+                })}
               </div>
             </div>
 
             {/* Col 2 – Restaurant hours */}
             <div className="flex flex-col gap-8">
               <h4 className="text-[#292524] text-[12px] tracking-[1.2px] uppercase font-light">
-                {siteSettings?.footerRestaurantHoursLabel ?? "Restaurant Timer"}
+                {siteSettings?.footerRestaurantHoursLabel ?? "Restaurant"}
               </h4>
-              <ul className="flex flex-col gap-4">
-                {restaurantHours.map((entry, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center justify-between gap-4"
-                  >
-                    <span className="text-[#78716c] text-sm font-light">
-                      {entry.days || entry.label}
-                    </span>
-                    <span className="text-[#78716c] text-sm font-light shrink-0">
-                      {entry.hours}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-col gap-4">
+                <ul className="flex flex-col gap-4">
+                  {restaurantHours.map((entry, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center justify-between gap-4"
+                    >
+                      <span className="text-[#78716c] text-sm font-light">
+                        {entry.days || entry.label}
+                      </span>
+                      <span className="text-[#78716c] text-sm font-light shrink-0">
+                        {entry.hours}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {(siteSettings?.kitchenClosingNote ||
+                  "Køkkenet lukker 20:30") && (
+                  <p className="text-[#a8a29e] text-xs font-light">
+                    {siteSettings?.kitchenClosingNote ??
+                      "Køkkenet lukker 20:30"}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Col 3 – Kitchen hours */}
-            <div className="flex flex-col gap-8">
-              <h4 className="text-[#292524] text-[12px] tracking-[1.2px] uppercase font-light">
-                {siteSettings?.footerKitchenHoursLabel ?? "Køkken Timer"}
-              </h4>
-              <ul className="flex flex-col gap-4">
-                {kitchenHours.map((entry, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center justify-between gap-4"
-                  >
-                    <span className="text-[#78716c] text-sm font-light">
-                      {entry.label || entry.days}
-                    </span>
-                    <span className="text-[#78716c] text-sm font-light shrink-0">
-                      {entry.hours}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Col 4 – Contact */}
+            {/* Col 3 – Contact */}
             <div className="flex flex-col gap-8">
               <h4 className="text-[#292524] text-[12px] tracking-[1.2px] uppercase font-light">
                 {siteSettings?.footerContactLabel ?? "Kontakt"}
@@ -254,4 +229,3 @@ export default async function Footer() {
     </>
   );
 }
-

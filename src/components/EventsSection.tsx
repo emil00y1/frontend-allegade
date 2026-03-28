@@ -44,7 +44,7 @@ export default function EventsSection({
   if (events.length === 0) return null;
 
   return (
-    <section className="bg-warm-gray px-8 lg:px-20 min-h-[calc(100vh-80px)] flex items-center py-0">
+    <section className="bg-warm-gray px-8 lg:px-20 lg:min-h-[calc(100vh-80px)] flex items-center py-16 lg:py-0">
       <div className="max-w-[1280px] mx-auto flex flex-col gap-6 lg:gap-12 w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">

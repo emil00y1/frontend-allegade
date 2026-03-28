@@ -1,14 +1,46 @@
-import { createDataAttribute } from "next-sanity";
 import { draftMode } from "next/headers";
+import type { Metadata } from "next";
 import Hero from "@/components/Hero";
 import WelcomeSection from "@/components/WelcomeSection";
 import EventsSection from "@/components/EventsSection";
 import SelskaberSection from "@/components/SelskaberSection";
+import { SectionRenderer } from "@/components/sections";
 import { sanityFetch } from "@/sanity/lib/live";
+import { urlFor } from "@/sanity/lib/image";
 
 const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
   _id,
   _type,
+  seo,
+  sections[]{
+    ...,
+    _type == "homeHeroSection" => {
+      ...,
+      backgroundVideo{ asset->{ url } },
+      backgroundImage{ ..., asset-> }
+    },
+    _type == "welcomeSection" => {
+      ...,
+      image{ ..., asset-> }
+    },
+    _type == "selskaberTeaserSection" => {
+      ...,
+      backgroundImage{ ..., asset-> }
+    },
+    _type == "textImageSection" => {
+      ...,
+      image{ ..., asset-> }
+    },
+    _type == "bannerSection" => {
+      ...,
+      backgroundImage{ ..., asset-> }
+    },
+    _type == "gallerySection" => {
+      ...,
+      images[]{ ..., asset-> }
+    }
+  },
+  // Fallbacks for existing data (just in case)
   hero{
     tagline, heading, headingItalic,
     ctaPrimaryLabel, ctaPrimaryUrl,
@@ -41,6 +73,33 @@ const SITE_SETTINGS_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"]
   newsletterLabel, newsletterSubtext, newsletterButtonLabel
 }`;
 
+export async function generateMetadata(): Promise<Metadata> {
+  const { data: homepage } = await sanityFetch<any>({ query: HOMEPAGE_QUERY });
+  const { data: siteSettings } = await sanityFetch<any>({ query: SITE_SETTINGS_QUERY });
+
+  const seo = homepage?.seo;
+  const hero = homepage?.sections?.find((s: any) => s._type === "homeHeroSection") || homepage?.hero;
+
+  const title = seo?.metaTitle || homepage?.title || "Forside";
+  const description = seo?.metaDescription || hero?.tagline || siteSettings?.footerDescription;
+  
+  const ogImage = seo?.shareImage 
+    ? urlFor(seo.shareImage).width(1200).height(630).url()
+    : hero?.backgroundImage 
+      ? urlFor(hero.backgroundImage).width(1200).height(630).url()
+      : undefined;
+
+  return {
+    title: `${title} | Allégade 10`,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: ogImage ? [{ url: ogImage }] : [],
+    },
+  };
+}
+
 export default async function IndexPage() {
   const [{ data: homepage }, { data: events }, { data: siteSettings }] =
     await Promise.all([
@@ -52,32 +111,21 @@ export default async function IndexPage() {
       sanityFetch<any>({ query: SITE_SETTINGS_QUERY }),
     ]);
 
-  const { isEnabled: isDraft } = await draftMode();
-
-  const hero = homepage?.hero;
-  const welcome = homepage?.welcomeSection;
-  const eventsSection = homepage?.eventsSection;
-  const selskaber = homepage?.selskaberTeaser;
-
   const globalBookTableUrl =
     siteSettings?.ctaBookTableUrl ||
     "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
 
-  // Creates a data-sanity attribute for visual editing overlays (draft mode only)
-  function attr(path: string) {
-    if (!isDraft || !homepage?._id) return {};
-    return {
-      "data-sanity": createDataAttribute({
-        id: homepage._id as string,
-        type: (homepage._type ?? "homepage") as string,
-        path,
-      })(),
-    };
-  }
+  // If no sections are defined in the new Page Builder, use the old fixed layout as fallback
+  const hasSections = homepage?.sections && homepage.sections.length > 0;
 
-  return (
-    <main>
-      <div {...attr("hero")}>
+  if (!hasSections) {
+    const hero = homepage?.hero;
+    const welcome = homepage?.welcomeSection;
+    const eventsSection = homepage?.eventsSection;
+    const selskaber = homepage?.selskaberTeaser;
+
+    return (
+      <main>
         <Hero
           tagline={hero?.tagline}
           heading={hero?.heading}
@@ -90,9 +138,6 @@ export default async function IndexPage() {
           backgroundVideoUrl={hero?.backgroundVideo?.asset?.url}
           backgroundImage={hero?.backgroundImage}
         />
-      </div>
-
-      <div {...attr("welcomeSection")}>
         <WelcomeSection
           eyebrow={welcome?.eyebrow}
           heading={welcome?.heading}
@@ -102,9 +147,6 @@ export default async function IndexPage() {
           linkUrl={welcome?.linkUrl}
           image={welcome?.image}
         />
-      </div>
-
-      <div {...attr("eventsSection")}>
         <EventsSection
           events={events || []}
           eyebrow={eventsSection?.eyebrow}
@@ -114,9 +156,6 @@ export default async function IndexPage() {
           allEventsUrl={eventsSection?.allEventsUrl}
           eventCtaLabel={eventsSection?.eventCtaLabel}
         />
-      </div>
-
-      <div {...attr("selskaberTeaser")}>
         <SelskaberSection
           heading={selskaber?.heading}
           description={selskaber?.description}
@@ -124,9 +163,19 @@ export default async function IndexPage() {
           ctaUrl={selskaber?.ctaUrl}
           backgroundImage={selskaber?.backgroundImage}
         />
-      </div>
+      </main>
+    );
+  }
 
+  return (
+    <main>
+      <SectionRenderer
+        documentId={homepage?._id ?? "homepage"}
+        documentType={homepage?._type ?? "homepage"}
+        sections={homepage?.sections}
+        events={events || []}
+        globalBookTableUrl={globalBookTableUrl}
+      />
     </main>
   );
 }
-

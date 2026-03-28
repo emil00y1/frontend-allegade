@@ -72,7 +72,7 @@ export default function TextImageSection({
   const imageFirst = imagePosition === "left";
 
   const imageBlock = image ? (
-    <div className="flex items-center justify-center w-full py-12 lg:py-20">
+    <div className="flex items-center justify-center w-full py-8 lg:py-20">
       <div className="relative w-full max-w-[82%]">
         {/* Decorative offset frame */}
         <div
@@ -80,7 +80,7 @@ export default function TextImageSection({
           aria-hidden="true"
         />
         {/* Image */}
-        <div className="relative aspect-[4/5] overflow-hidden shadow-xl">
+        <div className="relative aspect-[4/3] md:aspect-[4/5] overflow-hidden shadow-xl">
           <Image
             src={urlFor(image).width(900).height(1125).url()}
             alt={image?.alt ?? heading ?? ""}
@@ -100,7 +100,7 @@ export default function TextImageSection({
   ) : null;
 
   const textBlock = (
-    <div className="flex flex-col justify-center py-16 lg:py-24 lg:px-4">
+    <div className="flex flex-col justify-center py-10 lg:py-24 lg:px-4">
       {subheading && (
         <span className={`text-xs tracking-[0.25em] uppercase font-medium mb-6 ${accentColor}`}>
           {subheading}

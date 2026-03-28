@@ -1,9 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
+import { draftMode } from "next/headers";
+import { createDataAttribute } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
+import dynamic from "next/dynamic";
 import Breadcrumb from "@/components/Breadcrumb";
-import MenuTabs, { type MenuCard, type TabConfig } from "@/components/MenuTabs";
+import { type MenuCard, type TabConfig } from "@/components/MenuTabs";
+import { buttonVariants } from "@/lib/button-variants";
+import { type SanityImage, type SiteSettings } from "@/types/sanity";
+
+const MenuTabs = dynamic(() => import("@/components/MenuTabs"));
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,33 +21,24 @@ interface ServingTime {
 }
 
 interface MenuPageData {
+  _id: string;
+  _type: string;
   breadcrumbLabel?: string;
   headerHeading?: string;
   headerDescription?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  headerImage?: any;
+  headerImage?: SanityImage;
   headerServingTimes?: ServingTime[];
   bookTableLabel?: string;
   bookTableUrl?: string;
   tabs?: TabConfig[];
 }
 
-interface SiteSettingsData {
-  address?: string;
-  phone?: string;
-  email?: string;
-  footerDescription?: string;
-  restaurantHours?: { days?: string; hours: string }[];
-  kitchenHours?: { label?: string; hours: string }[];
-  socialLinks?: { platform: string; url: string }[];
-  ctaBookTableUrl?: string;
-  breadcrumbHomeLabel?: string;
-}
-
 // ─── Query ────────────────────────────────────────────────────────────────────
 
 const MENUKORT_QUERY = `{
   "menuPage": *[_type == "menuPage"][0]{
+    _id,
+    _type,
     breadcrumbLabel,
     headerHeading,
     headerDescription,
@@ -80,9 +78,10 @@ const DEFAULT_TABS: TabConfig[] = [
 
 export default async function MenukortPage() {
   const { data } = await sanityFetch({ query: MENUKORT_QUERY });
+  const isDraftMode = (await draftMode()).isEnabled;
   const menuPage = data?.menuPage as MenuPageData | null;
   const menus = (data?.menus ?? []) as MenuCard[];
-  const siteSettings = data?.siteSettings as SiteSettingsData | null;
+  const siteSettings = data?.siteSettings as SiteSettings | null;
 
   const heading = menuPage?.headerHeading ?? "Vores Menukort";
   const description =
@@ -121,7 +120,18 @@ export default async function MenukortPage() {
 
           {/* Serving times strip */}
           {servingTimes.length > 0 && (
-            <div className="flex flex-wrap gap-x-6 gap-y-2 mb-8">
+            <div
+              className="flex flex-wrap gap-x-6 gap-y-2 mb-8"
+              {...(isDraftMode && menuPage?._id
+                ? {
+                    "data-sanity": createDataAttribute({
+                      id: menuPage._id,
+                      type: menuPage._type,
+                      path: "headerServingTimes",
+                    }).toString(),
+                  }
+                : {})}
+            >
               {servingTimes.map((st, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className="w-1 h-1 rounded-full bg-brand shrink-0" />
@@ -138,7 +148,7 @@ export default async function MenukortPage() {
 
           <Link
             href={bookTableUrl}
-            className="self-start px-8 py-3.5 text-[11px] tracking-[2px] uppercase font-light text-white bg-brand hover:opacity-90 transition-opacity"
+            className={buttonVariants({ variant: "primary", size: "sm" })}
           >
             {bookTableLabel}
           </Link>
@@ -151,6 +161,7 @@ export default async function MenukortPage() {
               src={headerImageUrl}
               alt={heading}
               fill
+              sizes="40vw"
               className="object-cover"
               priority
             />
@@ -162,11 +173,23 @@ export default async function MenukortPage() {
       </section>
 
       {/* ── Tabs (sticky) + content ─────────────────────────────────── */}
-      <MenuTabs
-        tabs={tabs}
-        menus={menus}
-        bookTableUrl={bookTableUrl}
-      />
+      <div
+        {...(isDraftMode && menuPage?._id
+          ? {
+              "data-sanity": createDataAttribute({
+                id: menuPage._id,
+                type: menuPage._type,
+                path: "tabs",
+              }).toString(),
+            }
+          : {})}
+      >
+        <MenuTabs
+          tabs={tabs}
+          menus={menus}
+          bookTableUrl={bookTableUrl}
+        />
+      </div>
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
     </main>

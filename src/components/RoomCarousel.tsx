@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -34,223 +34,212 @@ interface RoomCarouselProps {
   sectionHeadingItalic?: string;
 }
 
-export default function RoomCarousel({
-  rooms,
-  bookingCtaUrl = "https://allegade10.suitcasebooking.com/da",
-  sectionHeading = "Udforsk",
-  sectionHeadingItalic = "Værelserne",
-}: RoomCarouselProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
+/* ── Image slider for each room card ─────────────────────────────────── */
 
-  if (!rooms || rooms.length === 0) return null;
+function RoomImageSlider({
+  images,
+  alt,
+}: {
+  images: RoomImage[];
+  alt: string;
+}) {
+  const [index, setIndex] = useState(0);
+  const count = images.length;
 
-  const room = rooms[activeIndex];
+  const prev = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIndex((i) => (i - 1 + count) % count);
+    },
+    [count],
+  );
 
-  // Build image list: primary image first, then gallery
+  const next = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIndex((i) => (i + 1) % count);
+    },
+    [count],
+  );
+
+  const current = images[index];
+
+  return (
+    <div className="group/slider relative w-full aspect-[4/3] overflow-hidden bg-warm-gray">
+      {current?.asset ? (
+        <Image
+          src={urlFor(current).width(600).height(450).auto("format").url()}
+          alt={current.alt ?? alt}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-opacity duration-300"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-warm-white border border-border-warm flex items-center justify-center">
+          <span className="text-[10px] tracking-[1px] uppercase text-warm-brown/50">
+            Billede kommer snart
+          </span>
+        </div>
+      )}
+
+      {count > 1 && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-dark-stone p-1.5 rounded-full opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200 shadow-sm"
+            aria-label="Forrige billede"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-dark-stone p-1.5 rounded-full opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200 shadow-sm"
+            aria-label="Næste billede"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </>
+      )}
+
+      {count > 1 && (
+        <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-10 flex gap-1.5">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIndex(i);
+              }}
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                i === index ? "bg-white w-3" : "bg-white/50 hover:bg-white/80"
+              }`}
+              aria-label={`Billede ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Room card ───────────────────────────────────────────────────────── */
+
+function RoomCard({
+  room,
+  bookingCtaUrl,
+}: {
+  room: HotelRoom;
+  bookingCtaUrl: string;
+}) {
   const allImages: RoomImage[] = [];
   if (room.image) allImages.push(room.image);
   if (room.gallery) allImages.push(...room.gallery);
 
-  const mainImage = allImages[0];
-  const thumbImages = allImages.slice(1, 4);
-  const extraCount = Math.max(0, allImages.length - 4);
-
-  const prev = () => setActiveIndex((i) => (i - 1 + rooms.length) % rooms.length);
-  const next = () => setActiveIndex((i) => (i + 1) % rooms.length);
+  const finalUrl =
+    room.ctaUrl ?? bookingCtaUrl ?? "https://allegade10.suitcasebooking.com/da";
+  const isExternal = finalUrl.startsWith("http");
 
   return (
-    <section id="vaerelser" className="bg-warm-gray py-24 lg:py-32">
-      {/* Section heading */}
-      <div className="px-10 lg:px-16 mb-10 text-center">
-        <h2 className="text-[clamp(2rem,4vw,3rem)] leading-none inline">
-          <span className="font-newsreader font-extralight text-dark-stone">
-            {sectionHeading}{" "}
-          </span>
-          <span className="font-cormorant font-light italic text-dark-stone">
-            {sectionHeadingItalic}
-          </span>
-        </h2>
-      </div>
+    <div className="bg-warm-white shadow-sm overflow-hidden flex flex-col">
+      <RoomImageSlider
+        images={allImages.length > 0 ? allImages : [{}]}
+        alt={room.title}
+      />
 
-      {/* Room tabs */}
-      {rooms.length > 1 && (
-        <div className="px-10 lg:px-16 mb-10">
-          <div className="max-w-6xl mx-auto flex items-center gap-2 flex-wrap">
-            {rooms.map((r, i) => (
-              <button
-                key={r._id}
-                onClick={() => setActiveIndex(i)}
-                className={`px-6 py-2.5 text-[11px] tracking-[1.2px] uppercase font-light transition-all duration-200 border ${
-                  i === activeIndex
-                    ? "bg-brand text-white border-brand"
-                    : "bg-transparent text-warm-brown border-border-warm hover:border-brand hover:text-dark-stone"
-                }`}
-              >
-                {r.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="px-6 py-5 flex flex-col flex-1">
+        <h3 className="font-newsreader font-extralight text-xl leading-7 text-dark-stone mb-2">
+          {room.title}
+        </h3>
 
-      <div className="relative px-10 lg:px-16">
-        {/* Prev/next arrows — sides of the section */}
-        {rooms.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-warm-white/90 hover:bg-warm-white text-dark-stone p-2 transition-all duration-200 shadow-md"
-              aria-label="Forrige værelse"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-warm-white/90 hover:bg-warm-white text-dark-stone p-2 transition-all duration-200 shadow-md"
-              aria-label="Næste værelse"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
+        {room.description && (
+          <p className="text-warm-brown text-sm leading-5 font-light mb-3">
+            {room.description}
+          </p>
         )}
 
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8">
-          {/* Gallery — 8 cols */}
-          <div className="lg:col-span-8 flex flex-col gap-4">
-            {/* Main image */}
-            <div className="relative w-full aspect-[16/9] overflow-hidden bg-warm-gray">
-              {mainImage?.asset ? (
-                <Image
-                  src={urlFor(mainImage).width(1200).height(675).auto("format").url()}
-                  alt={mainImage.alt ?? room.title}
-                  fill
-                  className="object-cover transition-opacity duration-300"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-warm-white border border-border-warm flex items-center justify-center">
-                  <span className="text-[10px] tracking-[1px] uppercase text-warm-brown/50">
-                    Billede kommer snart
-                  </span>
-                </div>
-              )}
-            </div>
+        {room.features && room.features.length > 0 && (
+          <ul className="flex flex-wrap gap-x-4 gap-y-1.5 mb-4">
+            {room.features.map((feat, i) => (
+              <li key={i} className="flex items-center gap-1.5">
+                <svg
+                  width="10"
+                  height="8"
+                  viewBox="0 0 13 10"
+                  fill="none"
+                  className="shrink-0 text-brand"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 5L4.5 8.5L12 1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="text-xs text-dark-stone">{feat}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
-            {/* Thumbnails */}
-            {thumbImages.length > 0 && (
-              <div className="grid grid-cols-4 gap-4">
-                {thumbImages.map((img, i) => (
-                  <div
-                    key={i}
-                    className="relative aspect-square overflow-hidden bg-warm-gray"
-                  >
-                    {img.asset && (
-                      <Image
-                        src={urlFor(img).width(400).height(400).auto("format").url()}
-                        alt={img.alt ?? "Værelse detalje"}
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                  </div>
-                ))}
-                {extraCount > 0 && (
-                  <div className="relative aspect-square bg-warm-white border border-border-warm flex items-center justify-center">
-                    <span className="text-[10px] tracking-[1px] uppercase text-dark-stone">
-                      +{extraCount} Fotos
-                    </span>
-                  </div>
-                )}
-                {thumbImages.length < 3 && extraCount === 0 &&
-                  Array.from({ length: 3 - thumbImages.length }).map((_, i) => (
-                    <div
-                      key={`empty-${i}`}
-                      className="aspect-square bg-warm-white border border-border-warm"
-                    />
-                  ))}
-              </div>
+        <div className="mt-auto border-t border-border-warm/30 pt-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[9px] tracking-[1px] uppercase text-dark-stone opacity-60 mb-0.5">
+              {room.priceLabel ?? "Pris pr. nat"}
+            </p>
+            {room.pricePerNight ? (
+              <p className="font-newsreader font-extralight text-lg text-dark-stone">
+                {room.pricePerNight.toLocaleString("da-DK")} DKK
+              </p>
+            ) : (
+              <p className="font-newsreader font-extralight text-sm text-warm-brown/70">
+                Kontakt os
+              </p>
             )}
           </div>
+          <Link
+            href={finalUrl}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
+            className="shrink-0 px-5 py-2.5 text-[10px] tracking-[1.5px] uppercase font-bold text-white bg-brand-mid hover:bg-brand transition-colors duration-300"
+          >
+            {room.ctaLabel ?? "Reserver"}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          {/* Room Card — 4 cols */}
-          <div className="lg:col-span-4 bg-warm-white border-l-4 border-brand px-10 py-10 flex flex-col justify-between shadow-sm">
-            <div className="flex flex-col gap-4 pb-10">
-              {room.roomType && (
-                <span className="text-[10px] tracking-[1px] uppercase font-bold text-brand">
-                  {room.roomType}
-                </span>
-              )}
-              <h3 className="font-newsreader font-extralight text-[1.875rem] leading-9 text-dark-stone">
-                {room.title}
-              </h3>
-              {room.description && (
-                <p className="text-warm-brown text-base leading-6 font-light pt-2">
-                  {room.description}
-                </p>
-              )}
-              {room.note && (
-                <p className="text-warm-brown/70 text-sm leading-5 font-light italic">
-                  {room.note}
-                </p>
-              )}
-              {room.features && room.features.length > 0 && (
-                <ul className="flex flex-col gap-4 pt-4">
-                  {room.features.map((feat, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <svg
-                        width="13"
-                        height="10"
-                        viewBox="0 0 13 10"
-                        fill="none"
-                        className="shrink-0 text-brand"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M1 5L4.5 8.5L12 1"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span className="text-sm text-dark-stone">{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+/* ── Room grid section ───────────────────────────────────────────────── */
 
-            {/* Price + CTA */}
-            <div className="border-t border-border-warm/30 pt-8 flex flex-col gap-6">
-              <div>
-                <p className="text-[10px] tracking-[1px] uppercase text-dark-stone opacity-60 mb-1">
-                  {room.priceLabel ?? "Pris pr. nat"}
-                </p>
-                {room.pricePerNight ? (
-                  <p className="font-newsreader font-extralight text-2xl text-dark-stone">
-                    {room.pricePerNight.toLocaleString("da-DK")} DKK
-                  </p>
-                ) : (
-                  <p className="font-newsreader font-extralight text-lg text-warm-brown/70">
-                    Kontakt os
-                  </p>
-                )}
-              </div>
-              {(() => {
-                const finalUrl = room.ctaUrl ?? bookingCtaUrl ?? "https://allegade10.suitcasebooking.com/da";
-                const isExternal = finalUrl.startsWith("http");
-                return (
-                  <Link
-                    href={finalUrl}
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                    className="px-8 py-4 text-[11px] tracking-[2.2px] uppercase font-bold text-white bg-brand-mid hover:bg-brand transition-colors duration-300"
-                  >
-                    {room.ctaLabel ?? "Reserver nu"}
-                  </Link>
-                );
-              })()}
-            </div>
-          </div>
+export default function RoomCarousel({
+  rooms,
+  bookingCtaUrl = "https://allegade10.suitcasebooking.com/da",
+  sectionHeading = "Udforsk vores værelser",
+}: RoomCarouselProps) {
+  if (!rooms || rooms.length === 0) return null;
+
+  return (
+    <section id="vaerelser" className="bg-warm-gray py-14 md:py-24 lg:py-32">
+      <div className="max-w-6xl mx-auto px-10 lg:px-16">
+        {/* Section heading */}
+        <div className="mb-12 text-center">
+          <h2 className="font-newsreader font-extralight text-[clamp(1.75rem,3vw,2.5rem)] leading-none text-dark-stone">
+            {sectionHeading || "Udforsk vores værelser"}
+          </h2>
+        </div>
+
+        {/* Room grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {rooms.map((room) => (
+            <RoomCard
+              key={room._id}
+              room={room}
+              bookingCtaUrl={bookingCtaUrl}
+            />
+          ))}
         </div>
       </div>
     </section>
