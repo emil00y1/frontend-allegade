@@ -2,6 +2,7 @@ import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
+import { type SanityImage } from "@/types/sanity";
 
 interface HotelTeaserSectionProps {
   eyebrow?: string;
@@ -10,8 +11,7 @@ interface HotelTeaserSectionProps {
   description?: string;
   ctaLabel?: string;
   ctaUrl?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  image?: any;
+  image?: SanityImage;
 }
 
 export default function HotelTeaserSection({

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { urlFor } from "@/sanity/lib/image";
+import { type SanityImage } from "@/types/sanity";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,8 +33,7 @@ export interface MenuCard {
   menuType: string;
   order?: number;
   intro?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  featuredImage?: any;
+  featuredImage?: SanityImage;
   price?: number;
   priceString?: string;
   priceLabel?: string;
@@ -423,14 +423,9 @@ export default function MenuTabs({
   menus,
   bookTableUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
 }: MenuTabsProps) {
-  const [activeTab, setActiveTab] = useState<string>(
-    tabs[0]?.menuType ?? "lunch",
+  const [activeTab, setActiveTab] = useState<string>(() =>
+    getDefaultMenuType(tabs),
   );
-
-  // Set time-appropriate default after hydration
-  useEffect(() => {
-    setActiveTab(getDefaultMenuType(tabs));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const menusByType = Object.fromEntries(menus.map((m) => [m.menuType, m]));
   const activeMenu = menusByType[activeTab];

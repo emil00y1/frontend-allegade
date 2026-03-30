@@ -1,5 +1,5 @@
 import { PortableText } from "next-sanity";
-import imageUrlBuilder, { type SanityImageSource } from "@sanity/image-url";
+import { createImageUrlBuilder, type SanityImageSource } from "@sanity/image-url";
 import { client } from "@/sanity/client";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +10,7 @@ const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{ backToPostsLabel }`;
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>
   projectId && dataset
-    ? imageUrlBuilder({ projectId, dataset }).image(source)
+    ? createImageUrlBuilder({ projectId, dataset }).image(source)
     : null;
 
 const options = { next: { revalidate: 30 } };

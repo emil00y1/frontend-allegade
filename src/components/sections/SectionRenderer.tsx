@@ -12,6 +12,28 @@ import Hero from "@/components/Hero";
 import WelcomeSection from "@/components/WelcomeSection";
 import EventsSection from "@/components/EventsSection";
 import SelskaberSection from "@/components/SelskaberSection";
+import RestaurantHero from "./RestaurantHero";
+import RestaurantStory from "./RestaurantStory";
+import RestaurantMenuTeaser from "./RestaurantMenuTeaser";
+import RestaurantPhilosophy from "./RestaurantPhilosophy";
+import RestaurantGallery from "./RestaurantGallery";
+import HotelHero from "./HotelHero";
+import HotelFacilities from "./HotelFacilities";
+import HotelRoomShowcase from "./HotelRoomShowcase";
+import HotelPracticalInfo from "./HotelPracticalInfo";
+import HotelNeighborhood from "./HotelNeighborhood";
+import HotelRestaurantTeaser from "./HotelRestaurantTeaser";
+import SelskaberHero from "./SelskaberHero";
+import SelskaberOccasions from "./SelskaberOccasions";
+import SelskaberVenues from "./SelskaberVenues";
+import SelskaberMenu from "./SelskaberMenu";
+import SelskaberCtaBanner from "./SelskaberCtaBanner";
+import SelskaberForm from "./SelskaberForm";
+import MenuHero from "./MenuHero";
+import MenuTabsSection from "./MenuTabsSection";
+import EventsHero from "./EventsHero";
+import EventsList from "./EventsList";
+import EventsArchive from "./EventsArchive";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SectionBlock = { _key: string; _type: string; [key: string]: any };
@@ -21,6 +43,28 @@ const sectionComponents: Record<string, React.ComponentType<Record<string, unkno
   welcomeSection: WelcomeSection as React.ComponentType<Record<string, unknown>>,
   eventsTeaserSection: EventsSection as React.ComponentType<Record<string, unknown>>,
   selskaberTeaserSection: SelskaberSection as React.ComponentType<Record<string, unknown>>,
+  restaurantHeroSection: RestaurantHero as React.ComponentType<Record<string, unknown>>,
+  restaurantStorySection: RestaurantStory as React.ComponentType<Record<string, unknown>>,
+  restaurantMenuTeaserSection: RestaurantMenuTeaser as React.ComponentType<Record<string, unknown>>,
+  restaurantPhilosophySection: RestaurantPhilosophy as React.ComponentType<Record<string, unknown>>,
+  restaurantGallerySection: RestaurantGallery as React.ComponentType<Record<string, unknown>>,
+  hotelHeroSection: HotelHero as React.ComponentType<Record<string, unknown>>,
+  hotelFacilitiesSection: HotelFacilities as React.ComponentType<Record<string, unknown>>,
+  hotelRoomShowcaseSection: HotelRoomShowcase as React.ComponentType<Record<string, unknown>>,
+  hotelPracticalInfoSection: HotelPracticalInfo as React.ComponentType<Record<string, unknown>>,
+  hotelNeighborhoodSection: HotelNeighborhood as React.ComponentType<Record<string, unknown>>,
+  hotelRestaurantTeaserSection: HotelRestaurantTeaser as React.ComponentType<Record<string, unknown>>,
+  selskaberHeroSection: SelskaberHero as React.ComponentType<Record<string, unknown>>,
+  selskaberOccasionsSection: SelskaberOccasions as React.ComponentType<Record<string, unknown>>,
+  selskaberVenuesSection: SelskaberVenues as React.ComponentType<Record<string, unknown>>,
+  selskaberMenuSection: SelskaberMenu as React.ComponentType<Record<string, unknown>>,
+  selskaberCtaBannerSection: SelskaberCtaBanner as React.ComponentType<Record<string, unknown>>,
+  selskaberFormSection: SelskaberForm as React.ComponentType<Record<string, unknown>>,
+  menuHeroSection: MenuHero as React.ComponentType<Record<string, unknown>>,
+  menuTabsSection: MenuTabsSection as React.ComponentType<Record<string, unknown>>,
+  eventsHeroSection: EventsHero as React.ComponentType<Record<string, unknown>>,
+  eventsListSection: EventsList as React.ComponentType<Record<string, unknown>>,
+  eventsArchiveSection: EventsArchive as React.ComponentType<Record<string, unknown>>,
   textImageSection: TextImageSection as React.ComponentType<Record<string, unknown>>,
   bannerSection: BannerSection as React.ComponentType<Record<string, unknown>>,
   richTextSection: RichTextSection as React.ComponentType<Record<string, unknown>>,
@@ -34,7 +78,14 @@ type SectionRendererProps = {
   documentType: string;
   sections?: SectionBlock[];
   events?: any[];
+  rooms?: any[];
+  menus?: any[];
+  occasionLabels?: string[];
+  upcomingEvents?: any[];
+  pastEvents?: any[];
+  featuredEvent?: any;
   globalBookTableUrl?: string;
+  breadcrumbHomeLabel?: string;
 };
 
 const dataAttrConfig = {
@@ -48,17 +99,20 @@ export default function SectionRenderer({
   documentType,
   sections: initialSections,
   events,
+  rooms,
+  menus,
+  occasionLabels,
+  upcomingEvents,
+  pastEvents,
+  featuredEvent,
   globalBookTableUrl,
+  breadcrumbHomeLabel,
 }: SectionRendererProps) {
-  // useOptimistic provides instant UI updates when sections are reordered
-  // via drag-and-drop in the Presentation tool
   const sections = useOptimistic<
     SectionBlock[] | undefined,
     SanityDocument<{ sections?: SectionBlock[] }>
   >(initialSections, (currentSections, action) => {
     if (action.id === documentId && action.document.sections) {
-      // Preserve full resolved data for sections that already exist locally,
-      // use the new order from the mutation
       return action.document.sections.map(
         (section) =>
           currentSections?.find((s) => s._key === section?._key) || section,
@@ -85,14 +139,37 @@ export default function SectionRenderer({
           return null;
         }
 
-        // Handle specific props for certain sections
         const extraProps: Record<string, any> = {};
         if (section._type === "eventsTeaserSection") {
           extraProps.events = events;
         }
-        if (section._type === "homeHeroSection") {
+        if (["homeHeroSection", "restaurantHeroSection", "hotelHeroSection", "selskaberHeroSection", "menuHeroSection"].includes(section._type)) {
           extraProps.ctaPrimaryUrl = section.ctaPrimaryUrl || globalBookTableUrl;
           extraProps.backgroundVideoUrl = section.backgroundVideo?.asset?.url;
+          extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
+          extraProps.globalBookTableUrl = globalBookTableUrl;
+          extraProps.bookingCtaUrl = section.bookingCtaUrl || globalBookTableUrl;
+        }
+        if (section._type === "hotelRoomShowcaseSection") {
+          extraProps.rooms = rooms;
+          extraProps.bookingCtaUrl = globalBookTableUrl;
+        }
+        if (section._type === "selskaberFormSection") {
+          extraProps.occasionLabels = occasionLabels;
+        }
+        if (section._type === "menuTabsSection") {
+          extraProps.menus = menus;
+          extraProps.globalBookTableUrl = globalBookTableUrl;
+        }
+        if (section._type === "eventsHeroSection") {
+          extraProps.featuredEvent = featuredEvent;
+          extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
+        }
+        if (section._type === "eventsListSection") {
+          extraProps.upcomingEvents = upcomingEvents;
+        }
+        if (section._type === "eventsArchiveSection") {
+          extraProps.pastEvents = pastEvents;
         }
 
         return (

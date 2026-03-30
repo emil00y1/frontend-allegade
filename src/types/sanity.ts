@@ -14,6 +14,38 @@ export interface SanitySlug {
   current: string;
 }
 
+export interface SanitySeo {
+  metaTitle?: string;
+  metaDescription?: string;
+  shareImage?: SanityImage;
+}
+
+export interface SanitySection {
+  _key: string;
+  _type: string;
+  [key: string]: unknown;
+}
+
+export interface MenuServiceItem {
+  _key: string;
+  title?: string;
+  timeLabel?: string;
+  description?: string;
+  priceFrom?: number;
+  priceLabel?: string;
+  image?: SanityImage;
+}
+
+export interface GalleryImage extends SanityImage {
+  alt?: string;
+}
+
+export interface StatItem {
+  _key: string;
+  value?: string;
+  label?: string;
+}
+
 export interface SanityHours {
   days?: string;
   hours: string;

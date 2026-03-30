@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { Instagram, Facebook, Linkedin, Youtube, Twitter, Mail } from "lucide-react";
+import {
+  Instagram,
+  Facebook,
+  Linkedin,
+  Youtube,
+  Twitter,
+  Mail,
+  type LucideIcon,
+} from "lucide-react";
 import NewsletterSection from "@/components/NewsletterSection";
 import { sanityFetch } from "@/sanity/lib/live";
 
@@ -56,7 +64,7 @@ const defaultRestaurantHours: HourEntry[] = [
   { days: "Søndag", hours: "10.00 - 21.00" },
 ];
 
-const platformIcons: Record<string, any> = {
+const platformIcons: Record<string, LucideIcon> = {
   instagram: Instagram,
   facebook: Facebook,
   linkedin: Linkedin,
@@ -112,7 +120,8 @@ export default async function Footer() {
               {/* Social icons */}
               <div className="flex gap-4">
                 {socialLinks.map((link, i) => {
-                  const Icon = platformIcons[link.platform?.toLowerCase()] || Instagram;
+                  const Icon =
+                    platformIcons[link.platform?.toLowerCase()] || Instagram;
                   return (
                     <a
                       key={i}
