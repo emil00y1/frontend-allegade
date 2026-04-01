@@ -34,6 +34,11 @@ import MenuTabsSection from "./MenuTabsSection";
 import EventsHero from "./EventsHero";
 import EventsList from "./EventsList";
 import EventsArchive from "./EventsArchive";
+import FaqSection from "./FaqSection";
+import TestimonialsSection from "./TestimonialsSection";
+import TeamSection from "./TeamSection";
+import OffersSection from "./OffersSection";
+import JobListingSection from "./JobListingSection";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SectionBlock = { _key: string; _type: string; [key: string]: any };
@@ -71,6 +76,11 @@ const sectionComponents: Record<string, React.ComponentType<Record<string, unkno
   gallerySection: GallerySection as React.ComponentType<Record<string, unknown>>,
   quoteSection: QuoteSection as React.ComponentType<Record<string, unknown>>,
   ctaBannerSection: CtaBannerSection as React.ComponentType<Record<string, unknown>>,
+  faqSection: FaqSection as React.ComponentType<Record<string, unknown>>,
+  testimonialsSection: TestimonialsSection as React.ComponentType<Record<string, unknown>>,
+  teamSection: TeamSection as React.ComponentType<Record<string, unknown>>,
+  offersSection: OffersSection as React.ComponentType<Record<string, unknown>>,
+  jobListingSection: JobListingSection as React.ComponentType<Record<string, unknown>>,
 };
 
 type SectionRendererProps = {
@@ -133,6 +143,25 @@ export default function SectionRenderer({
       }).toString()}
     >
       {sections.map((section) => {
+        // Handle reusable block references — render nested content sections
+        if (section._type === "reusableBlockReferenceSection") {
+          const blockContent = section.block?.content;
+          if (!blockContent || !Array.isArray(blockContent)) return null;
+          return (
+            <div key={section._key}>
+              {blockContent.map((nestedSection: SectionBlock) => {
+                const NestedComponent = sectionComponents[nestedSection._type];
+                if (!NestedComponent) return null;
+                return (
+                  <div key={nestedSection._key}>
+                    <NestedComponent {...nestedSection} />
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
         const Component = sectionComponents[section._type];
         if (!Component) {
           console.warn(`Unknown section type: ${section._type}`);

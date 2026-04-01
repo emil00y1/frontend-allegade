@@ -9,6 +9,23 @@ export const SECTIONS_QUERY_FRAGMENT = `
     ...,
     image{ ..., asset-> },
     backgroundImage{ ..., asset-> },
-    images[]{ ..., asset-> }
+    images[]{ ..., asset-> },
+    members[]{ ..., image{ ..., asset-> } },
+    testimonials[]{ ..., image{ ..., asset-> } },
+    offers[]{ ..., image{ ..., asset-> } },
+    _type == "reusableBlockReferenceSection" => {
+      ...,
+      block->{
+        content[]{
+          ...,
+          image{ ..., asset-> },
+          backgroundImage{ ..., asset-> },
+          images[]{ ..., asset-> },
+          members[]{ ..., image{ ..., asset-> } },
+          testimonials[]{ ..., image{ ..., asset-> } },
+          offers[]{ ..., image{ ..., asset-> } }
+        }
+      }
+    }
   }
 `;

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 interface NavLink {
   name: string;
   href: string;
+  pageReference?: { slug?: string };
 }
 
 interface HeaderProps {
@@ -48,7 +49,12 @@ export default function Header({
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const rawLinks =
-    navLinks && navLinks.length > 0 ? navLinks : DEFAULT_NAV_LINKS;
+    navLinks && navLinks.length > 0
+      ? navLinks.map((l) => ({
+          ...l,
+          href: l.pageReference?.slug ? `/${l.pageReference.slug}` : l.href,
+        }))
+      : DEFAULT_NAV_LINKS;
 
   // Desktop: filter out empty/home links
   const desktopNavLinks = rawLinks.filter((l) => l.name && l.href !== "/");

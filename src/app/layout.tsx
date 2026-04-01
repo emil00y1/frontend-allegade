@@ -41,7 +41,7 @@ const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], wei
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
-  navigation[]{ name, href },
+  navigation[]{ name, href, pageReference->{ "slug": slug.current } },
   ctaBookTableLabel,
   ctaBookTableUrl,
   ctaBookStayLabel,
