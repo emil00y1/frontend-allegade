@@ -8,8 +8,6 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { draftMode } from "next/headers";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { DisableDraftMode } from "@/components/DisableDraftMode";
 import { SanityLive } from "@/sanity/lib/live";
 import { VisualEditing } from "next-sanity/visual-editing";
@@ -40,25 +38,15 @@ const jost = Jost({ variable: "--font-jost", subsets: ["latin"], weight: ["300",
 const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], weight: ["300"], style: ["normal", "italic"] });
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
-const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
-  navigation[]{ name, href },
-  ctaBookTableLabel,
-  ctaBookTableUrl,
-  ctaBookStayLabel,
-  ctaBookStayUrl,
+const SETTINGS_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   colorTheme,
   fontPairing,
-  headerMenuOpenLabel,
-  headerMenuCloseLabel
-}`;
-
-const FAVICON_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   "faviconUrl": favicon.asset->url
 }`;
 
 // ─── Dynamic metadata (favicon from Sanity) ───────────────────────────────────
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await sanityFetch({ query: FAVICON_QUERY });
+  const { data } = await sanityFetch({ query: SETTINGS_QUERY });
   const base: Metadata = {
     title: "Allégade 10",
     description: "Hotel, restaurant og selskabslokaler på Frederiksberg",
@@ -73,10 +61,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data: navSettings } = await sanityFetch({ query: NAV_QUERY });
+  const { data: settings } = await sanityFetch({ query: SETTINGS_QUERY });
 
-  const themeVars = getThemeVars(navSettings?.colorTheme);
-  const fontVars = getFontVars(navSettings?.fontPairing);
+  const themeVars = getThemeVars(settings?.colorTheme);
+  const fontVars = getFontVars(settings?.fontPairing);
 
   const allFontVariables = cn(
     inter.variable, newsreader.variable, cormorantGaramond.variable,
@@ -92,17 +80,7 @@ export default async function RootLayout({
       style={{ ...themeVars, ...fontVars } as React.CSSProperties}
     >
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
-        <Header
-          navLinks={navSettings?.navigation}
-          ctaBookTableLabel={navSettings?.ctaBookTableLabel}
-          ctaBookTableUrl={navSettings?.ctaBookTableUrl}
-          ctaBookStayLabel={navSettings?.ctaBookStayLabel}
-          ctaBookStayUrl={navSettings?.ctaBookStayUrl}
-          menuOpenLabel={navSettings?.headerMenuOpenLabel}
-          menuCloseLabel={navSettings?.headerMenuCloseLabel}
-        />
         {children}
-        <Footer />
         <SanityLive />
         {(await draftMode()).isEnabled && (
           <>
