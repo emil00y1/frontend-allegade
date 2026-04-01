@@ -15,7 +15,7 @@ interface Event {
 }
 
 interface EventsSectionProps {
-  events: Event[];
+  events?: Event[];
   eyebrow?: string;
   heading?: string;
   description?: string;
