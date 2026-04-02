@@ -101,7 +101,7 @@ function formatPrice(item: MenuItem): string | null {
 function SectionHeader({ title, note }: { title?: string; note?: string }) {
   if (!title) return null;
   return (
-    <div className="mt-12 mb-6 first:mt-0">
+    <div>
       <div className="flex items-center gap-4 mb-1">
         <h3 className="text-[11px] tracking-[2.5px] uppercase font-light text-dark-stone shrink-0">
           {title}
@@ -373,7 +373,7 @@ function StandardMenuTab({
         }
 
         return (
-          <div key={section._key}>
+          <div key={section._key} className="mt-12 mb-6 first:mt-0">
             <SectionHeader
               title={section.sectionTitle}
               note={section.sectionNote}
@@ -398,7 +398,7 @@ function BeveragesTab({ menu }: { menu: MenuCard }) {
   return (
     <div className="py-12 lg:py-16 max-w-2xl mx-auto">
       {menu.sections?.map((section) => (
-        <div key={section._key}>
+        <div key={section._key} className="mt-12 mb-6 first:mt-0">
           <SectionHeader
             title={section.sectionTitle}
             note={section.sectionNote}
