@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PortableText } from "next-sanity";
 import Link from "next/link";
 import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 
 const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug][0]{
@@ -24,8 +25,7 @@ const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug][0]{
 const ALL_JOBS_QUERY = `*[_type == "jobPosting" && defined(slug.current)]{ "slug": slug.current }`;
 
 export async function generateStaticParams() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: jobs } = await sanityFetch<any>({ query: ALL_JOBS_QUERY });
+  const jobs = await client.fetch(ALL_JOBS_QUERY);
   return (jobs || []).map((job: any) => ({ slug: job.slug }));
 }
 
