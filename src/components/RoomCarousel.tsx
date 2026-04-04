@@ -15,6 +15,7 @@ interface RoomImage {
 export interface HotelRoom {
   _id: string;
   title: string;
+  slug?: { current: string };
   roomType?: string;
   pricePerNight?: number;
   priceLabel?: string;
@@ -147,9 +148,17 @@ function RoomCard({
       />
 
       <div className="px-6 py-5 flex flex-col flex-1">
-        <h3 className="font-newsreader font-extralight text-xl leading-7 text-dark-stone mb-2">
-          {room.title}
-        </h3>
+        {room.slug?.current ? (
+          <Link href={`/hotel/vaerelser/${room.slug.current}`} className="group/title">
+            <h3 className="font-newsreader font-extralight text-xl leading-7 text-dark-stone mb-2 group-hover/title:text-brand transition-colors duration-200">
+              {room.title}
+            </h3>
+          </Link>
+        ) : (
+          <h3 className="font-newsreader font-extralight text-xl leading-7 text-dark-stone mb-2">
+            {room.title}
+          </h3>
+        )}
 
         {room.description && (
           <p className="text-warm-brown text-sm leading-5 font-light mb-3">

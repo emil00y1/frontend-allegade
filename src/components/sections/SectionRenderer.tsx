@@ -23,6 +23,8 @@ import HotelRoomShowcase from "./HotelRoomShowcase";
 import HotelPracticalInfo from "./HotelPracticalInfo";
 import HotelNeighborhood from "./HotelNeighborhood";
 import HotelRestaurantTeaser from "./HotelRestaurantTeaser";
+import HotelStory from "./HotelStory";
+import HotelArrival from "./HotelArrival";
 import SelskaberHero from "./SelskaberHero";
 import SelskaberOccasions from "./SelskaberOccasions";
 import SelskaberVenues from "./SelskaberVenues";
@@ -59,6 +61,8 @@ const sectionComponents: Record<string, React.ComponentType<Record<string, unkno
   hotelPracticalInfoSection: HotelPracticalInfo as React.ComponentType<Record<string, unknown>>,
   hotelNeighborhoodSection: HotelNeighborhood as React.ComponentType<Record<string, unknown>>,
   hotelRestaurantTeaserSection: HotelRestaurantTeaser as React.ComponentType<Record<string, unknown>>,
+  hotelStorySection: HotelStory as React.ComponentType<Record<string, unknown>>,
+  hotelArrivalSection: HotelArrival as React.ComponentType<Record<string, unknown>>,
   selskaberHeroSection: SelskaberHero as React.ComponentType<Record<string, unknown>>,
   selskaberOccasionsSection: SelskaberOccasions as React.ComponentType<Record<string, unknown>>,
   selskaberVenuesSection: SelskaberVenues as React.ComponentType<Record<string, unknown>>,

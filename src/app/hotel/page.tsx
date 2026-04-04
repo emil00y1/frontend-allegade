@@ -92,7 +92,7 @@ const HOTEL_PAGE_QUERY = `{
     restaurantCtaLabel, restaurantCtaUrl, restaurantImage{ ..., asset-> }
   },
   "rooms": *[_type == "hotelRoom"] | order(order asc, title asc){
-    _id, title, roomType, pricePerNight, priceLabel, description, note, features, ctaLabel, ctaUrl,
+    _id, title, slug, roomType, pricePerNight, priceLabel, description, note, features, ctaLabel, ctaUrl,
     image{ ..., asset-> }, gallery[]{ ..., asset-> }
   },
   "siteSettings": *[_type == "siteSettings"][0]{
