@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PortableText } from "next-sanity";
 import type { TypedObject } from "sanity";
 import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
 
@@ -41,8 +42,8 @@ const ROOM_QUERY = `*[_type == "hotelRoom" && slug.current == $slug][0]{
 const ROOM_SLUGS_QUERY = `*[_type == "hotelRoom" && defined(slug.current)]{ "slug": slug.current }`;
 
 export async function generateStaticParams() {
-  const { data } = await sanityFetch({ query: ROOM_SLUGS_QUERY });
-  return (data as Array<{ slug: string }> ?? []).map((r) => ({ slug: r.slug }));
+  const rooms = await client.fetch<Array<{ slug: string }>>(ROOM_SLUGS_QUERY);
+  return (rooms ?? []).map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({
