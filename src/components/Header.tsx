@@ -20,6 +20,9 @@ interface HeaderProps {
   ctaBookStayUrl?: string;
   menuOpenLabel?: string;
   menuCloseLabel?: string;
+  logoText?: string;
+  logoImageUrl?: string;
+  logoImageLightUrl?: string;
 }
 
 function isExternal(url: string) {
@@ -42,6 +45,9 @@ export default function Header({
   ctaBookStayUrl = "https://allegade10.suitcasebooking.com/da",
   menuOpenLabel = "Åbn menu",
   menuCloseLabel = "Luk menu",
+  logoText,
+  logoImageUrl,
+  logoImageLightUrl,
 }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -79,6 +85,8 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const currentLogoUrl = !isHome || scrolled ? logoImageUrl : (logoImageLightUrl || logoImageUrl);
+
   return (
     <>
       <header
@@ -95,24 +103,49 @@ export default function Header({
       >
         <div className="max-w-[1280px] mx-auto px-8 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-baseline shrink-0">
-            <span
-              className={cn(
-                "text-2xl font-newsreader font-extralight transition-colors duration-300",
-                !isHome || scrolled ? "text-dark-stone" : "text-white",
-              )}
-            >
-              Allégade
-            </span>
-            <span
-              className={cn(
-                "text-2xl ml-1 font-cormorant font-light italic transition-colors duration-300",
-                !isHome || scrolled ? "text-dark-stone" : "text-white",
-              )}
-            >
-              10
-            </span>
+          <Link href="/" className="flex items-center gap-4 shrink-0">
+            {currentLogoUrl && (
+              <img
+                src={currentLogoUrl}
+                alt={logoText || "Allégade 10"}
+                className="h-10 w-auto object-contain"
+              />
+            )}
+            {(!currentLogoUrl || logoText) && (
+              <div className="flex items-baseline">
+                {logoText ? (
+                  <span
+                    className={cn(
+                      "text-2xl font-newsreader font-extralight transition-colors duration-300",
+                      !isHome || scrolled ? "text-dark-stone" : "text-white",
+                    )}
+                  >
+                    {logoText}
+                  </span>
+                ) : (
+                  <>
+                    <span
+                      className={cn(
+                        "text-2xl font-newsreader font-extralight transition-colors duration-300",
+                        !isHome || scrolled ? "text-dark-stone" : "text-white",
+                      )}
+                    >
+                      Allégade
+                    </span>
+                    <span
+                      className={cn(
+                        "text-2xl ml-1 font-cormorant font-light italic transition-colors duration-300",
+                        !isHome || scrolled ? "text-dark-stone" : "text-white",
+                      )}
+                    >
+                      10
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
           </Link>
+...
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
@@ -189,13 +222,32 @@ export default function Header({
         )}
       >
         <div className="flex items-center justify-between px-8 h-20">
-          <Link href="/" className="flex items-baseline">
-            <span className="text-xl text-dark-stone font-newsreader font-extralight">
-              Allégade
-            </span>
-            <span className="text-xl ml-1 text-dark-stone font-cormorant font-light italic">
-              10
-            </span>
+          <Link href="/" className="flex items-center gap-3">
+            {logoImageUrl && (
+              <img
+                src={logoImageUrl}
+                alt={logoText || "Allégade 10"}
+                className="h-8 w-auto object-contain"
+              />
+            )}
+            {(!logoImageUrl || logoText) && (
+              <div className="flex items-baseline">
+                {logoText ? (
+                  <span className="text-xl text-dark-stone font-newsreader font-extralight">
+                    {logoText}
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-xl text-dark-stone font-newsreader font-extralight">
+                      Allégade
+                    </span>
+                    <span className="text-xl ml-1 text-dark-stone font-cormorant font-light italic">
+                      10
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
           </Link>
           <button
             onClick={() => setDrawerOpen(false)}

@@ -16,7 +16,7 @@ import { VisualEditing } from "next-sanity/visual-editing";
 import { cn } from "@/lib/utils";
 import { sanityFetch } from "@/sanity/lib/live";
 import { getThemeVars } from "@/lib/themes";
-import { getFontVars } from "@/lib/fonts";
+import { getFontVars, generateFontFaceCSS } from "@/lib/fonts";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 // Classic pairing (current defaults)
@@ -48,19 +48,26 @@ const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   ctaBookStayUrl,
   colorTheme,
   fontPairing,
+  customFontPairings[]{ _key, label, headingFontUrl, headingFontFamily, bodyFontUrl, bodyFontFamily, accentFontUrl, accentFontFamily },
   headerMenuOpenLabel,
-  headerMenuCloseLabel
+  headerMenuCloseLabel,
+  logoText,
+  "logoImageUrl": logoImage.asset->url,
+  "logoImageLightUrl": logoImageLight.asset->url
 }`;
 
 const FAVICON_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
+  title,
+  logoText,
   "faviconUrl": favicon.asset->url
 }`;
 
-// ─── Dynamic metadata (favicon from Sanity) ───────────────────────────────────
+// ─── Dynamic metadata (favicon and title from Sanity) ─────────────────────────
 export async function generateMetadata(): Promise<Metadata> {
   const { data } = await sanityFetch({ query: FAVICON_QUERY });
+  const siteTitle = data?.title || data?.logoText || "Allégade 10";
   const base: Metadata = {
-    title: "Allégade 10",
+    title: siteTitle,
     description: "Hotel, restaurant og selskabslokaler på Frederiksberg",
   };
   if (data?.faviconUrl) {
@@ -76,7 +83,8 @@ export default async function RootLayout({
   const { data: navSettings } = await sanityFetch({ query: NAV_QUERY });
 
   const themeVars = getThemeVars(navSettings?.colorTheme);
-  const fontVars = getFontVars(navSettings?.fontPairing);
+  const fontVars = getFontVars(navSettings?.fontPairing, navSettings?.customFontPairings);
+  const fontFaceCSS = generateFontFaceCSS(navSettings?.fontPairing, navSettings?.customFontPairings);
 
   const allFontVariables = cn(
     inter.variable, newsreader.variable, cormorantGaramond.variable,
@@ -91,6 +99,7 @@ export default async function RootLayout({
       className={cn("font-sans", allFontVariables)}
       style={{ ...themeVars, ...fontVars } as React.CSSProperties}
     >
+      {fontFaceCSS && <style dangerouslySetInnerHTML={{ __html: fontFaceCSS }} />}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
         <Header
           navLinks={navSettings?.navigation}
@@ -100,6 +109,9 @@ export default async function RootLayout({
           ctaBookStayUrl={navSettings?.ctaBookStayUrl}
           menuOpenLabel={navSettings?.headerMenuOpenLabel}
           menuCloseLabel={navSettings?.headerMenuCloseLabel}
+          logoText={navSettings?.logoText}
+          logoImageUrl={navSettings?.logoImageUrl}
+          logoImageLightUrl={navSettings?.logoImageLightUrl}
         />
         {children}
         <Footer />

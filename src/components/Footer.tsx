@@ -18,7 +18,9 @@ const FOOTER_QUERY = `*[_type == "siteSettings"][0]{
   newsletterFirstNameLabel, newsletterLastNameLabel, newsletterEmailLabel,
   newsletterSuccessMessage, newsletterErrorMessage,
   footerRestaurantHoursLabel, footerContactLabel,
-  footerLinks[]{ label, url }
+  footerLinks[]{ label, url },
+  logoText,
+  "logoImageUrl": logoImage.asset->url
 }`;
 
 interface HourEntry {
@@ -56,6 +58,8 @@ interface SiteSettings {
   footerRestaurantHoursLabel?: string;
   footerContactLabel?: string;
   footerLinks?: FooterLink[];
+  logoText?: string;
+  logoImageUrl?: string;
 }
 
 const defaultRestaurantHours: HourEntry[] = [
@@ -103,13 +107,32 @@ export default async function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 pb-12">
             {/* Col 1 – Brand */}
             <div className="flex flex-col gap-6">
-              <Link href="/" className="flex items-baseline">
-                <span className="text-xl text-[#292524] font-newsreader font-extralight">
-                  Allégade
-                </span>
-                <span className="text-xl ml-1 text-[#292524] font-cormorant font-light italic">
-                  10
-                </span>
+              <Link href="/" className="flex items-center gap-3">
+                {siteSettings?.logoImageUrl && (
+                  <img
+                    src={siteSettings.logoImageUrl}
+                    alt={siteSettings.logoText || "Allégade 10"}
+                    className="h-8 w-auto object-contain"
+                  />
+                )}
+                {(!siteSettings?.logoImageUrl || siteSettings?.logoText) && (
+                  <div className="flex items-baseline">
+                    {siteSettings?.logoText ? (
+                      <span className="text-xl text-[#292524] font-newsreader font-extralight">
+                        {siteSettings.logoText}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-xl text-[#292524] font-newsreader font-extralight">
+                          Allégade
+                        </span>
+                        <span className="text-xl ml-1 text-[#292524] font-cormorant font-light italic">
+                          10
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
               </Link>
 
               <p className="text-[#78716c] text-sm font-light leading-[22px] tracking-[0.35px]">
