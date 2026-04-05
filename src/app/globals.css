@@ -3,6 +3,11 @@
 html {
   scroll-behavior: smooth;
 }
+
+.logo-svg svg,
+.logo-svg svg * {
+  fill: currentColor !important;
+}
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

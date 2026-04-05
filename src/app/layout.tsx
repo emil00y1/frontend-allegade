@@ -82,6 +82,14 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const { data: navSettings } = await sanityFetch({ query: NAV_QUERY });
 
+  let logoSvgContent: string | null = null;
+  if (navSettings?.logoImageUrl) {
+    try {
+      const res = await fetch(navSettings.logoImageUrl);
+      if (res.ok) logoSvgContent = await res.text();
+    } catch {}
+  }
+
   const themeVars = getThemeVars(navSettings?.colorTheme);
   const fontVars = getFontVars(navSettings?.fontPairing, navSettings?.customFontPairings);
   const fontFaceCSS = generateFontFaceCSS(navSettings?.fontPairing, navSettings?.customFontPairings);
@@ -112,6 +120,7 @@ export default async function RootLayout({
           logoText={navSettings?.logoText}
           logoImageUrl={navSettings?.logoImageUrl}
           logoImageLightUrl={navSettings?.logoImageLightUrl}
+          logoSvgContent={logoSvgContent}
         />
         {children}
         <Footer />

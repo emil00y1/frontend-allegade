@@ -23,6 +23,7 @@ interface HeaderProps {
   logoText?: string;
   logoImageUrl?: string;
   logoImageLightUrl?: string;
+  logoSvgContent?: string | null;
 }
 
 function isExternal(url: string) {
@@ -48,6 +49,7 @@ export default function Header({
   logoText,
   logoImageUrl,
   logoImageLightUrl,
+  logoSvgContent,
 }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -101,20 +103,25 @@ export default function Header({
               : "bg-transparent border-transparent"),
         )}
       >
-        <div className="max-w-[1280px] mx-auto px-8 h-20 flex items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-8 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-4 shrink-0">
-            {currentLogoUrl && (
+            {logoSvgContent ? (
+              <span
+                dangerouslySetInnerHTML={{ __html: logoSvgContent }}
+                className={cn(
+                  "logo-svg h-8 flex items-center transition-colors duration-300 [&_svg]:h-full [&_svg]:w-auto",
+                  !isHome || scrolled ? "text-dark-stone" : "text-warm-white",
+                )}
+              />
+            ) : currentLogoUrl ? (
               <img
                 src={currentLogoUrl}
                 alt={logoText || "Allégade 10"}
-                className={cn(
-                  "h-10 w-auto object-contain transition-all duration-300",
-                  isHome && !scrolled && !logoImageLightUrl && "brightness-0 invert",
-                )}
+                className="h-10 w-auto object-contain transition-all duration-300"
               />
-            )}
-            {!currentLogoUrl && (
+            ) : null}
+            {!currentLogoUrl && !logoSvgContent && (
               <div className="flex items-baseline">
                 {logoText ? (
                   <span
@@ -148,7 +155,6 @@ export default function Header({
               </div>
             )}
           </Link>
-...
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
@@ -224,16 +230,21 @@ export default function Header({
           drawerOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
-        <div className="flex items-center justify-between px-8 h-20">
+        <div className="flex items-center justify-between px-8 h-16">
           <Link href="/" className="flex items-center gap-3">
-            {logoImageUrl && (
+            {logoSvgContent ? (
+              <span
+                dangerouslySetInnerHTML={{ __html: logoSvgContent }}
+                className="logo-svg h-8 flex items-center text-dark-stone [&_svg]:h-full [&_svg]:w-auto"
+              />
+            ) : logoImageUrl ? (
               <img
                 src={logoImageUrl}
                 alt={logoText || "Allégade 10"}
                 className="h-8 w-auto object-contain"
               />
-            )}
-            {!logoImageUrl && (
+            ) : null}
+            {!logoImageUrl && !logoSvgContent && (
               <div className="flex items-baseline">
                 {logoText ? (
                   <span className="text-xl text-dark-stone font-newsreader font-extralight">
