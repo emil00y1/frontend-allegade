@@ -99,7 +99,7 @@ const HOTEL_PAGE_QUERY = `{
     address, phone, email, footerDescription, socialLinks,
     restaurantHours, kitchenClosingNote,
     newsletterLabel, newsletterSubtext, newsletterButtonLabel,
-    breadcrumbHomeLabel
+    breadcrumbHomeLabel, ctaBookStayUrl
   }
 }`;
 
@@ -136,7 +136,7 @@ export default async function HotelPage() {
   const siteSettings = result?.siteSettings;
   const rooms = result?.rooms ?? [];
 
-  const globalBookTableUrl = siteSettings?.ctaBookTableUrl || "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+  const globalBookTableUrl = siteSettings?.ctaBookStayUrl || "https://allegade10.suitcasebooking.com/da";
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
