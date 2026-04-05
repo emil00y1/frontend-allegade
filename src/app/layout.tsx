@@ -52,8 +52,7 @@ const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   headerMenuOpenLabel,
   headerMenuCloseLabel,
   logoText,
-  "logoImageUrl": logoImage.asset->url,
-  "logoImageLightUrl": logoImageLight.asset->url
+  "logoImageUrl": logoImage.asset->url
 }`;
 
 const FAVICON_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
@@ -119,7 +118,6 @@ export default async function RootLayout({
           menuCloseLabel={navSettings?.headerMenuCloseLabel}
           logoText={navSettings?.logoText}
           logoImageUrl={navSettings?.logoImageUrl}
-          logoImageLightUrl={navSettings?.logoImageLightUrl}
           logoSvgContent={logoSvgContent}
         />
         {children}

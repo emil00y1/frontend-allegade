@@ -22,7 +22,6 @@ interface HeaderProps {
   menuCloseLabel?: string;
   logoText?: string;
   logoImageUrl?: string;
-  logoImageLightUrl?: string;
   logoSvgContent?: string | null;
 }
 
@@ -48,7 +47,6 @@ export default function Header({
   menuCloseLabel = "Luk menu",
   logoText,
   logoImageUrl,
-  logoImageLightUrl,
   logoSvgContent,
 }: HeaderProps) {
   const pathname = usePathname();
@@ -87,7 +85,6 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const currentLogoUrl = !isHome || scrolled ? logoImageUrl : (logoImageLightUrl || logoImageUrl);
 
   return (
     <>
@@ -114,14 +111,14 @@ export default function Header({
                   !isHome || scrolled ? "text-dark-stone" : "text-warm-white",
                 )}
               />
-            ) : currentLogoUrl ? (
+            ) : logoImageUrl ? (
               <img
-                src={currentLogoUrl}
+                src={logoImageUrl}
                 alt={logoText || "Allégade 10"}
-                className="h-10 w-auto object-contain transition-all duration-300"
+                className="h-8 w-auto object-contain transition-all duration-300"
               />
             ) : null}
-            {!currentLogoUrl && !logoSvgContent && (
+            {!logoImageUrl && !logoSvgContent && (
               <div className="flex items-baseline">
                 {logoText ? (
                   <span
