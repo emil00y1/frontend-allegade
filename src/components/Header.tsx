@@ -108,10 +108,13 @@ export default function Header({
               <img
                 src={currentLogoUrl}
                 alt={logoText || "Allégade 10"}
-                className="h-10 w-auto object-contain"
+                className={cn(
+                  "h-10 w-auto object-contain transition-all duration-300",
+                  isHome && !scrolled && !logoImageLightUrl && "brightness-0 invert",
+                )}
               />
             )}
-            {(!currentLogoUrl || logoText) && (
+            {!currentLogoUrl && (
               <div className="flex items-baseline">
                 {logoText ? (
                   <span
@@ -230,7 +233,7 @@ export default function Header({
                 className="h-8 w-auto object-contain"
               />
             )}
-            {(!logoImageUrl || logoText) && (
+            {!logoImageUrl && (
               <div className="flex items-baseline">
                 {logoText ? (
                   <span className="text-xl text-dark-stone font-newsreader font-extralight">
