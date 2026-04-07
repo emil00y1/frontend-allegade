@@ -41,6 +41,7 @@ import TestimonialsSection from "./TestimonialsSection";
 import TeamSection from "./TeamSection";
 import OffersSection from "./OffersSection";
 import JobListingSection from "./JobListingSection";
+import ContactSection from "./ContactSection";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SectionBlock = { _key: string; _type: string; [key: string]: any };
@@ -85,6 +86,7 @@ const sectionComponents: Record<string, React.ComponentType<Record<string, unkno
   teamSection: TeamSection as React.ComponentType<Record<string, unknown>>,
   offersSection: OffersSection as React.ComponentType<Record<string, unknown>>,
   jobListingSection: JobListingSection as React.ComponentType<Record<string, unknown>>,
+  contactSection: ContactSection as React.ComponentType<Record<string, unknown>>,
 };
 
 type SectionRendererProps = {
