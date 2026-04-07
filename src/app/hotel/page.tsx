@@ -136,7 +136,7 @@ export default async function HotelPage() {
   const siteSettings = result?.siteSettings;
   const rooms = result?.rooms ?? [];
 
-  const globalBookTableUrl = siteSettings?.ctaBookStayUrl || "https://allegade10.suitcasebooking.com/da";
+  const globalBookTableUrl = siteSettings?.ctaBookTableUrl || "https://allegade10.suitcasebooking.com/da";
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
