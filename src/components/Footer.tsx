@@ -12,7 +12,7 @@ import NewsletterSection from "@/components/NewsletterSection";
 import { sanityFetch } from "@/sanity/lib/live";
 
 const FOOTER_QUERY = `*[_type == "siteSettings"][0]{
-  address, phone, email, footerDescription, socialLinks,
+  address, phone, email, cvr, footerDescription, socialLinks,
   restaurantHours, kitchenClosingNote,
   newsletterLabel, newsletterSubtext, newsletterButtonLabel,
   newsletterFirstNameLabel, newsletterLastNameLabel, newsletterEmailLabel,
@@ -57,6 +57,7 @@ interface SiteSettings {
   newsletterErrorMessage?: string;
   footerRestaurantHoursLabel?: string;
   footerContactLabel?: string;
+  cvr?: string;
   footerLinks?: FooterLink[];
   logoText?: string;
   logoImageUrl?: string;
@@ -236,7 +237,7 @@ export default async function Footer() {
           {/* Bottom bar */}
           <div className="border-t border-[rgba(214,211,209,0.2)] pt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <p className="text-[#a8a29e] text-[10px] tracking-[1px] uppercase font-light">
-              © Allégade 10
+              © Allégade 10{siteSettings?.cvr ? ` · CVR: ${siteSettings.cvr}` : ''}
             </p>
             <div className="flex gap-8">
               {(siteSettings?.footerLinks && siteSettings.footerLinks.length > 0
