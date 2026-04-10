@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { rateLimit } from "@/lib/rate-limit";
 
 function createTransporter() {
   return nodemailer.createTransport({
@@ -14,6 +15,9 @@ function createTransporter() {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = rateLimit(req);
+  if (limited) return limited;
+
   try {
     const body = await req.json();
     const { name, email, message } = body;
