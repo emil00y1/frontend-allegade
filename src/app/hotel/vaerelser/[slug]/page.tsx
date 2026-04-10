@@ -34,6 +34,7 @@ interface RoomPageData {
 const ROOM_QUERY = `*[_type == "hotelRoom" && slug.current == $slug][0]{
   _id, title, slug, roomType, pricePerNight, priceLabel,
   description, note, features, ctaLabel, ctaUrl,
+  seo,
   image{ ..., asset-> },
   gallery[]{ ..., asset-> },
   body
@@ -56,17 +57,22 @@ export async function generateMetadata({
   const room = data as RoomPageData | null;
   if (!room) return {};
 
-  const imageUrl = room.image?.asset
-    ? urlFor(room.image).width(1200).height(630).url()
-    : undefined;
+  const seo = (room as any).seo;
+  const title = seo?.metaTitle || room.title;
+  const description = seo?.metaDescription || room.description;
+  const ogImage = seo?.shareImage
+    ? urlFor(seo.shareImage).width(1200).height(630).url()
+    : room.image?.asset
+      ? urlFor(room.image).width(1200).height(630).url()
+      : undefined;
 
   return {
-    title: `${room.title} | Hotel Allégade 10`,
-    description: room.description,
+    title: `${title} | Hotel Allégade 10`,
+    description,
     openGraph: {
-      title: room.title,
-      description: room.description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
+      title,
+      description,
+      images: ogImage ? [{ url: ogImage }] : [],
     },
   };
 }
