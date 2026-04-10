@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, Clock } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
+import ShareButton from "@/components/ShareButton";
 import { urlFor } from "@/sanity/lib/image";
 
 interface EventsListProps {
@@ -51,8 +52,13 @@ export default function EventsList({
                     )}
                   </div>
                   <div className="flex flex-col gap-3 p-6 flex-1">
-                    {event.category && <span className="text-brand text-[10px] tracking-[1.5px] uppercase font-light">{event.category}</span>}
-                    <h3 className="font-newsreader font-extralight text-xl text-dark-stone leading-snug group-hover:text-brand transition-colors duration-200">{event.title}</h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-col gap-3">
+                        {event.category && <span className="text-brand text-[10px] tracking-[1.5px] uppercase font-light">{event.category}</span>}
+                        <h3 className="font-newsreader font-extralight text-xl text-dark-stone leading-snug group-hover:text-brand transition-colors duration-200">{event.title}</h3>
+                      </div>
+                      <ShareButton url={`/events/${event.slug.current}`} title={event.title} />
+                    </div>
                     <div className="border-t border-border-warm/30 mt-auto pt-4 flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-3.5 h-3.5 text-brand shrink-0" strokeWidth={1.5} />

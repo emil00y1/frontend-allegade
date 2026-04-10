@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import SectionHeading from "@/components/SectionHeading";
+import ShareButton from "@/components/ShareButton";
 
 interface Event {
   _id: string;
@@ -89,14 +90,19 @@ export default function EventsSection({
 
               {/* Content */}
               <div className="flex flex-col gap-3 p-5 flex-1">
-                {event.category && (
-                  <span className="text-brand text-[10px] tracking-[1px] uppercase font-light">
-                    {event.category}
-                  </span>
-                )}
-                <h3 className="text-dark-stone text-lg font-newsreader font-extralight leading-snug">
-                  {event.title}
-                </h3>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-3">
+                    {event.category && (
+                      <span className="text-brand text-[10px] tracking-[1px] uppercase font-light">
+                        {event.category}
+                      </span>
+                    )}
+                    <h3 className="text-dark-stone text-lg font-newsreader font-extralight leading-snug">
+                      {event.title}
+                    </h3>
+                  </div>
+                  <ShareButton url={`/events/${event.slug.current}`} title={event.title} />
+                </div>
                 <div className="flex items-center gap-2 py-2 border-b border-border-warm">
                   <CalendarDays
                     className="w-3.5 h-3.5 text-warm-brown shrink-0"
