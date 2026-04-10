@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { sanityFetch } from "@/sanity/lib/live";
 import { getThemeVars } from "@/lib/themes";
 import { getFontVars, generateFontFaceCSS } from "@/lib/fonts";
+import CookieConsent from "@/components/CookieConsent";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 // Classic pairing (current defaults)
@@ -122,6 +123,7 @@ export default async function RootLayout({
         />
         {children}
         <Footer />
+        <CookieConsent />
         <SanityLive />
         {(await draftMode()).isEnabled && (
           <>
