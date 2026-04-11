@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { sanityFetch } from "@/sanity/lib/live";
 
-const JOBS_QUERY = `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now())] | order(publishedAt desc){
+const JOBS_QUERY = `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now())] | order(publishedAt desc){
   _id,
   title,
   slug,

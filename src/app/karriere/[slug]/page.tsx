@@ -7,7 +7,7 @@ import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 import StructuredData from "@/components/StructuredData";
 
-const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug && isActive == true && (!defined(publishAt) || publishAt <= now())][0]{
+const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug && isActive == true && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now())][0]{
   _id,
   title,
   slug,

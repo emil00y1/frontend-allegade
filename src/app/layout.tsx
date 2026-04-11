@@ -1,4 +1,5 @@
 import React from "react";
+import Script from "next/script";
 import type { Metadata } from "next";
 import {
   Geist, Geist_Mono, Inter, Newsreader, Cormorant_Garamond,
@@ -43,7 +44,7 @@ const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], wei
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
 const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
-  navigation[]{ name, href, pageReference->{ "slug": slug.current } },
+  navigation[]{ name, href, pageReference->{ "slug": slug.current }, children[]{ name, href, pageReference->{ "slug": slug.current } } },
   ctaBookTableLabel,
   ctaBookTableUrl,
   ctaBookStayLabel,
@@ -66,7 +67,8 @@ const FAVICON_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   email,
   footerDescription,
   "logoImageUrl": logoImage.asset->url,
-  socialLinks
+  socialLinks,
+  googleAnalyticsId
 }`;
 
 // ─── Dynamic metadata (favicon and title from Sanity) ─────────────────────────
@@ -118,6 +120,17 @@ export default async function RootLayout({
       style={{ ...themeVars, ...fontVars } as React.CSSProperties}
     >
       {fontFaceCSS && <style dangerouslySetInnerHTML={{ __html: fontFaceCSS }} />}
+      {siteInfo?.googleAnalyticsId && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${siteInfo.googleAnalyticsId}`}
+            strategy="afterInteractive"
+          />
+          <Script id="gtag-init" strategy="afterInteractive">
+            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${siteInfo.googleAnalyticsId}');`}
+          </Script>
+        </>
+      )}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
         <StructuredData data={{
           "@context": "https://schema.org",

@@ -18,7 +18,7 @@ type JobListingSectionProps = {
   emptyStateText?: string;
 };
 
-const JOBS_QUERY = `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now())] | order(publishedAt desc){
+const JOBS_QUERY = `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now())] | order(publishedAt desc){
   _id,
   title,
   slug,

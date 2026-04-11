@@ -43,7 +43,7 @@ export default function EventsList({
             {list.map((event) => {
               const imageUrl = event.image?.asset ? urlFor(event.image).width(800).height(600).auto("format").url() : null;
               return (
-                <Link key={event._id} href={`/events/${event.slug.current}`} className="group flex flex-col bg-warm-white">
+                <Link key={event._id} href={`/begivenheder/${event.slug.current}`} className="group flex flex-col bg-warm-white">
                   <div className="relative aspect-[4/3] overflow-hidden bg-warm-gray">
                     {imageUrl ? (
                       <Image src={imageUrl} alt={event.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -57,7 +57,7 @@ export default function EventsList({
                         {event.category && <span className="text-brand text-[10px] tracking-[1.5px] uppercase font-light">{event.category}</span>}
                         <h3 className="font-newsreader font-extralight text-xl text-dark-stone leading-snug group-hover:text-brand transition-colors duration-200">{event.title}</h3>
                       </div>
-                      <ShareButton url={`/events/${event.slug.current}`} title={event.title} />
+                      <ShareButton url={`/begivenheder/${event.slug.current}`} title={event.title} />
                     </div>
                     <div className="border-t border-border-warm/30 mt-auto pt-4 flex flex-col gap-2">
                       <div className="flex items-center gap-2">

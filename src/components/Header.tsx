@@ -6,10 +6,17 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface NavChildLink {
+  name: string;
+  href: string;
+  pageReference?: { slug?: string };
+}
+
 interface NavLink {
   name: string;
   href: string;
   pageReference?: { slug?: string };
+  children?: NavChildLink[];
 }
 
 interface HeaderProps {
@@ -59,8 +66,14 @@ export default function Header({
       ? navLinks.map((l) => ({
           ...l,
           href: l.pageReference?.slug ? `/${l.pageReference.slug}` : l.href,
+          children: l.children?.map((c) => ({
+            ...c,
+            href: c.pageReference?.slug ? `/${c.pageReference.slug}` : c.href,
+          })),
         }))
       : DEFAULT_NAV_LINKS;
+
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Desktop: filter out empty/home links
   const desktopNavLinks = rawLinks.filter((l) => l.name && l.href !== "/");
@@ -155,18 +168,72 @@ export default function Header({
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            {desktopNavLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href ?? "/"}
-                className={cn(
-                  "text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
-                  !isHome || scrolled ? "text-dark-stone" : "text-white/90",
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {desktopNavLinks.map((link) => {
+              const hasChildren = link.children && link.children.length > 0;
+              if (!hasChildren) {
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href ?? "/"}
+                    className={cn(
+                      "text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60",
+                      !isHome || scrolled ? "text-dark-stone" : "text-white/90",
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              }
+              return (
+                <div
+                  key={link.name}
+                  className="relative"
+                  onMouseEnter={() => setOpenDropdown(link.name)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <button
+                    className={cn(
+                      "text-[11px] tracking-[1.2px] uppercase font-light transition-colors duration-300 hover:opacity-60 flex items-center gap-1",
+                      !isHome || scrolled ? "text-dark-stone" : "text-white/90",
+                    )}
+                    onClick={() => setOpenDropdown(openDropdown === link.name ? null : link.name)}
+                  >
+                    {link.name}
+                    <svg width="8" height="5" viewBox="0 0 8 5" fill="none" className="mt-px">
+                      <path d="M1 1L4 4L7 1" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <div
+                    className={cn(
+                      "absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-all duration-200",
+                      openDropdown === link.name ? "opacity-100 visible translate-y-0" : "opacity-0 invisible -translate-y-1",
+                    )}
+                  >
+                    <div className="bg-warm-white border border-border-warm shadow-lg min-w-[180px] py-2">
+                      {link.href && (
+                        <Link
+                          href={link.href}
+                          className="block px-5 py-2.5 text-[11px] tracking-[1px] uppercase font-light text-dark-stone hover:text-brand hover:bg-warm-gray transition-colors duration-200"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          {link.name}
+                        </Link>
+                      )}
+                      {link.children!.map((child) => (
+                        <Link
+                          key={child.name}
+                          href={child.href ?? "/"}
+                          className="block px-5 py-2.5 text-[11px] tracking-[1px] uppercase font-light text-warm-brown hover:text-dark-stone hover:bg-warm-gray transition-colors duration-200"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </nav>
 
           {/* Right Actions */}
@@ -272,20 +339,37 @@ export default function Header({
         <nav className="flex flex-col px-4 py-2 gap-1 overflow-y-auto">
           {mobileNavLinks.map((link) => {
             const active = isActive(link.href);
+            const hasChildren = link.children && link.children.length > 0;
             return (
-              <Link
-                key={link.name}
-                href={link.href ?? "/"}
-                onClick={() => setDrawerOpen(false)}
-                className={cn(
-                  "flex items-center px-4 py-3.5 text-[11px] font-light tracking-[1.2px] uppercase hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200",
-                  active
-                    ? "text-dark-stone underline underline-offset-4 decoration-brand/40"
-                    : "text-warm-brown",
-                )}
-              >
-                {link.name}
-              </Link>
+              <div key={link.name}>
+                <Link
+                  href={link.href ?? "/"}
+                  onClick={() => setDrawerOpen(false)}
+                  className={cn(
+                    "flex items-center px-4 py-3.5 text-[11px] font-light tracking-[1.2px] uppercase hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200",
+                    active
+                      ? "text-dark-stone underline underline-offset-4 decoration-brand/40"
+                      : "text-warm-brown",
+                  )}
+                >
+                  {link.name}
+                </Link>
+                {hasChildren && link.children!.map((child) => (
+                  <Link
+                    key={child.name}
+                    href={child.href ?? "/"}
+                    onClick={() => setDrawerOpen(false)}
+                    className={cn(
+                      "flex items-center pl-8 pr-4 py-2.5 text-[10px] font-light tracking-[1px] uppercase hover:text-dark-stone hover:bg-warm-gray rounded-lg transition-all duration-200",
+                      isActive(child.href)
+                        ? "text-dark-stone"
+                        : "text-warm-brown/70",
+                    )}
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+              </div>
             );
           })}
         </nav>

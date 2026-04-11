@@ -22,7 +22,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Active job postings
   const jobs = await client.fetch<{ slug: string }[]>(
-    `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now()) && defined(slug.current)]{ "slug": slug.current }`
+    `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now()) && defined(slug.current)]{ "slug": slug.current }`
   )
 
   // Published generic pages not already covered by static routes

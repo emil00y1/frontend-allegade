@@ -92,9 +92,15 @@ export default function NewsletterSection({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="bg-brand text-white text-[11px] tracking-[1.2px] uppercase font-light px-7 py-2.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0"
+              className="bg-brand text-white text-[11px] tracking-[1.2px] uppercase font-light px-7 py-2.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap shrink-0 inline-flex items-center justify-center gap-2"
             >
-              {status === "loading" ? "..." : buttonLabel}
+              {status === "loading" && (
+                <svg className="animate-spin size-3.5" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
+              {status === "loading" ? "Sender…" : buttonLabel}
             </button>
           </form>
         </div>

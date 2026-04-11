@@ -42,13 +42,33 @@ export default function SelskaberInquiryForm({
   });
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof typeof fields, string>>>({});
 
   const set = (key: keyof typeof fields) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => setFields((prev) => ({ ...prev, [key]: e.target.value }));
+  ) => {
+    setFields((prev) => ({ ...prev, [key]: e.target.value }));
+    if (fieldErrors[key]) {
+      setFieldErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
+  };
+
+  function validate(): boolean {
+    const errors: Partial<Record<keyof typeof fields, string>> = {};
+    if (!fields.name.trim()) errors.name = "Navn er påkrævet";
+    if (!fields.email.trim()) {
+      errors.email = "Email er påkrævet";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+      errors.email = "Indtast en gyldig emailadresse";
+    }
+    if (!fields.message.trim()) errors.message = "Besked er påkrævet";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setFormState("submitting");
     setErrorMessage("");
 
@@ -71,9 +91,12 @@ export default function SelskaberInquiryForm({
     }
   };
 
-  const inputClass =
-    "w-full bg-transparent border border-border-warm px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none focus:border-warm-brown transition-colors";
+  const inputBase =
+    "w-full bg-transparent border px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none transition-colors";
+  const inputClass = (field?: keyof typeof fields) =>
+    cn(inputBase, fieldErrors[field!] ? "border-red-400 focus:border-red-500" : "border-border-warm focus:border-warm-brown");
   const labelClass = "block text-[10px] tracking-[1.5px] uppercase text-[#78716c] mb-2";
+  const errorClass = "text-[11px] text-red-500 font-light mt-1.5";
 
   if (formState === "success") {
     return (
@@ -156,9 +179,9 @@ export default function SelskaberInquiryForm({
                   value={fields.name}
                   onChange={set("name")}
                   placeholder="Jens Jensen"
-                  required
-                  className={inputClass}
+                  className={inputClass("name")}
                 />
+                {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
               </div>
               <div>
                 <label className={labelClass}>Email *</label>
@@ -167,9 +190,9 @@ export default function SelskaberInquiryForm({
                   value={fields.email}
                   onChange={set("email")}
                   placeholder="jens@eksempel.dk"
-                  required
-                  className={inputClass}
+                  className={inputClass("email")}
                 />
+                {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
               </div>
             </div>
 
@@ -180,7 +203,7 @@ export default function SelskaberInquiryForm({
                 <select
                   value={fields.occasion}
                   onChange={set("occasion")}
-                  className={cn(inputClass, "appearance-none cursor-pointer")}
+                  className={cn(inputClass(), "appearance-none cursor-pointer")}
                 >
                   <option value="" className="bg-warm-gray">
                     Vælg anledning
@@ -200,7 +223,7 @@ export default function SelskaberInquiryForm({
                   value={fields.guestCount}
                   onChange={set("guestCount")}
                   placeholder="f.eks. 40"
-                  className={inputClass}
+                  className={inputClass()}
                 />
               </div>
             </div>
@@ -212,7 +235,7 @@ export default function SelskaberInquiryForm({
                 type="date"
                 value={fields.desiredDate}
                 onChange={set("desiredDate")}
-                className={cn(inputClass, "cursor-pointer [color-scheme:light]")}
+                className={cn(inputClass(), "cursor-pointer [color-scheme:light]")}
               />
             </div>
 
@@ -223,10 +246,10 @@ export default function SelskaberInquiryForm({
                 value={fields.message}
                 onChange={set("message")}
                 placeholder="Fortæl os om jeres arrangement, ønsker til menu, særlige behov osv."
-                required
                 rows={5}
-                className={cn(inputClass, "resize-none")}
+                className={cn(inputClass("message"), "resize-none")}
               />
+              {fieldErrors.message && <p className={errorClass}>{fieldErrors.message}</p>}
             </div>
 
             {/* Error */}
@@ -238,8 +261,14 @@ export default function SelskaberInquiryForm({
             <button
               type="submit"
               disabled={formState === "submitting"}
-              className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-brand hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-brand hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
+              {formState === "submitting" && (
+                <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              )}
               {formState === "submitting" ? "Sender…" : "Send forespørgsel"}
             </button>
           </form>

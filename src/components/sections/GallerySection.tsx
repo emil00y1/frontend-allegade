@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
+import Lightbox from "@/components/Lightbox";
 
 type GalleryImage = {
   _key: string;
@@ -42,9 +46,18 @@ export default function GallerySection({
   columns = "3",
   aspectRatio = "landscape",
 }: GallerySectionProps) {
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
   if (!images || images.length === 0) return null;
 
   const dims = dimensionsMap[aspectRatio];
+
+  const validImages = images.filter((img) => img?.asset);
+
+  const lightboxImages = validImages.map((img) => ({
+    src: urlFor(img).width(1600).auto("format").url(),
+    alt: img.alt,
+  }));
 
   return (
     <section className="bg-warm-white py-14 md:py-24 lg:py-32">
@@ -56,10 +69,15 @@ export default function GallerySection({
         )}
 
         <div className={`grid ${colsMap[columns]} gap-4`}>
-          {images.map((img) => {
+          {images.map((img, idx) => {
             if (!img?.asset) return null;
+            const validIndex = validImages.indexOf(img);
             return (
-              <figure key={img._key} className="group overflow-hidden">
+              <figure
+                key={img._key}
+                className="group overflow-hidden cursor-pointer"
+                onClick={() => setLightboxIndex(validIndex)}
+              >
                 <div className={`relative ${aspectMap[aspectRatio]} overflow-hidden bg-warm-gray`}>
                   <Image
                     src={urlFor(img).width(dims.width).height(dims.height).auto("format").url()}
@@ -79,6 +97,14 @@ export default function GallerySection({
           })}
         </div>
       </div>
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={lightboxImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </section>
   );
 }

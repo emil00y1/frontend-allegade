@@ -9,6 +9,7 @@ import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
 import StructuredData from "@/components/StructuredData";
+import RoomGallery from "@/components/RoomGallery";
 
 interface RoomImage {
   asset?: { _ref?: string; url?: string };
@@ -264,36 +265,15 @@ export default async function RoomPage({
       </section>
 
       {/* Gallery */}
-      {galleryImages.length > 1 && (
-        <section className="bg-warm-gray py-16 lg:py-24">
-          <div className="max-w-6xl mx-auto px-10 lg:px-16">
-            <h2 className="text-[11px] tracking-[1.4px] uppercase font-light text-dark-stone mb-8">
-              Galleri
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {galleryImages.map((img, i) => {
-                if (!img?.asset) return null;
-                return (
-                  <div
-                    key={i}
-                    className={`relative overflow-hidden bg-warm-gray ${
-                      i === 0 ? "col-span-2 row-span-2 aspect-[4/3]" : "aspect-square"
-                    }`}
-                  >
-                    <Image
-                      src={urlFor(img).width(800).height(600).auto("format").url()}
-                      alt={img.alt ?? room.title}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
+      <RoomGallery
+        images={galleryImages
+          .filter((img) => img?.asset)
+          .map((img) => ({
+            src: urlFor(img).width(800).height(600).auto("format").url(),
+            hiRes: urlFor(img).width(1600).auto("format").url(),
+            alt: img.alt ?? room.title,
+          }))}
+      />
 
       {/* Bottom CTA */}
       <section className="bg-dark-stone py-16 lg:py-20 text-center">

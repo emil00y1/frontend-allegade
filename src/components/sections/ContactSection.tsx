@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface ContactSectionProps {
   eyebrow?: string;
@@ -12,10 +13,12 @@ interface ContactSectionProps {
 }
 
 type FormState = "idle" | "submitting" | "success" | "error";
+type FieldKey = "name" | "email" | "message";
 
-const inputClass =
-  "w-full bg-transparent border border-[#e0dbd8] px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none focus:border-[#8b6f47] transition-colors";
+const inputBase =
+  "w-full bg-transparent border px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none transition-colors";
 const labelClass = "block text-[10px] tracking-[1.5px] uppercase text-[#78716c] mb-2";
+const errorClass = "text-[11px] text-red-500 font-light mt-1.5";
 
 export default function ContactSection({
   eyebrow = "Kom i kontakt",
@@ -27,14 +30,36 @@ export default function ContactSection({
   const [fields, setFields] = useState({ name: "", email: "", message: "" });
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({});
+
+  const inputClass = (field?: FieldKey) =>
+    cn(inputBase, fieldErrors[field!] ? "border-red-400 focus:border-red-500" : "border-[#e0dbd8] focus:border-[#8b6f47]");
 
   const set =
     (key: keyof typeof fields) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
+      if (fieldErrors[key]) {
+        setFieldErrors((prev) => ({ ...prev, [key]: undefined }));
+      }
+    };
+
+  function validate(): boolean {
+    const errors: Partial<Record<FieldKey, string>> = {};
+    if (!fields.name.trim()) errors.name = "Navn er påkrævet";
+    if (!fields.email.trim()) {
+      errors.email = "Email er påkrævet";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+      errors.email = "Indtast en gyldig emailadresse";
+    }
+    if (!fields.message.trim()) errors.message = "Besked er påkrævet";
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setFormState("submitting");
     setErrorMessage("");
 
@@ -148,9 +173,9 @@ export default function ContactSection({
                     value={fields.name}
                     onChange={set("name")}
                     placeholder="Jens Jensen"
-                    required
-                    className={inputClass}
+                    className={inputClass("name")}
                   />
+                  {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
                 </div>
                 <div>
                   <label className={labelClass}>Email *</label>
@@ -159,9 +184,9 @@ export default function ContactSection({
                     value={fields.email}
                     onChange={set("email")}
                     placeholder="jens@eksempel.dk"
-                    required
-                    className={inputClass}
+                    className={inputClass("email")}
                   />
+                  {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
                 </div>
               </div>
 
@@ -171,10 +196,10 @@ export default function ContactSection({
                   value={fields.message}
                   onChange={set("message")}
                   placeholder="Skriv din besked her…"
-                  required
                   rows={5}
-                  className={`${inputClass} resize-none`}
+                  className={cn(inputClass("message"), "resize-none")}
                 />
+                {fieldErrors.message && <p className={errorClass}>{fieldErrors.message}</p>}
               </div>
 
               {formState === "error" && (
@@ -184,8 +209,14 @@ export default function ContactSection({
               <button
                 type="submit"
                 disabled={formState === "submitting"}
-                className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-[#8b6f47] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-[#8b6f47] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
               >
+                {formState === "submitting" && (
+                  <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
                 {formState === "submitting" ? "Sender…" : "Send besked"}
               </button>
             </form>

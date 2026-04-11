@@ -63,7 +63,7 @@ const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
   }
 }`;
 
-const EVENTS_QUERY = `*[_type == "event" && defined(slug.current) && (!defined(publishAt) || publishAt <= now())]
+const EVENTS_QUERY = `*[_type == "event" && defined(slug.current) && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now())]
   | order(startDate asc)[0...4]{
     _id, title, slug, startDate, category,
     image{ ..., asset-> }
