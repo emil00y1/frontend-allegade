@@ -6,7 +6,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 
-const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug][0]{
+const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug && isActive == true && (!defined(publishAt) || publishAt <= now())][0]{
   _id,
   title,
   slug,

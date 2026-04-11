@@ -25,7 +25,7 @@ const QUERY = `{
     upcomingHeading, emptyStateHeading, emptyStateText,
     freeLabel, archiveEyebrow, archiveHeading
   },
-  "events": *[_type == "event" && defined(slug.current)] | order(startDate asc){
+  "events": *[_type == "event" && defined(slug.current) && (!defined(publishAt) || publishAt <= now())] | order(startDate asc){
     _id, title, slug, startDate, endDate, price, priceDescription, category, excerpt,
     image{ ..., asset-> },
     "venue": venue->{ name }

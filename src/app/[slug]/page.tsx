@@ -4,7 +4,7 @@ import { SectionRenderer } from "@/components/sections";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 
-const PAGE_QUERY = `*[_type == "page" && slug.current == $slug && isPublished == true][0]{
+const PAGE_QUERY = `*[_type == "page" && slug.current == $slug && isPublished == true && (!defined(publishAt) || publishAt <= now())][0]{
   _id,
   _type,
   title,
