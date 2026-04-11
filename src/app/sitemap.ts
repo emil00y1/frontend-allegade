@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { client } from '@/sanity/client'
 
+export const revalidate = 3600 // regenerate sitemap every hour
+
 const BASE_URL = 'https://www.allegade10.dk'
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [
@@ -14,6 +16,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/om-os`, priority: 0.6, changeFrequency: 'monthly' },
   { url: `${BASE_URL}/kontakt`, priority: 0.6, changeFrequency: 'monthly' },
   { url: `${BASE_URL}/privatlivspolitik`, priority: 0.3, changeFrequency: 'yearly' },
+  { url: `${BASE_URL}/cookiepolitik`, priority: 0.3, changeFrequency: 'yearly' },
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

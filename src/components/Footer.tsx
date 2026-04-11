@@ -245,6 +245,7 @@ export default async function Footer() {
                 : [
                     { label: "Kontakt", url: "/kontakt" },
                     { label: "Privatlivspolitik", url: "/privatlivspolitik" },
+                    { label: "Cookiepolitik", url: "/cookiepolitik" },
                   ]
               ).map((link) => (
                 <Link
