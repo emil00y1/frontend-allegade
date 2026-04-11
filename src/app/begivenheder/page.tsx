@@ -7,6 +7,7 @@ import EventsList from "@/components/sections/EventsList";
 import EventsArchive from "@/components/sections/EventsArchive";
 import { SectionRenderer } from "@/components/sections";
 import { SECTIONS_QUERY_FRAGMENT } from "@/sanity/lib/sections-query";
+import StructuredData from "@/components/StructuredData";
 
 // ─── Query ────────────────────────────────────────────────────────────────────
 
@@ -69,11 +70,49 @@ export default async function BegivenhedPage() {
   const pastEvents = events.filter((e) => new Date(e.startDate) < now).reverse();
   const featuredEvent = upcomingEvents[0];
 
+  const eventSchemas = upcomingEvents.map((event: any) => ({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    ...(event.startDate && { startDate: event.startDate }),
+    ...(event.endDate && { endDate: event.endDate }),
+    ...(event.excerpt && { description: event.excerpt }),
+    location: {
+      "@type": "Place",
+      name: event.venue?.name || "Allégade 10",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
+    },
+    ...(event.price != null && {
+      offers: {
+        "@type": "Offer",
+        price: event.price,
+        priceCurrency: "DKK",
+        ...(event.price === 0 && { price: 0 }),
+      },
+    }),
+    ...(event.image?.asset && {
+      image: event.image.asset.url,
+    }),
+    url: `https://allegade10.dk/begivenheder`,
+    organizer: {
+      "@type": "Organization",
+      name: "Allégade 10",
+      url: "https://allegade10.dk",
+    },
+  }));
+
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
     return (
       <main>
+        {eventSchemas.length > 0 && <StructuredData data={eventSchemas} />}
         <EventsHero
           heroHeading={page.heroHeading}
           heroHeadingItalic={page.heroHeadingItalic}
@@ -100,6 +139,7 @@ export default async function BegivenhedPage() {
 
   return (
     <main>
+      {eventSchemas.length > 0 && <StructuredData data={eventSchemas} />}
       <SectionRenderer
         documentId={page?._id ?? "eventsPage"}
         documentType={page?._type ?? "eventsPage"}

@@ -7,6 +7,7 @@ import SelskaberSection from "@/components/SelskaberSection";
 import { SectionRenderer } from "@/components/sections";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
+import StructuredData from "@/components/StructuredData";
 
 const HOMEPAGE_QUERY = `*[_type == "homepage" && _id == "homepage"][0]{
   _id,
@@ -115,6 +116,53 @@ export default async function IndexPage() {
     siteSettings?.ctaBookTableUrl ||
     "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
 
+  const hotelRestaurantSchema = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      name: "Hotel Allégade 10",
+      url: "https://allegade10.dk/hotel",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
+      ...(siteSettings?.phone && { telephone: siteSettings.phone }),
+      ...(siteSettings?.email && { email: siteSettings.email }),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      name: "Restaurant Allégade 10",
+      url: "https://allegade10.dk/restaurant",
+      servesCuisine: "Danish",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
+      ...(siteSettings?.phone && { telephone: siteSettings.phone }),
+      ...(siteSettings?.email && { email: siteSettings.email }),
+      ...(siteSettings?.restaurantHours && {
+        openingHoursSpecification: siteSettings.restaurantHours.map((h: any) => ({
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: h.days || h.label,
+          opens: h.hours?.split(" - ")?.[0]?.replace(".", ":"),
+          closes: h.hours?.split(" - ")?.[1]?.replace(".", ":"),
+        })),
+      }),
+      ...(siteSettings?.ctaBookTableUrl && {
+        acceptsReservations: true,
+        reservations: siteSettings.ctaBookTableUrl,
+      }),
+      menu: "https://allegade10.dk/menukort",
+    },
+  ];
+
   // If no sections are defined in the new Page Builder, use the old fixed layout as fallback
   const hasSections = homepage?.sections && homepage.sections.length > 0;
 
@@ -126,6 +174,7 @@ export default async function IndexPage() {
 
     return (
       <main>
+        <StructuredData data={hotelRestaurantSchema} />
         <Hero
           tagline={hero?.tagline}
           heading={hero?.heading}
@@ -169,6 +218,7 @@ export default async function IndexPage() {
 
   return (
     <main>
+      <StructuredData data={hotelRestaurantSchema} />
       <SectionRenderer
         documentId={homepage?._id ?? "homepage"}
         documentType={homepage?._type ?? "homepage"}

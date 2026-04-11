@@ -8,6 +8,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
+import StructuredData from "@/components/StructuredData";
 
 interface RoomImage {
   asset?: { _ref?: string; url?: string };
@@ -100,8 +101,38 @@ export default async function RoomPage({
   if (room.image) galleryImages.push(room.image);
   if (room.gallery) galleryImages.push(...room.gallery);
 
+  const roomSchema = {
+    "@context": "https://schema.org",
+    "@type": "HotelRoom",
+    name: room.title,
+    ...(room.description && { description: room.description }),
+    ...(room.roomType && { bed: room.roomType }),
+    ...(heroImageUrl && { image: heroImageUrl }),
+    ...(room.features?.length && {
+      amenityFeature: room.features.map((feat) => ({
+        "@type": "LocationFeatureSpecification",
+        name: feat,
+        value: true,
+      })),
+    }),
+    ...(room.pricePerNight && {
+      offers: {
+        "@type": "Offer",
+        price: room.pricePerNight,
+        priceCurrency: "DKK",
+        url: bookingUrl,
+      },
+    }),
+    containedInPlace: {
+      "@type": "Hotel",
+      name: "Hotel Allégade 10",
+      url: "https://allegade10.dk/hotel",
+    },
+  };
+
   return (
     <main>
+      <StructuredData data={roomSchema} />
       {/* Hero */}
       <section className="relative bg-warm-gray min-h-[50vh] lg:min-h-[65vh] overflow-hidden">
         {heroImageUrl ? (

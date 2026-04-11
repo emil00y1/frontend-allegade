@@ -8,6 +8,7 @@ import { SectionRenderer } from "@/components/sections";
 import { type SiteSettings, type SanitySeo, type SanityImage, type SanitySection } from "@/types/sanity";
 import { type TabConfig, type MenuCard } from "@/components/MenuTabs";
 import { SECTIONS_QUERY_FRAGMENT } from "@/sanity/lib/sections-query";
+import StructuredData from "@/components/StructuredData";
 
 interface MenuPageData {
   _id: string;
@@ -95,11 +96,51 @@ export default async function MenukortPage() {
   const menus = result?.menus ?? [];
 
   const globalBookTableUrl = siteSettings?.ctaBookTableUrl || "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+
+  const menuSchema = {
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    name: page?.headerHeading || "Menukort",
+    description: page?.headerDescription,
+    url: "https://allegade10.dk/menukort",
+    ...(menus.length > 0 && {
+      hasMenuSection: menus.map((menu: any) => ({
+        "@type": "MenuSection",
+        name: menu.title,
+        ...(menu.intro && { description: menu.intro }),
+        ...(menu.sections && {
+          hasMenuItem: menu.sections.flatMap((section: any) =>
+            (section.items || []).map((item: any) => ({
+              "@type": "MenuItem",
+              name: item.name,
+              ...(item.description && { description: item.description }),
+              ...(item.price != null && {
+                offers: {
+                  "@type": "Offer",
+                  price: item.price,
+                  priceCurrency: "DKK",
+                },
+              }),
+              ...(item.priceString && !item.price && {
+                offers: {
+                  "@type": "Offer",
+                  price: item.priceString,
+                  priceCurrency: "DKK",
+                },
+              }),
+            }))
+          ),
+        }),
+      })),
+    }),
+  };
+
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
     return (
       <main className="bg-warm-white min-h-[calc(100vh-80px)]">
+        <StructuredData data={menuSchema} />
         <MenuHero
           breadcrumbLabel={page.breadcrumbLabel}
           headerHeading={page.headerHeading}
@@ -122,6 +163,7 @@ export default async function MenukortPage() {
 
   return (
     <main className="bg-warm-white min-h-[calc(100vh-80px)]">
+      <StructuredData data={menuSchema} />
       <SectionRenderer
         documentId={page?._id ?? "menuPage"}
         documentType={page?._type ?? "menuPage"}

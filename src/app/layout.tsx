@@ -18,6 +18,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { getThemeVars } from "@/lib/themes";
 import { getFontVars, generateFontFaceCSS } from "@/lib/fonts";
 import CookieConsent from "@/components/CookieConsent";
+import StructuredData from "@/components/StructuredData";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
 // Classic pairing (current defaults)
@@ -59,7 +60,13 @@ const NAV_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
 const FAVICON_QUERY = `*[_type == "siteSettings" && _id == "siteSettings"][0]{
   title,
   logoText,
-  "faviconUrl": favicon.asset->url
+  "faviconUrl": favicon.asset->url,
+  address,
+  phone,
+  email,
+  footerDescription,
+  "logoImageUrl": logoImage.asset->url,
+  socialLinks
 }`;
 
 // ─── Dynamic metadata (favicon and title from Sanity) ─────────────────────────
@@ -80,7 +87,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { data: navSettings } = await sanityFetch({ query: NAV_QUERY });
+  const [{ data: navSettings }, { data: siteInfo }] = await Promise.all([
+    sanityFetch({ query: NAV_QUERY }),
+    sanityFetch({ query: FAVICON_QUERY }),
+  ]);
 
   let logoSvgContent: string | null = null;
   if (navSettings?.logoImageUrl) {
@@ -109,6 +119,26 @@ export default async function RootLayout({
     >
       {fontFaceCSS && <style dangerouslySetInnerHTML={{ __html: fontFaceCSS }} />}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
+        <StructuredData data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: siteInfo?.logoText || "Allégade 10",
+          url: "https://allegade10.dk",
+          ...(siteInfo?.logoImageUrl && { logo: siteInfo.logoImageUrl }),
+          ...(siteInfo?.footerDescription && { description: siteInfo.footerDescription }),
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Allégade 10",
+            addressLocality: "Frederiksberg",
+            postalCode: "2000",
+            addressCountry: "DK",
+          },
+          ...(siteInfo?.phone && { telephone: siteInfo.phone }),
+          ...(siteInfo?.email && { email: siteInfo.email }),
+          ...(siteInfo?.socialLinks?.length && {
+            sameAs: siteInfo.socialLinks.map((l: any) => l.url).filter(Boolean),
+          }),
+        }} />
         <Header
           navLinks={navSettings?.navigation}
           ctaBookTableLabel={navSettings?.ctaBookTableLabel}

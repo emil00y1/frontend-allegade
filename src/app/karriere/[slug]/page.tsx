@@ -5,6 +5,7 @@ import Link from "next/link";
 import { sanityFetch } from "@/sanity/lib/live";
 import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/lib/image";
+import StructuredData from "@/components/StructuredData";
 
 const JOB_QUERY = `*[_type == "jobPosting" && slug.current == $slug && isActive == true && (!defined(publishAt) || publishAt <= now())][0]{
   _id,
@@ -79,8 +80,34 @@ export default async function JobPostingPage({
 
   const applyUrl = job.applicationUrl || (job.applicationEmail ? `mailto:${job.applicationEmail}` : null);
 
+  const jobPostingSchema = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.title,
+    ...(job.description && { description: job.description }),
+    ...(job.publishedAt && { datePosted: job.publishedAt }),
+    ...(job.deadline && { validThrough: job.deadline }),
+    employmentType: job.employmentType === "fuldtid" ? "FULL_TIME" : "PART_TIME",
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: job.location || "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
+    },
+    hiringOrganization: {
+      "@type": "Organization",
+      name: "Allégade 10",
+      sameAs: "https://allegade10.dk",
+    },
+  };
+
   return (
     <main className="min-h-screen bg-white">
+      <StructuredData data={jobPostingSchema} />
       <section className="py-14 md:py-24 lg:py-32">
         <div className="max-w-3xl mx-auto px-6 lg:px-16">
           <Link

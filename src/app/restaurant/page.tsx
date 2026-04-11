@@ -18,6 +18,7 @@ import {
   type StatItem,
 } from "@/types/sanity";
 import { SECTIONS_QUERY_FRAGMENT } from "@/sanity/lib/sections-query";
+import StructuredData from "@/components/StructuredData";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -138,11 +139,44 @@ export default async function RestaurantPage() {
     siteSettings?.ctaBookTableUrl ||
     "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
 
+  const restaurantSchema = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    name: page?.title || "Restaurant Allégade 10",
+    url: "https://allegade10.dk/restaurant",
+    description: page?.heroDescription,
+    servesCuisine: "Danish",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Allégade 10",
+      addressLocality: "Frederiksberg",
+      postalCode: "2000",
+      addressCountry: "DK",
+    },
+    ...(siteSettings?.phone && { telephone: siteSettings.phone }),
+    ...(siteSettings?.email && { email: siteSettings.email }),
+    ...(siteSettings?.restaurantHours && {
+      openingHoursSpecification: siteSettings.restaurantHours.map((h: any) => ({
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: h.days || h.label,
+        opens: h.hours?.split(" - ")?.[0]?.replace(".", ":"),
+        closes: h.hours?.split(" - ")?.[1]?.replace(".", ":"),
+      })),
+    }),
+    acceptsReservations: true,
+    ...(globalBookTableUrl && { reservations: globalBookTableUrl }),
+    menu: "https://allegade10.dk/menukort",
+    ...(page?.heroImage?.asset && {
+      image: urlFor(page.heroImage).width(1200).height(800).url(),
+    }),
+  };
+
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
     return (
       <main>
+        <StructuredData data={restaurantSchema} />
         <RestaurantHero
           heroImage={page.heroImage}
           heroHeading={page.heroHeading}
@@ -190,6 +224,7 @@ export default async function RestaurantPage() {
 
   return (
     <main>
+      <StructuredData data={restaurantSchema} />
       <SectionRenderer
         documentId={page?._id ?? "restaurantPage"}
         documentType={page?._type ?? "restaurantPage"}

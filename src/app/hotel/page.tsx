@@ -12,6 +12,7 @@ import { SectionRenderer } from "@/components/sections";
 import { type SiteSettings, type SanitySeo, type SanityImage, type SanitySection, type StatItem } from "@/types/sanity";
 import { type HotelRoom } from "@/components/RoomCarousel";
 import { SECTIONS_QUERY_FRAGMENT } from "@/sanity/lib/sections-query";
+import StructuredData from "@/components/StructuredData";
 
 interface HotelPageData {
   _id: string;
@@ -137,11 +138,66 @@ export default async function HotelPage() {
   const rooms = result?.rooms ?? [];
 
   const globalBookTableUrl = siteSettings?.ctaBookTableUrl || "https://allegade10.suitcasebooking.com/da";
+
+  const faqItems = (page?.faqItems || (page?.sections?.find((s: any) => s._type === "hotelPracticalInfoSection") as any)?.faqItems) as Array<{ question?: string; answer?: string }> | undefined;
+
+  const structuredData: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      name: page?.title || "Hotel Allégade 10",
+      url: "https://allegade10.dk/hotel",
+      description: page?.heroDescription,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
+      ...(siteSettings?.phone && { telephone: siteSettings.phone }),
+      ...(siteSettings?.email && { email: siteSettings.email }),
+      ...((siteSettings as any)?.ctaBookStayUrl && {
+        reservations: (siteSettings as any).ctaBookStayUrl,
+      }),
+      ...(rooms.length > 0 && {
+        containsPlace: rooms.map((room: any) => ({
+          "@type": "HotelRoom",
+          name: room.title,
+          description: room.description,
+          ...(room.pricePerNight && {
+            offers: {
+              "@type": "Offer",
+              price: room.pricePerNight,
+              priceCurrency: "DKK",
+            },
+          }),
+        })),
+      }),
+    },
+  ];
+
+  if (faqItems?.length) {
+    structuredData.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item: any) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    });
+  }
+
   const hasSections = page?.sections && page.sections.length > 0;
 
   if (!hasSections && page) {
     return (
       <main>
+        <StructuredData data={structuredData} />
         <HotelHero
           heroImage={page.heroImage}
           heroHeading={page.heroHeading}
@@ -198,6 +254,7 @@ export default async function HotelPage() {
 
   return (
     <main>
+      <StructuredData data={structuredData} />
       <SectionRenderer
         documentId={page?._id ?? "hotelPage"}
         documentType={page?._type ?? "hotelPage"}
