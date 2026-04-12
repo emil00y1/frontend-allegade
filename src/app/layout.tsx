@@ -171,7 +171,7 @@ export default async function RootLayout({
         {(await draftMode()).isEnabled && (
           <>
             <DisableDraftMode />
-            <VisualEditing />
+            <VisualEditing studioUrl="https://d4vf1kg67jjbhf4zsbewieod.sanity.studio" />
           </>
         )}
       </body>
