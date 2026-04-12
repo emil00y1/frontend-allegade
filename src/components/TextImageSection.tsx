@@ -78,16 +78,16 @@ export default function TextImageSection({
   const imageFirst = imagePosition === "left";
 
   const imageBlock = image ? (
-    <div className="flex items-center justify-center w-full py-6 lg:py-20">
-      <div className="relative w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-[82%]">
-        {/* Decorative offset frame */}
+    <div className={`flex items-center justify-center w-full pb-8 lg:py-20 ${imageFirst ? "order-last lg:order-first" : "order-last"}`}>
+      <div className="relative w-full lg:max-w-[82%]">
+        {/* Decorative offset frame — desktop only */}
         <div
-          className={`absolute inset-0 translate-x-3 translate-y-3 lg:translate-x-5 lg:translate-y-5 border ${frameColor}`}
+          className={`hidden lg:block absolute inset-0 lg:translate-x-5 lg:translate-y-5 border ${frameColor}`}
           aria-hidden="true"
         />
         {/* Image */}
         <div
-          className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden shadow-xl"
+          className="relative aspect-[3/2] lg:aspect-[4/5] overflow-hidden shadow-xl"
           data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].image`)}
         >
           <SanityImage
@@ -95,7 +95,7 @@ export default function TextImageSection({
             alt={image?.alt ?? heading ?? ""}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 90vw, 40vw"
+            sizes="(max-width: 768px) 100vw, 40vw"
           />
         </div>
         {/* Caption */}
@@ -109,7 +109,7 @@ export default function TextImageSection({
   ) : null;
 
   const textBlock = (
-    <div className="flex flex-col justify-center py-10 lg:py-24 lg:px-4">
+    <div className="flex flex-col justify-center py-10 lg:py-24 lg:px-4 order-first">
       {subheading && (
         <span className={`text-xs tracking-[0.25em] uppercase font-medium mb-6 ${accentColor}`}>
           {subheading}
