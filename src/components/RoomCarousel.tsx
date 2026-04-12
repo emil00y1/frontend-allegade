@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 interface RoomImage {
   _key?: string;
@@ -68,8 +67,8 @@ function RoomImageSlider({
   return (
     <div className="group/slider relative w-full aspect-[4/3] overflow-hidden bg-warm-gray">
       {current?.asset ? (
-        <Image
-          src={urlFor(current).width(600).height(450).auto("format").url()}
+        <SanityImage
+          image={current}
           alt={current.alt ?? alt}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

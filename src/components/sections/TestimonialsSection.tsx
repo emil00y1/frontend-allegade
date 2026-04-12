@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type Testimonial = {
   _key: string;
@@ -50,11 +49,11 @@ export default function TestimonialsSection({
 
               <div className="flex items-center gap-4 pt-6 border-t border-stone-200">
                 {t.image?.asset && (
-                  <Image
-                    src={urlFor(t.image).width(80).height(80).url()}
+                  <SanityImage
+                    image={t.image}
                     alt={t.name || ""}
-                    width={40}
-                    height={40}
+                    width={80}
+                    height={80}
                     className="rounded-full object-cover w-10 h-10"
                   />
                 )}

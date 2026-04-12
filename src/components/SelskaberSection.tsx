@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 interface SelskaberSectionProps {
   heading?: string;
@@ -22,10 +21,11 @@ export default function SelskaberSection({
     <section className="relative w-full flex items-center justify-center overflow-hidden py-28">
       {/* Background */}
       {backgroundImage ? (
-        <Image
-          src={urlFor(backgroundImage).width(1600).url()}
+        <SanityImage
+          image={backgroundImage}
           alt={heading}
           fill
+          sizes="100vw"
           className="object-cover"
         />
       ) : (

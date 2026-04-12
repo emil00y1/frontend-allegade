@@ -1,8 +1,7 @@
-import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
-import { type SanityImage } from "@/types/sanity";
+import { SanityImage } from "@/components/SanityImage";
+import { type SanityImage as SanityImageType } from "@/types/sanity";
 
 interface HotelTeaserSectionProps {
   eyebrow?: string;
@@ -11,7 +10,7 @@ interface HotelTeaserSectionProps {
   description?: string;
   ctaLabel?: string;
   ctaUrl?: string;
-  image?: SanityImage;
+  image?: SanityImageType;
 }
 
 export default function HotelTeaserSection({
@@ -51,10 +50,11 @@ export default function HotelTeaserSection({
         {/* Image column */}
         <div className="flex-1 relative h-[320px] overflow-hidden bg-warm-gray w-full">
           {image ? (
-            <Image
-              src={urlFor(image).width(800).url()}
+            <SanityImage
+              image={image}
               alt={heading}
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           ) : (

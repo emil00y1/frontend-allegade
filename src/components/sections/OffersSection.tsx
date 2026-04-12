@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type Offer = {
   _key: string;
@@ -50,8 +49,8 @@ export default function OffersSection({
             >
               {offer.image?.asset && (
                 <div className="aspect-[4/3] relative">
-                  <Image
-                    src={urlFor(offer.image).width(600).height(450).url()}
+                  <SanityImage
+                    image={offer.image}
                     alt={offer.title || ""}
                     fill
                     className="object-cover"

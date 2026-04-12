@@ -1,8 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { PortableText } from "next-sanity";
 import type { TypedObject } from "sanity";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type TextImageSectionProps = {
   heading?: string;
@@ -81,8 +80,8 @@ export default function TextImageSection({
         />
         {/* Image */}
         <div className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden shadow-xl">
-          <Image
-            src={urlFor(image).width(900).height(1125).url()}
+          <SanityImage
+            image={image}
             alt={image?.alt ?? heading ?? ""}
             fill
             className="object-cover"

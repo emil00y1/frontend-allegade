@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 import Lightbox from "@/components/Lightbox";
 
 type GalleryImage = {
@@ -79,8 +79,8 @@ export default function GallerySection({
                 onClick={() => setLightboxIndex(validIndex)}
               >
                 <div className={`relative ${aspectMap[aspectRatio]} overflow-hidden bg-warm-gray`}>
-                  <Image
-                    src={urlFor(img).width(dims.width).height(dims.height).auto("format").url()}
+                  <SanityImage
+                    image={img}
                     alt={img.alt ?? ""}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
-import { type SanityImage } from "@/types/sanity";
+import { SanityImage } from "@/components/SanityImage";
+import { type SanityImage as SanityImageType } from "@/types/sanity";
 
 interface HotelRestaurantTeaserProps {
   restaurantEyebrow?: string;
@@ -10,7 +9,7 @@ interface HotelRestaurantTeaserProps {
   restaurantDescription?: string;
   restaurantCtaLabel?: string;
   restaurantCtaUrl?: string;
-  restaurantImage?: SanityImage;
+  restaurantImage?: SanityImageType;
 }
 
 export default function HotelRestaurantTeaser({
@@ -29,7 +28,7 @@ export default function HotelRestaurantTeaser({
           <div className="flex flex-col md:flex-row gap-12 items-center">
             {restaurantImage?.asset && (
               <div className="relative shrink-0 w-full md:w-72 aspect-[3/2] md:aspect-square overflow-hidden">
-                <Image src={urlFor(restaurantImage).width(600).height(600).auto("format").url()} alt="Restaurant" fill sizes="(max-width: 768px) 100vw, 18rem" className="object-cover" />
+                <SanityImage image={restaurantImage} alt="Restaurant" fill sizes="(max-width: 768px) 100vw, 18rem" className="object-cover" />
               </div>
             )}
 

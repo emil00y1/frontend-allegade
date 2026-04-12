@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 interface WelcomeSectionProps {
   eyebrow?: string;
@@ -60,10 +59,11 @@ export default function WelcomeSection({
         <div className="lg:col-span-5 relative flex justify-center">
           <div className="relative bg-warm-gray overflow-hidden aspect-[4/3] lg:aspect-[4/5] w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-none">
             {image ? (
-              <Image
-                src={urlFor(image).width(800).url()}
+              <SanityImage
+                image={image}
                 alt={image.alt || heading}
                 fill
+                sizes="(max-width: 1024px) 75vw, 40vw"
                 className="object-cover"
               />
             ) : (

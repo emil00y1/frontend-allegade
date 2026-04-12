@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type BannerSectionProps = {
   heading?: string;
@@ -37,8 +36,8 @@ export default function BannerSection({
   return (
     <section className={`relative overflow-hidden ${sizeMap[size]}`}>
       {backgroundImage?.asset && (
-        <Image
-          src={urlFor(backgroundImage).width(1920).height(800).auto("format").url()}
+        <SanityImage
+          image={backgroundImage}
           alt={backgroundImage?.alt ?? heading ?? ""}
           fill
           className="object-cover"

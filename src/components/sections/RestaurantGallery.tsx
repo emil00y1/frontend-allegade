@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 import { type GalleryImage } from "@/types/sanity";
 
 interface RestaurantGalleryProps {
@@ -21,16 +20,16 @@ export default function RestaurantGallery({
         {images.length >= 3 ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             <div className="relative col-span-2 lg:col-span-1 lg:row-span-2 aspect-[4/3] lg:aspect-auto overflow-hidden bg-warm-gray">
-              <Image src={urlFor(images[0]).width(800).height(1000).auto("format").url()} alt={images[0].alt ?? "Galleri"} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <SanityImage image={images[0]} alt={images[0].alt ?? "Galleri"} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
             </div>
             {images.slice(1, 3).map((img, i) => (
               <div key={i} className="relative aspect-[4/3] overflow-hidden bg-warm-gray">
-                <Image src={urlFor(img).width(700).height(520).auto("format").url()} alt={img.alt ?? "Galleri"} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
+                <SanityImage image={img} alt={img.alt ?? "Galleri"} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
               </div>
             ))}
             {images[3] && (
               <div className="relative aspect-[4/3] overflow-hidden bg-warm-gray">
-                <Image src={urlFor(images[3]).width(700).height(520).auto("format").url()} alt={images[3].alt ?? "Galleri"} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
+                <SanityImage image={images[3]} alt={images[3].alt ?? "Galleri"} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover" />
               </div>
             )}
           </div>
@@ -38,7 +37,7 @@ export default function RestaurantGallery({
           <div className="grid grid-cols-2 gap-3">
             {images.map((img, i) => (
               <div key={i} className="relative aspect-[4/3] overflow-hidden bg-warm-gray">
-                <Image src={urlFor(img).width(700).height(520).auto("format").url()} alt={img.alt ?? "Galleri"} fill sizes="50vw" className="object-cover" />
+                <SanityImage image={img} alt={img.alt ?? "Galleri"} fill sizes="50vw" className="object-cover" />
               </div>
             ))}
           </div>

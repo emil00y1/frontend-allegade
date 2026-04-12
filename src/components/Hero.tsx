@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { SanityImage } from "@/components/SanityImage";
 import { urlFor } from "@/sanity/lib/image";
 
 interface HeroProps {
@@ -136,10 +137,11 @@ export default function Hero({
 
       {/* Fallback image if no video */}
       {!backgroundVideoUrl && backgroundImage && (
-        <Image
-          src={urlFor(backgroundImage).width(1600).url()}
+        <SanityImage
+          image={backgroundImage}
           alt="Allégade 10"
           fill
+          sizes="100vw"
           className="object-cover"
           priority
         />

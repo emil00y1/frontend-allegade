@@ -1,7 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays } from "lucide-react";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 import SectionHeading from "@/components/SectionHeading";
 import ShareButton from "@/components/ShareButton";
 
@@ -77,10 +76,11 @@ export default function EventsSection({
               {/* Image */}
               <div className="relative h-[180px] overflow-hidden bg-warm-gray">
                 {event.image ? (
-                  <Image
-                    src={urlFor(event.image).width(600).height(360).url()}
+                  <SanityImage
+                    image={event.image}
                     alt={event.image.alt || event.title}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (

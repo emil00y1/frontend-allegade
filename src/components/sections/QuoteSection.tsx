@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type QuoteSectionProps = {
   quote?: string;
@@ -41,8 +40,8 @@ export default function QuoteSection({
     <section className={`relative overflow-hidden py-28 lg:py-40 ${hasImage ? "" : bgMap[backgroundColor]}`}>
       {hasImage && (
         <>
-          <Image
-            src={urlFor(backgroundImage).width(1920).height(800).auto("format").url()}
+          <SanityImage
+            image={backgroundImage}
             alt=""
             fill
             className="object-cover"

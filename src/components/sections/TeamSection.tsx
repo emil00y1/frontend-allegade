@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { urlFor } from "@/sanity/lib/image";
+import { SanityImage } from "@/components/SanityImage";
 
 type TeamMember = {
   _key: string;
@@ -43,8 +42,8 @@ export default function TeamSection({
             <div key={member._key} className="text-center">
               {member.image?.asset && (
                 <div className="aspect-square relative mb-5 overflow-hidden">
-                  <Image
-                    src={urlFor(member.image).width(400).height(400).url()}
+                  <SanityImage
+                    image={member.image}
                     alt={member.name || ""}
                     fill
                     className="object-cover"
