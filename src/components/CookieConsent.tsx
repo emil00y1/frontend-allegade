@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
 
 const COOKIE_KEY = "cookie-consent";
 
+const listeners = new Set<() => void>();
+const subscribe = (cb: () => void) => {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+};
+const getSnapshot = () => localStorage.getItem(COOKIE_KEY);
+const getServerSnapshot = () => "ssr";
+
 export default function CookieConsent() {
-  const [visible, setVisible] = useState(
-    () => typeof window !== "undefined" && !localStorage.getItem(COOKIE_KEY),
-  );
+  const stored = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function respond(choice: "accepted" | "declined") {
     localStorage.setItem(COOKIE_KEY, choice);
-    setVisible(false);
+    listeners.forEach((l) => l());
 
     if (choice === "accepted" && typeof window.gtag === "function") {
       window.gtag("consent", "update", {
@@ -21,7 +29,7 @@ export default function CookieConsent() {
     }
   }
 
-  if (!visible) return null;
+  if (stored !== null) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg border border-border-warm/40 bg-warm-white/95 p-5 shadow-lg backdrop-blur-sm">

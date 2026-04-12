@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
@@ -28,14 +31,99 @@ export default function Hero({
   backgroundVideoUrl = "https://cdn.sanity.io/files/b0bkhf04/production/bf5322023ca71a37f92e42f0607cfba31b760e04.mp4",
   backgroundImage,
 }: HeroProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const startTimeRef = useRef<number>(Date.now());
+  const [videoReady, setVideoReady] = useState(false);
+  const [canFinish, setCanFinish] = useState(false);
+  const [progressDone, setProgressDone] = useState(false);
+  const [hideLoader, setHideLoader] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  // Minimum duration (ms) the loader is shown so the 0→100 fill is visible.
+  const MIN_LOADER_MS = 1000;
+
+  useEffect(() => {
+    if (!backgroundVideoUrl) {
+      setVideoReady(true);
+      return;
+    }
+    const v = videoRef.current;
+    if (!v) return;
+    const onReady = () => setVideoReady(true);
+    if (v.readyState >= 3) {
+      onReady();
+      return;
+    }
+    v.addEventListener("canplaythrough", onReady);
+    v.addEventListener("loadeddata", onReady);
+    // Safety fallback so the loader can't hang forever
+    const timeout = window.setTimeout(onReady, 8000);
+    return () => {
+      v.removeEventListener("canplaythrough", onReady);
+      v.removeEventListener("loadeddata", onReady);
+      window.clearTimeout(timeout);
+    };
+  }, [backgroundVideoUrl]);
+
+  // Enforce the minimum display window before the loader is allowed to finish.
+  useEffect(() => {
+    const elapsed = Date.now() - startTimeRef.current;
+    const remaining = Math.max(0, MIN_LOADER_MS - elapsed);
+    const t = window.setTimeout(() => setCanFinish(true), remaining);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  // Drive the progress bar. Tie the fill to elapsed time so it visibly
+  // animates 0→~90% over MIN_LOADER_MS, then jumps to 100% when ready.
+  useEffect(() => {
+    const done = videoReady && canFinish;
+    if (done) {
+      setProgress(100);
+      return;
+    }
+    let raf = 0;
+    const tick = () => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const timeTarget = Math.min(90, (elapsed / MIN_LOADER_MS) * 90);
+      const v = videoRef.current;
+      let real = 0;
+      if (v && v.duration && v.buffered.length) {
+        real = (v.buffered.end(v.buffered.length - 1) / v.duration) * 90;
+      }
+      const target = Math.max(timeTarget, real);
+      setProgress((p) => (p < target ? p + (target - p) * 0.12 : p));
+      raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
+  }, [videoReady, canFinish]);
+
+  // When the bar reaches 100%, wait for the width transition to visibly
+  // finish, then start the overlay fade-out and finally unmount.
+  const FILL_TRANSITION_MS = 500;
+  const FADE_OUT_MS = 600;
+  useEffect(() => {
+    if (!(videoReady && canFinish)) return;
+    const t = window.setTimeout(() => setProgressDone(true), FILL_TRANSITION_MS);
+    return () => window.clearTimeout(t);
+  }, [videoReady, canFinish]);
+
+  useEffect(() => {
+    if (!progressDone) return;
+    const t = window.setTimeout(() => setHideLoader(true), FADE_OUT_MS);
+    return () => window.clearTimeout(t);
+  }, [progressDone]);
+
   return (
     <section className="relative w-full h-screen min-h-[640px] flex items-center justify-center overflow-hidden">
       {/* Background Video */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
         poster={
           backgroundImage
@@ -130,7 +218,21 @@ export default function Hero({
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </div>
+
+      {/* Full-screen loader — stays until the hero video is ready */}
+      {!hideLoader && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-warm-white transition-opacity duration-[600ms] ease-out"
+          style={{ opacity: progressDone ? 0 : 1, pointerEvents: progressDone ? "none" : "auto" }}
+        >
+          <div className="relative h-px w-56 overflow-hidden bg-black/5">
+            <div
+              className="absolute inset-y-0 left-0 bg-black/40 transition-[width] duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-
