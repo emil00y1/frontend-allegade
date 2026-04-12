@@ -1,4 +1,5 @@
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type TeamMember = {
   _key: string;
@@ -10,12 +11,18 @@ type TeamMember = {
 };
 
 type TeamSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   description?: string;
   members?: TeamMember[];
 };
 
 export default function TeamSection({
+  _key,
+  documentId,
+  documentType,
   heading,
   description,
   members,
@@ -41,7 +48,10 @@ export default function TeamSection({
           {members.map((member) => (
             <div key={member._key} className="text-center">
               {member.image?.asset && (
-                <div className="aspect-square relative mb-5 overflow-hidden">
+                <div
+                  className="aspect-square relative mb-5 overflow-hidden"
+                  data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].members[_key=="${member._key}"].image`)}
+                >
                   <SanityImage
                     image={member.image}
                     alt={member.name || ""}

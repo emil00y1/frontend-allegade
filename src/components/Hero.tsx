@@ -5,8 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { SanityImage } from "@/components/SanityImage";
 import { urlFor } from "@/sanity/lib/image";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface HeroProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   tagline?: string;
   heading?: string;
   headingItalic?: string;
@@ -21,6 +25,9 @@ interface HeroProps {
 }
 
 export default function Hero({
+  _key,
+  documentId,
+  documentType,
   tagline = "Kulturel perle i Frederiksbergs centrum",
   heading = "Velkommen til",
   headingItalic = "Allégade 10",
@@ -137,14 +144,19 @@ export default function Hero({
 
       {/* Fallback image if no video */}
       {!backgroundVideoUrl && backgroundImage && (
-        <SanityImage
-          image={backgroundImage}
-          alt="Allégade 10"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority
-        />
+        <div
+          className="absolute inset-0"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].backgroundImage`)}
+        >
+          <SanityImage
+            image={backgroundImage}
+            alt="Allégade 10"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        </div>
       )}
 
       {/* Gradient overlay */}

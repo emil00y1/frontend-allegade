@@ -1,10 +1,13 @@
 import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { urlFor } from "@/sanity/lib/image";
-
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface RestaurantStoryProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   storyImage?: SanityImage;
   storyEyebrow?: string;
   storyHeading?: string;
@@ -13,6 +16,9 @@ interface RestaurantStoryProps {
 }
 
 export default function RestaurantStory({
+  _key,
+  documentId,
+  documentType,
   storyImage,
   storyEyebrow,
   storyHeading,
@@ -28,7 +34,10 @@ export default function RestaurantStory({
     <section className="bg-warm-white pt-24 pb-24 lg:pt-32 lg:pb-32 border-t border-border-warm/20">
       <div className="max-w-6xl mx-auto px-10 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          <div className="relative aspect-[4/3] md:aspect-[3/4] overflow-hidden bg-warm-gray">
+          <div
+            className="relative aspect-[4/3] md:aspect-[3/4] overflow-hidden bg-warm-gray"
+            data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].storyImage`)}
+          >
             {storyImageUrl ? (
               <Image src={storyImageUrl} alt="Om Allégade 10" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
             ) : (

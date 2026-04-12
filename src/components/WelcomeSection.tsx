@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface WelcomeSectionProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   eyebrow?: string;
   heading?: string;
   paragraph1?: string;
@@ -13,6 +17,9 @@ interface WelcomeSectionProps {
 }
 
 export default function WelcomeSection({
+  _key,
+  documentId,
+  documentType,
   eyebrow = "Vores Historie",
   heading = "Et samlingspunkt gennem århundreder",
   paragraph1 = "Siden 1797 har Allégade 10 været rammen om Frederiksbergs mest betydningsfulde møder. Her, hvor de gamle lindetræer kaster skygger over de historiske mure, fortsætter vi traditionen med klassisk dansk gæstfrihed.",
@@ -57,7 +64,10 @@ export default function WelcomeSection({
 
         {/* Image column */}
         <div className="lg:col-span-5 relative flex justify-center">
-          <div className="relative bg-warm-gray overflow-hidden aspect-[4/3] lg:aspect-[4/5] w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-none">
+          <div
+            className="relative bg-warm-gray overflow-hidden aspect-[4/3] lg:aspect-[4/5] w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-none"
+            data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].image`)}
+          >
             {image ? (
               <SanityImage
                 image={image}

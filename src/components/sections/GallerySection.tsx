@@ -4,6 +4,7 @@ import { useState } from "react";
 import { urlFor } from "@/sanity/lib/image";
 import { SanityImage } from "@/components/SanityImage";
 import Lightbox from "@/components/Lightbox";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type GalleryImage = {
   _key: string;
@@ -16,6 +17,9 @@ type GalleryImage = {
 };
 
 type GallerySectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   images?: GalleryImage[];
   columns?: "2" | "3" | "4";
@@ -41,6 +45,9 @@ const dimensionsMap = {
 };
 
 export default function GallerySection({
+  _key,
+  documentId,
+  documentType,
   heading,
   images,
   columns = "3",
@@ -78,7 +85,10 @@ export default function GallerySection({
                 className="group overflow-hidden cursor-pointer"
                 onClick={() => setLightboxIndex(validIndex)}
               >
-                <div className={`relative ${aspectMap[aspectRatio]} overflow-hidden bg-warm-gray`}>
+                <div
+                  className={`relative ${aspectMap[aspectRatio]} overflow-hidden bg-warm-gray`}
+                  data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].images[_key=="${img._key}"]`)}
+                >
                   <SanityImage
                     image={img}
                     alt={img.alt ?? ""}

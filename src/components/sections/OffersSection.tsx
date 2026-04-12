@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type Offer = {
   _key: string;
@@ -14,12 +15,18 @@ type Offer = {
 };
 
 type OffersSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   description?: string;
   offers?: Offer[];
 };
 
 export default function OffersSection({
+  _key,
+  documentId,
+  documentType,
   heading,
   description,
   offers,
@@ -48,7 +55,10 @@ export default function OffersSection({
               className="bg-white flex flex-col overflow-hidden"
             >
               {offer.image?.asset && (
-                <div className="aspect-[4/3] relative">
+                <div
+                  className="aspect-[4/3] relative"
+                  data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].offers[_key=="${offer._key}"].image`)}
+                >
                   <SanityImage
                     image={offer.image}
                     alt={offer.title || ""}

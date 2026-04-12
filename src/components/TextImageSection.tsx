@@ -2,8 +2,12 @@ import Link from "next/link";
 import { PortableText } from "next-sanity";
 import type { TypedObject } from "sanity";
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type TextImageSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   subheading?: string;
   body?: TypedObject[];
@@ -52,6 +56,9 @@ const ctaStyleMap = {
 };
 
 export default function TextImageSection({
+  _key,
+  documentId,
+  documentType,
   heading,
   subheading,
   body,
@@ -79,7 +86,10 @@ export default function TextImageSection({
           aria-hidden="true"
         />
         {/* Image */}
-        <div className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden shadow-xl">
+        <div
+          className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden shadow-xl"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].image`)}
+        >
           <SanityImage
             image={image}
             alt={image?.alt ?? heading ?? ""}

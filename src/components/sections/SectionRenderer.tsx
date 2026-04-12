@@ -159,8 +159,16 @@ export default function SectionRenderer({
                 const NestedComponent = sectionComponents[nestedSection._type];
                 if (!NestedComponent) return null;
                 return (
-                  <div key={nestedSection._key}>
-                    <NestedComponent {...nestedSection} />
+                  <div
+                    key={nestedSection._key}
+                    data-sanity={createDataAttribute({
+                      ...dataAttrConfig,
+                      id: documentId,
+                      type: documentType,
+                      path: `sections[_key=="${section._key}"].block->content[_key=="${nestedSection._key}"]`,
+                    }).toString()}
+                  >
+                    <NestedComponent {...nestedSection} documentId={documentId} documentType={documentType} />
                   </div>
                 );
               })}
@@ -174,7 +182,7 @@ export default function SectionRenderer({
           return null;
         }
 
-        const extraProps: Record<string, any> = {};
+        const extraProps: Record<string, any> = { documentId, documentType };
         if (section._type === "eventsTeaserSection") {
           extraProps.events = events;
         }

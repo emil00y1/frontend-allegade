@@ -4,8 +4,12 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface HotelHeroProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heroImage?: SanityImage;
   heroHeading?: string;
   heroHeadingItalic?: string;
@@ -22,6 +26,9 @@ interface HotelHeroProps {
 }
 
 export default function HotelHero({
+  _key,
+  documentId,
+  documentType,
   heroImage,
   heroHeading,
   heroHeadingItalic,
@@ -91,11 +98,16 @@ export default function HotelHero({
       </div>
 
       <div className="relative hidden lg:block min-h-[calc(100vh-80px)] overflow-hidden">
-        {heroImageUrl ? (
-          <Image src={heroImageUrl} alt={heroHeading ?? "Hotel"} fill sizes="50vw" className="object-cover object-center" priority />
-        ) : (
-          <div className="absolute inset-0 bg-warm-gray" />
-        )}
+        <div
+          className="absolute inset-0"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].heroImage`)}
+        >
+          {heroImageUrl ? (
+            <Image src={heroImageUrl} alt={heroHeading ?? "Hotel"} fill sizes="50vw" className="object-cover object-center" priority />
+          ) : (
+            <div className="absolute inset-0 bg-warm-gray" />
+          )}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
         {(heroFloatingStarText || heroFloatingSubtext) && (
           <div className="absolute bottom-12 left-12 bg-warm-white px-8 py-6 shadow-2xl">

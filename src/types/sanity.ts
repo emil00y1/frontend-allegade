@@ -37,6 +37,7 @@ export interface MenuServiceItem {
 }
 
 export interface GalleryImage extends SanityImage {
+  _key: string;
   alt?: string;
 }
 

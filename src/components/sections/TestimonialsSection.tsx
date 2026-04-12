@@ -1,4 +1,5 @@
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type Testimonial = {
   _key: string;
@@ -10,11 +11,17 @@ type Testimonial = {
 };
 
 type TestimonialsSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   testimonials?: Testimonial[];
 };
 
 export default function TestimonialsSection({
+  _key,
+  documentId,
+  documentType,
   heading,
   testimonials,
 }: TestimonialsSectionProps) {
@@ -49,13 +56,17 @@ export default function TestimonialsSection({
 
               <div className="flex items-center gap-4 pt-6 border-t border-stone-200">
                 {t.image?.asset && (
-                  <SanityImage
-                    image={t.image}
-                    alt={t.name || ""}
-                    width={80}
-                    height={80}
-                    className="rounded-full object-cover w-10 h-10"
-                  />
+                  <div
+                    data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].testimonials[_key=="${t._key}"].image`)}
+                  >
+                    <SanityImage
+                      image={t.image}
+                      alt={t.name || ""}
+                      width={80}
+                      height={80}
+                      className="rounded-full object-cover w-10 h-10"
+                    />
+                  </div>
                 )}
                 <div>
                   {t.name && (

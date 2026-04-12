@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type BannerSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heading?: string;
   subheading?: string;
   ctaLabel?: string;
@@ -25,6 +29,9 @@ const overlayMap = {
 };
 
 export default function BannerSection({
+  _key,
+  documentId,
+  documentType,
   heading,
   subheading,
   ctaLabel,
@@ -36,13 +43,18 @@ export default function BannerSection({
   return (
     <section className={`relative overflow-hidden ${sizeMap[size]}`}>
       {backgroundImage?.asset && (
-        <SanityImage
-          image={backgroundImage}
-          alt={backgroundImage?.alt ?? heading ?? ""}
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
+        <div
+          className="absolute inset-0"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].backgroundImage`)}
+        >
+          <SanityImage
+            image={backgroundImage}
+            alt={backgroundImage?.alt ?? heading ?? ""}
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+        </div>
       )}
 
       <div className={`absolute inset-0 ${overlayMap[overlay]}`} />

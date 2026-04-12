@@ -3,10 +3,13 @@ import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
-
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface RestaurantHeroProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   heroImage?: SanityImage;
   heroHeading?: string;
   heroHeadingItalic?: string;
@@ -20,6 +23,9 @@ interface RestaurantHeroProps {
 }
 
 export default function RestaurantHero({
+  _key,
+  documentId,
+  documentType,
   heroImage,
   heroHeading,
   heroHeadingItalic,
@@ -65,11 +71,16 @@ export default function RestaurantHero({
         </div>
       </div>
       <div className="relative hidden lg:block overflow-hidden bg-warm-gray min-h-[calc(100vh-80px)]">
-        {heroImageUrl ? (
-          <Image src={heroImageUrl} alt="Restaurant Allégade 10" fill sizes="50vw" className="object-cover" priority />
-        ) : (
-          <div className="absolute inset-0 bg-warm-gray" />
-        )}
+        <div
+          className="absolute inset-0"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].heroImage`)}
+        >
+          {heroImageUrl ? (
+            <Image src={heroImageUrl} alt="Restaurant Allégade 10" fill sizes="50vw" className="object-cover" priority />
+          ) : (
+            <div className="absolute inset-0 bg-warm-gray" />
+          )}
+        </div>
       </div>
     </section>
   );

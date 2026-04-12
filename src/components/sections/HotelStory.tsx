@@ -2,8 +2,12 @@ import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { urlFor } from "@/sanity/lib/image";
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface HotelStoryProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   storyImage?: SanityImage;
   storyEyebrow?: string;
   storyHeading?: string;
@@ -13,6 +17,9 @@ interface HotelStoryProps {
 }
 
 export default function HotelStory({
+  _key,
+  documentId,
+  documentType,
   storyImage,
   storyEyebrow,
   storyHeading,
@@ -35,7 +42,10 @@ export default function HotelStory({
       <div className="max-w-6xl mx-auto px-10 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Image */}
-          <div className="relative aspect-[4/3] md:aspect-[3/4] overflow-hidden bg-warm-gray order-last lg:order-first">
+          <div
+            className="relative aspect-[4/3] md:aspect-[3/4] overflow-hidden bg-warm-gray order-last lg:order-first"
+            data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].storyImage`)}
+          >
             {storyImageUrl ? (
               <Image
                 src={storyImageUrl}

@@ -3,10 +3,13 @@ import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { urlFor } from "@/sanity/lib/image";
 import { buttonVariants } from "@/lib/button-variants";
-
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface MenuHeroProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   breadcrumbLabel?: string;
   headerHeading?: string;
   headerDescription?: string;
@@ -19,6 +22,9 @@ interface MenuHeroProps {
 }
 
 export default function MenuHero({
+  _key,
+  documentId,
+  documentType,
   breadcrumbLabel,
   headerHeading,
   headerDescription,
@@ -68,11 +74,16 @@ export default function MenuHero({
       </div>
 
       <div className="relative hidden lg:block overflow-hidden bg-warm-gray">
-        {headerImageUrl ? (
-          <Image src={headerImageUrl} alt={headerHeading ?? "Menukort"} fill sizes="40vw" className="object-cover" priority />
-        ) : (
-          <div className="absolute inset-0 bg-warm-gray" />
-        )}
+        <div
+          className="absolute inset-0"
+          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].headerImage`)}
+        >
+          {headerImageUrl ? (
+            <Image src={headerImageUrl} alt={headerHeading ?? "Menukort"} fill sizes="40vw" className="object-cover" priority />
+          ) : (
+            <div className="absolute inset-0 bg-warm-gray" />
+          )}
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,10 @@
 import { SanityImage } from "@/components/SanityImage";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 type QuoteSectionProps = {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   quote?: string;
   attribution?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +31,9 @@ const attrColorMap = {
 };
 
 export default function QuoteSection({
+  _key,
+  documentId,
+  documentType,
   quote,
   attribution,
   backgroundImage,
@@ -40,13 +47,18 @@ export default function QuoteSection({
     <section className={`relative overflow-hidden py-28 lg:py-40 ${hasImage ? "" : bgMap[backgroundColor]}`}>
       {hasImage && (
         <>
-          <SanityImage
-            image={backgroundImage}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="100vw"
-          />
+          <div
+            className="absolute inset-0"
+            data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].backgroundImage`)}
+          >
+            <SanityImage
+              image={backgroundImage}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
           <div className="absolute inset-0 bg-black/60" />
         </>
       )}

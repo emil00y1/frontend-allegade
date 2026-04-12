@@ -1,15 +1,21 @@
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface RestaurantPhilosophyProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   philosophyImage?: SanityImage;
   philosophyQuote?: string;
   philosophyAttribution?: string;
 }
 
 export default function RestaurantPhilosophy({
+  _key,
+  documentId,
+  documentType,
   philosophyImage,
   philosophyQuote,
   philosophyAttribution,
@@ -22,7 +28,12 @@ export default function RestaurantPhilosophy({
     <section className="relative overflow-hidden py-16 md:py-32 lg:py-48 bg-dark-stone max-h-[calc(100vh-80px)] flex items-center justify-center">
       {philosophyImageUrl && (
         <>
-          <Image src={philosophyImageUrl} alt="Filosofi" fill sizes="100vw" className="object-cover opacity-30" />
+          <div
+            className="absolute inset-0"
+            data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].philosophyImage`)}
+          >
+            <Image src={philosophyImageUrl} alt="Filosofi" fill sizes="100vw" className="object-cover opacity-30" />
+          </div>
           <div className="absolute inset-0 bg-dark-stone/60" />
         </>
       )}

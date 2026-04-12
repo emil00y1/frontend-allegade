@@ -1,8 +1,12 @@
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { type SanityImage } from "@/types/sanity";
+import { dataAttr } from "@/sanity/lib/visual-editing";
 
 interface HotelFacilitiesProps {
+  _key?: string;
+  documentId?: string;
+  documentType?: string;
   facilitiesHeading?: string;
   facilitiesHeadingItalic?: string;
   facilitiesDescription?: string;
@@ -10,6 +14,9 @@ interface HotelFacilitiesProps {
 }
 
 export default function HotelFacilities({
+  _key,
+  documentId,
+  documentType,
   facilitiesHeading,
   facilitiesHeadingItalic,
   facilitiesDescription,
@@ -43,7 +50,10 @@ export default function HotelFacilities({
             return (
               <div key={f._key} className="flex flex-col gap-0">
                 {iconUrl ? (
-                  <div className="w-7 h-7 mb-[28px] relative shrink-0">
+                  <div
+                    className="w-7 h-7 mb-[28px] relative shrink-0"
+                    data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].facilities[_key=="${f._key}"].icon`)}
+                  >
                     <Image src={iconUrl} alt={f.title ?? ""} width={28} height={28} className="object-contain" />
                   </div>
                 ) : (
