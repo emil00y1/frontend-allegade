@@ -436,34 +436,39 @@ export default function MenuTabs({
   return (
     <div>
       {/* ── Sticky tab bar ────────────────────────────────────────────── */}
-      <div className="sticky top-20 z-40 bg-warm-white border-b border-border-warm shadow-sm">
+      <div className="sticky top-16 z-40 bg-warm-white border-b border-border-warm shadow-sm">
         <div className="max-w-6xl mx-auto px-10 lg:px-16">
-          {/* overflow-x-auto for mobile horizontal scroll; hide scrollbar */}
-          <div className="flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.menuType;
-              return (
-                <button
-                  key={tab.menuType}
-                  onClick={() => setActiveTab(tab.menuType)}
-                  className={cn(
-                    "flex flex-col items-center px-6 py-4 shrink-0 border-b-2 transition-all duration-200 focus:outline-none",
-                    isActive
-                      ? "border-brand text-dark-stone"
-                      : "border-transparent text-warm-brown hover:text-dark-stone",
-                  )}
-                >
-                  <span className="font-sans font-light text-sm leading-snug">
-                    {tab.label}
-                  </span>
-                  {tab.servingTime && (
-                    <span className="text-[10px] text-warm-brown/75 font-light mt-0.5 font-sans">
-                      {tab.servingTime}
+          {/* Relative wrapper so the fade overlay is contained */}
+          <div className="relative">
+            {/* overflow-x-auto for mobile horizontal scroll; hide scrollbar */}
+            <div className="flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.menuType;
+                return (
+                  <button
+                    key={tab.menuType}
+                    onClick={() => setActiveTab(tab.menuType)}
+                    className={cn(
+                      "flex flex-col items-center px-6 py-4 shrink-0 border-b-2 transition-all duration-200 focus:outline-none",
+                      isActive
+                        ? "border-brand text-dark-stone"
+                        : "border-transparent text-warm-brown hover:text-dark-stone",
+                    )}
+                  >
+                    <span className="font-sans font-light text-sm leading-snug">
+                      {tab.label}
                     </span>
-                  )}
-                </button>
-              );
-            })}
+                    {tab.servingTime && (
+                      <span className="text-[10px] text-warm-brown/75 font-light mt-0.5 font-sans">
+                        {tab.servingTime}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Fade gradient — hints at horizontal scroll on mobile, hidden on lg */}
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-warm-white to-transparent lg:hidden" />
           </div>
         </div>
       </div>
