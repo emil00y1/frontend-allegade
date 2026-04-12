@@ -72,15 +72,15 @@ export default function TextImageSection({
   const imageFirst = imagePosition === "left";
 
   const imageBlock = image ? (
-    <div className="flex items-center justify-center w-full py-8 lg:py-20">
-      <div className="relative w-full max-w-[82%]">
+    <div className="flex items-center justify-center w-full py-6 lg:py-20">
+      <div className="relative w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-[82%]">
         {/* Decorative offset frame */}
         <div
-          className={`absolute inset-0 translate-x-5 translate-y-5 border ${frameColor}`}
+          className={`absolute inset-0 translate-x-3 translate-y-3 lg:translate-x-5 lg:translate-y-5 border ${frameColor}`}
           aria-hidden="true"
         />
         {/* Image */}
-        <div className="relative aspect-[4/3] md:aspect-[4/5] overflow-hidden shadow-xl">
+        <div className="relative aspect-[4/3] lg:aspect-[4/5] overflow-hidden shadow-xl">
           <Image
             src={urlFor(image).width(900).height(1125).url()}
             alt={image?.alt ?? heading ?? ""}

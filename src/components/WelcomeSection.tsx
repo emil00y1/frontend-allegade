@@ -57,8 +57,8 @@ export default function WelcomeSection({
         </div>
 
         {/* Image column */}
-        <div className="lg:col-span-5 relative">
-          <div className="relative bg-warm-gray overflow-hidden aspect-[4/3] md:aspect-[4/5]">
+        <div className="lg:col-span-5 relative flex justify-center">
+          <div className="relative bg-warm-gray overflow-hidden aspect-[4/3] lg:aspect-[4/5] w-full max-w-[75%] sm:max-w-[65%] md:max-w-md lg:max-w-none">
             {image ? (
               <Image
                 src={urlFor(image).width(800).url()}

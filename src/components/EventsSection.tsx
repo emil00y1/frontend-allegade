@@ -71,7 +71,7 @@ export default function EventsSection({
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {events.map((event) => (
             <div key={event._id} className="bg-warm-white flex flex-col">
               {/* Image */}
