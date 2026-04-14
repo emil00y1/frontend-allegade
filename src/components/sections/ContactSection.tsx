@@ -10,6 +10,28 @@ interface ContactSectionProps {
   email?: string;
   address?: string;
   notificationEmail?: string;
+  // Field labels
+  nameLabel?: string;
+  emailLabel?: string;
+  messageLabel?: string;
+  // Placeholders
+  namePlaceholder?: string;
+  emailPlaceholder?: string;
+  messagePlaceholder?: string;
+  // Validation
+  nameRequiredMessage?: string;
+  emailRequiredMessage?: string;
+  emailInvalidMessage?: string;
+  messageRequiredMessage?: string;
+  genericErrorMessage?: string;
+  networkErrorMessage?: string;
+  // Submit & states
+  submitLabel?: string;
+  submittingLabel?: string;
+  successEyebrow?: string;
+  successHeading?: string;
+  successBodyPrefix?: string;
+  successBodySuffix?: string;
 }
 
 type FormState = "idle" | "submitting" | "success" | "error";
@@ -26,6 +48,24 @@ export default function ContactSection({
   phone = "+45 33 31 17 51",
   email = "info@allegade10.dk",
   address,
+  nameLabel = "Navn *",
+  emailLabel = "Email *",
+  messageLabel = "Besked *",
+  namePlaceholder = "Jens Jensen",
+  emailPlaceholder = "jens@eksempel.dk",
+  messagePlaceholder = "Skriv din besked her…",
+  nameRequiredMessage = "Navn er påkrævet",
+  emailRequiredMessage = "Email er påkrævet",
+  emailInvalidMessage = "Indtast en gyldig emailadresse",
+  messageRequiredMessage = "Besked er påkrævet",
+  genericErrorMessage = "Noget gik galt.",
+  networkErrorMessage = "Netværksfejl. Prøv venligst igen.",
+  submitLabel = "Send besked",
+  submittingLabel = "Sender…",
+  successEyebrow = "Tak for din besked",
+  successHeading = "Vi vender tilbage hurtigst muligt",
+  successBodyPrefix = "Du er også velkommen til at ringe til os på ",
+  successBodySuffix = ".",
 }: ContactSectionProps) {
   const [fields, setFields] = useState({ name: "", email: "", message: "" });
   const [formState, setFormState] = useState<FormState>("idle");
@@ -46,13 +86,13 @@ export default function ContactSection({
 
   function validate(): boolean {
     const errors: Partial<Record<FieldKey, string>> = {};
-    if (!fields.name.trim()) errors.name = "Navn er påkrævet";
+    if (!fields.name.trim()) errors.name = nameRequiredMessage;
     if (!fields.email.trim()) {
-      errors.email = "Email er påkrævet";
+      errors.email = emailRequiredMessage;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
-      errors.email = "Indtast en gyldig emailadresse";
+      errors.email = emailInvalidMessage;
     }
-    if (!fields.message.trim()) errors.message = "Besked er påkrævet";
+    if (!fields.message.trim()) errors.message = messageRequiredMessage;
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -71,13 +111,13 @@ export default function ContactSection({
       });
       const json = await res.json();
       if (!res.ok) {
-        setErrorMessage(json.error ?? "Noget gik galt.");
+        setErrorMessage(json.error ?? genericErrorMessage);
         setFormState("error");
       } else {
         setFormState("success");
       }
     } catch {
-      setErrorMessage("Netværksfejl. Prøv venligst igen.");
+      setErrorMessage(networkErrorMessage);
       setFormState("error");
     }
   };
@@ -150,40 +190,40 @@ export default function ContactSection({
           {formState === "success" ? (
             <div className="flex flex-col justify-center gap-4">
               <span className="text-[10px] tracking-[2px] uppercase text-[#8b6f47]">
-                Tak for din besked
+                {successEyebrow}
               </span>
               <h3 className="font-newsreader font-extralight text-2xl text-[#292524] leading-tight">
-                Vi vender tilbage hurtigst muligt
+                {successHeading}
               </h3>
               <p className="text-sm font-light text-[#78716c] leading-7">
-                Du er også velkommen til at ringe til os på{" "}
+                {successBodyPrefix}
                 <a href={`tel:${phone?.replace(/\s/g, "")}`} className="text-[#292524] hover:text-[#8b6f47] transition-colors">
                   {phone}
                 </a>
-                .
+                {successBodySuffix}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
-                  <label className={labelClass}>Navn *</label>
+                  <label className={labelClass}>{nameLabel}</label>
                   <input
                     type="text"
                     value={fields.name}
                     onChange={set("name")}
-                    placeholder="Jens Jensen"
+                    placeholder={namePlaceholder}
                     className={inputClass("name")}
                   />
                   {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
                 </div>
                 <div>
-                  <label className={labelClass}>Email *</label>
+                  <label className={labelClass}>{emailLabel}</label>
                   <input
                     type="email"
                     value={fields.email}
                     onChange={set("email")}
-                    placeholder="jens@eksempel.dk"
+                    placeholder={emailPlaceholder}
                     className={inputClass("email")}
                   />
                   {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
@@ -191,11 +231,11 @@ export default function ContactSection({
               </div>
 
               <div>
-                <label className={labelClass}>Besked *</label>
+                <label className={labelClass}>{messageLabel}</label>
                 <textarea
                   value={fields.message}
                   onChange={set("message")}
-                  placeholder="Skriv din besked her…"
+                  placeholder={messagePlaceholder}
                   rows={5}
                   className={cn(inputClass("message"), "resize-none")}
                 />
@@ -217,7 +257,7 @@ export default function ContactSection({
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                 )}
-                {formState === "submitting" ? "Sender…" : "Send besked"}
+                {formState === "submitting" ? submittingLabel : submitLabel}
               </button>
             </form>
           )}

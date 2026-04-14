@@ -23,6 +23,7 @@ const QUERY = `{
     },
     // Fallbacks
     heroEyebrow, heroHeading, heroHeadingItalic, heroDescription, heroCtaLabel,
+    heroImage{ ..., asset-> },
     upcomingHeading, emptyStateHeading, emptyStateText,
     freeLabel, archiveEyebrow, archiveHeading
   },
@@ -118,6 +119,7 @@ export default async function BegivenhedPage() {
           heroHeadingItalic={page.heroHeadingItalic}
           heroDescription={page.heroDescription}
           heroCtaLabel={page.heroCtaLabel}
+          heroImage={page.heroImage}
           featuredEvent={featuredEvent}
           breadcrumbHomeLabel={breadcrumbHomeLabel}
         />

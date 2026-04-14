@@ -8,6 +8,7 @@ interface EventsHeroProps {
   heroHeadingItalic?: string;
   heroDescription?: string;
   heroCtaLabel?: string;
+  heroImage?: any;
   featuredEvent?: any;
   breadcrumbHomeLabel?: string;
 }
@@ -17,11 +18,14 @@ export default function EventsHero({
   heroHeadingItalic,
   heroDescription,
   heroCtaLabel,
+  heroImage,
   featuredEvent,
   breadcrumbHomeLabel,
 }: EventsHeroProps) {
-  const featuredImageUrl = featuredEvent?.image?.asset
-    ? urlFor(featuredEvent.image).width(1200).height(1600).auto("format").url()
+  // Prefer the explicitly uploaded hero image; fall back to the featured event's image
+  const imageSource = heroImage?.asset ? heroImage : featuredEvent?.image?.asset ? featuredEvent.image : null;
+  const featuredImageUrl = imageSource
+    ? urlFor(imageSource).width(1200).height(1600).auto("format").url()
     : null;
 
   return (

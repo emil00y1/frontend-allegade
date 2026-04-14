@@ -9,6 +9,32 @@ interface SelskaberInquiryFormProps {
   description?: string;
   phone?: string;
   email?: string;
+  // Field labels
+  nameLabel?: string;
+  emailLabel?: string;
+  occasionLabel?: string;
+  guestCountLabel?: string;
+  dateLabel?: string;
+  messageLabel?: string;
+  // Placeholders
+  namePlaceholder?: string;
+  emailPlaceholder?: string;
+  occasionPlaceholder?: string;
+  guestCountPlaceholder?: string;
+  messagePlaceholder?: string;
+  // Validation
+  nameRequiredMessage?: string;
+  emailRequiredMessage?: string;
+  emailInvalidMessage?: string;
+  messageRequiredMessage?: string;
+  genericErrorMessage?: string;
+  networkErrorMessage?: string;
+  // Submit & states
+  submitLabel?: string;
+  submittingLabel?: string;
+  successEyebrow?: string;
+  successHeading?: string;
+  successBody?: string;
 }
 
 const DEFAULT_OCCASIONS = [
@@ -29,8 +55,30 @@ export default function SelskaberInquiryForm({
   description = "Fortæl os lidt om jeres planer, så vender vi tilbage med et uforpligtende forslag til jeres arrangement.",
   phone = "+45 33 31 17 51",
   email = "info@allegade10.dk",
+  nameLabel = "Navn *",
+  emailLabel = "Email *",
+  occasionLabel = "Anledning",
+  guestCountLabel = "Antal gæster",
+  dateLabel = "Ønsket dato",
+  messageLabel = "Besked *",
+  namePlaceholder = "Jens Jensen",
+  emailPlaceholder = "jens@eksempel.dk",
+  occasionPlaceholder = "Vælg anledning",
+  guestCountPlaceholder = "f.eks. 40",
+  messagePlaceholder = "Fortæl os om jeres arrangement, ønsker til menu, særlige behov osv.",
+  nameRequiredMessage = "Navn er påkrævet",
+  emailRequiredMessage = "Email er påkrævet",
+  emailInvalidMessage = "Indtast en gyldig emailadresse",
+  messageRequiredMessage = "Besked er påkrævet",
+  genericErrorMessage = "Noget gik galt.",
+  networkErrorMessage = "Netværksfejl. Prøv venligst igen.",
+  submitLabel = "Send forespørgsel",
+  submittingLabel = "Sender…",
+  successEyebrow = "Tak for din henvendelse",
+  successHeading = "Vi har modtaget jeres forespørgsel",
+  successBody = "Vi vender tilbage hurtigst muligt med et uforpligtende forslag. I kan også kontakte os direkte på",
 }: SelskaberInquiryFormProps) {
-  const options = occasionOptions ?? DEFAULT_OCCASIONS;
+  const options = occasionOptions && occasionOptions.length > 0 ? occasionOptions : DEFAULT_OCCASIONS;
 
   const [fields, setFields] = useState({
     name: "",
@@ -55,13 +103,13 @@ export default function SelskaberInquiryForm({
 
   function validate(): boolean {
     const errors: Partial<Record<keyof typeof fields, string>> = {};
-    if (!fields.name.trim()) errors.name = "Navn er påkrævet";
+    if (!fields.name.trim()) errors.name = nameRequiredMessage;
     if (!fields.email.trim()) {
-      errors.email = "Email er påkrævet";
+      errors.email = emailRequiredMessage;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
-      errors.email = "Indtast en gyldig emailadresse";
+      errors.email = emailInvalidMessage;
     }
-    if (!fields.message.trim()) errors.message = "Besked er påkrævet";
+    if (!fields.message.trim()) errors.message = messageRequiredMessage;
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -80,13 +128,13 @@ export default function SelskaberInquiryForm({
       });
       const json = await res.json();
       if (!res.ok) {
-        setErrorMessage(json.error ?? "Noget gik galt.");
+        setErrorMessage(json.error ?? genericErrorMessage);
         setFormState("error");
       } else {
         setFormState("success");
       }
     } catch {
-      setErrorMessage("Netværksfejl. Prøv venligst igen.");
+      setErrorMessage(networkErrorMessage);
       setFormState("error");
     }
   };
@@ -104,14 +152,13 @@ export default function SelskaberInquiryForm({
         <div className="max-w-6xl mx-auto px-10 lg:px-16">
           <div className="max-w-lg">
             <p className="text-[10px] tracking-[2px] uppercase text-brand mb-6">
-              Tak for din henvendelse
+              {successEyebrow}
             </p>
             <h2 className="font-newsreader font-extralight text-3xl text-[#292524] leading-tight mb-4">
-              Vi har modtaget jeres forespørgsel
+              {successHeading}
             </h2>
             <p className="text-[#78716c] font-light leading-7 text-sm">
-              Vi vender tilbage hurtigst muligt med et uforpligtende forslag. I
-              kan også kontakte os direkte på{" "}
+              {successBody}{" "}
               <a href={`tel:${phone}`} className="text-[#292524] hover:text-brand transition-colors">
                 {phone}
               </a>
@@ -173,23 +220,23 @@ export default function SelskaberInquiryForm({
             {/* Row 1: Navn + Email */}
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
-                <label className={labelClass}>Navn *</label>
+                <label className={labelClass}>{nameLabel}</label>
                 <input
                   type="text"
                   value={fields.name}
                   onChange={set("name")}
-                  placeholder="Jens Jensen"
+                  placeholder={namePlaceholder}
                   className={inputClass("name")}
                 />
                 {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
               </div>
               <div>
-                <label className={labelClass}>Email *</label>
+                <label className={labelClass}>{emailLabel}</label>
                 <input
                   type="email"
                   value={fields.email}
                   onChange={set("email")}
-                  placeholder="jens@eksempel.dk"
+                  placeholder={emailPlaceholder}
                   className={inputClass("email")}
                 />
                 {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
@@ -199,14 +246,14 @@ export default function SelskaberInquiryForm({
             {/* Row 2: Anledning + Antal gæster */}
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
-                <label className={labelClass}>Anledning</label>
+                <label className={labelClass}>{occasionLabel}</label>
                 <select
                   value={fields.occasion}
                   onChange={set("occasion")}
                   className={cn(inputClass(), "appearance-none cursor-pointer")}
                 >
                   <option value="" className="bg-warm-gray">
-                    Vælg anledning
+                    {occasionPlaceholder}
                   </option>
                   {options.map((o) => (
                     <option key={o} value={o} className="bg-warm-gray">
@@ -216,13 +263,13 @@ export default function SelskaberInquiryForm({
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Antal gæster</label>
+                <label className={labelClass}>{guestCountLabel}</label>
                 <input
                   type="number"
                   min={1}
                   value={fields.guestCount}
                   onChange={set("guestCount")}
-                  placeholder="f.eks. 40"
+                  placeholder={guestCountPlaceholder}
                   className={inputClass()}
                 />
               </div>
@@ -230,7 +277,7 @@ export default function SelskaberInquiryForm({
 
             {/* Row 3: Dato */}
             <div>
-              <label className={labelClass}>Ønsket dato</label>
+              <label className={labelClass}>{dateLabel}</label>
               <input
                 type="date"
                 value={fields.desiredDate}
@@ -241,11 +288,11 @@ export default function SelskaberInquiryForm({
 
             {/* Row 4: Besked */}
             <div>
-              <label className={labelClass}>Besked *</label>
+              <label className={labelClass}>{messageLabel}</label>
               <textarea
                 value={fields.message}
                 onChange={set("message")}
-                placeholder="Fortæl os om jeres arrangement, ønsker til menu, særlige behov osv."
+                placeholder={messagePlaceholder}
                 rows={5}
                 className={cn(inputClass("message"), "resize-none")}
               />
@@ -269,7 +316,7 @@ export default function SelskaberInquiryForm({
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               )}
-              {formState === "submitting" ? "Sender…" : "Send forespørgsel"}
+              {formState === "submitting" ? submittingLabel : submitLabel}
             </button>
           </form>
         </div>
