@@ -19,31 +19,105 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/cookiepolitik`, priority: 0.3, changeFrequency: 'yearly' },
 ]
 
+type SlugRow = { slug: string; lastUpdated?: string }
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Active job postings
-  const jobs = await client.fetch<{ slug: string }[]>(
-    `*[_type == "jobPosting" && isActive == true && (!defined(publishAt) || publishAt <= now()) && (!defined(unpublishAt) || unpublishAt > now()) && defined(slug.current)]{ "slug": slug.current }`
-  )
+  // Fetch slug lists in parallel. Each collection targets documents that are
+  // actually publicly visible today (publishAt/unpublishAt respected).
+  const [jobs, pages, rooms, upcomingEvents, pastEvents] = await Promise.all([
+    client.fetch<SlugRow[]>(
+      `*[_type == "jobPosting" && isActive == true
+        && (!defined(publishAt) || publishAt <= now())
+        && (!defined(unpublishAt) || unpublishAt > now())
+        && defined(slug.current)]{
+          "slug": slug.current,
+          "lastUpdated": _updatedAt
+        }`,
+    ),
+    client.fetch<SlugRow[]>(
+      `*[_type == "page" && isPublished == true
+        && (!defined(publishAt) || publishAt <= now())
+        && defined(slug.current)]{
+          "slug": slug.current,
+          "lastUpdated": _updatedAt
+        }`,
+    ),
+    client.fetch<SlugRow[]>(
+      `*[_type == "hotelRoom" && defined(slug.current)]{
+        "slug": slug.current,
+        "lastUpdated": _updatedAt
+      }`,
+    ),
+    client.fetch<SlugRow[]>(
+      `*[_type == "event"
+        && defined(slug.current)
+        && (!defined(publishAt) || publishAt <= now())
+        && (!defined(unpublishAt) || unpublishAt > now())
+        && (!defined(startDate) || startDate >= now())]{
+          "slug": slug.current,
+          "lastUpdated": _updatedAt
+        }`,
+    ),
+    client.fetch<SlugRow[]>(
+      `*[_type == "event"
+        && defined(slug.current)
+        && defined(startDate)
+        && startDate < now()]{
+          "slug": slug.current,
+          "lastUpdated": _updatedAt
+        }`,
+    ),
+  ])
 
-  // Published generic pages not already covered by static routes
   const staticSlugs = new Set(['kontakt', 'om-os', 'privatlivspolitik'])
-  const pages = await client.fetch<{ slug: string }[]>(
-    `*[_type == "page" && isPublished == true && (!defined(publishAt) || publishAt <= now()) && defined(slug.current)]{ "slug": slug.current }`
-  )
 
-  const jobRoutes: MetadataRoute.Sitemap = jobs.map(({ slug }) => ({
+  const jobRoutes: MetadataRoute.Sitemap = jobs.map(({ slug, lastUpdated }) => ({
     url: `${BASE_URL}/karriere/${slug}`,
     priority: 0.5,
     changeFrequency: 'monthly',
+    ...(lastUpdated && { lastModified: new Date(lastUpdated) }),
   }))
 
   const pageRoutes: MetadataRoute.Sitemap = pages
     .filter(({ slug }) => !staticSlugs.has(slug))
-    .map(({ slug }) => ({
+    .map(({ slug, lastUpdated }) => ({
       url: `${BASE_URL}/${slug}`,
       priority: 0.5,
       changeFrequency: 'monthly',
+      ...(lastUpdated && { lastModified: new Date(lastUpdated) }),
     }))
 
-  return [...STATIC_ROUTES, ...jobRoutes, ...pageRoutes]
+  const roomRoutes: MetadataRoute.Sitemap = rooms.map(({ slug, lastUpdated }) => ({
+    url: `${BASE_URL}/hotel/vaerelser/${slug}`,
+    priority: 0.7,
+    changeFrequency: 'monthly',
+    ...(lastUpdated && { lastModified: new Date(lastUpdated) }),
+  }))
+
+  const upcomingEventRoutes: MetadataRoute.Sitemap = upcomingEvents.map(
+    ({ slug, lastUpdated }) => ({
+      url: `${BASE_URL}/begivenheder/${slug}`,
+      priority: 0.7,
+      changeFrequency: 'daily',
+      ...(lastUpdated && { lastModified: new Date(lastUpdated) }),
+    }),
+  )
+
+  const pastEventRoutes: MetadataRoute.Sitemap = pastEvents.map(
+    ({ slug, lastUpdated }) => ({
+      url: `${BASE_URL}/begivenheder/${slug}`,
+      priority: 0.3,
+      changeFrequency: 'yearly',
+      ...(lastUpdated && { lastModified: new Date(lastUpdated) }),
+    }),
+  )
+
+  return [
+    ...STATIC_ROUTES,
+    ...jobRoutes,
+    ...pageRoutes,
+    ...roomRoutes,
+    ...upcomingEventRoutes,
+    ...pastEventRoutes,
+  ]
 }

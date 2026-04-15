@@ -78,6 +78,8 @@ export default async function BegivenhedPage() {
     ...(event.startDate && { startDate: event.startDate }),
     ...(event.endDate && { endDate: event.endDate }),
     ...(event.excerpt && { description: event.excerpt }),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: {
       "@type": "Place",
       name: event.venue?.name || "Allégade 10",
@@ -94,13 +96,15 @@ export default async function BegivenhedPage() {
         "@type": "Offer",
         price: event.price,
         priceCurrency: "DKK",
-        ...(event.price === 0 && { price: 0 }),
+        availability: "https://schema.org/InStock",
       },
     }),
     ...(event.image?.asset && {
       image: event.image.asset.url,
     }),
-    url: `https://allegade10.dk/begivenheder`,
+    url: event.slug?.current
+      ? `https://allegade10.dk/begivenheder/${event.slug.current}`
+      : `https://allegade10.dk/begivenheder`,
     organizer: {
       "@type": "Organization",
       name: "Allégade 10",

@@ -1,10 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
-import Breadcrumb from "@/components/Breadcrumb";
 import { urlFor } from "@/sanity/lib/image";
-import { buttonVariants } from "@/lib/button-variants";
 import { type SanityImage } from "@/types/sanity";
-import { dataAttr } from "@/sanity/lib/visual-editing";
+import BaseHeroSection from "./BaseHeroSection";
 
 interface MenuHeroProps {
   _key?: string;
@@ -35,56 +31,39 @@ export default function MenuHero({
   breadcrumbHomeLabel,
   globalBookTableUrl,
 }: MenuHeroProps) {
-  const servingTimes = headerServingTimes || [];
-  const finalBookingUrl = bookTableUrl || globalBookTableUrl || "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+  const finalBookingUrl =
+    bookTableUrl ||
+    globalBookTableUrl ||
+    "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+
   const headerImageUrl = headerImage?.asset
     ? urlFor(headerImage).width(900).height(600).auto("format").url()
     : null;
 
   return (
-    <section className="grid lg:grid-cols-[3fr_2fr] min-h-[30vh] bg-warm-white border-b border-border-warm/30">
-      <div className="flex flex-col justify-center px-10 lg:px-16 pt-32 pb-10 lg:pt-36 lg:pb-12">
-        <Breadcrumb current={breadcrumbLabel ?? "Menukort"} className="mb-6" homeLabel={breadcrumbHomeLabel} />
-        <h1 className="font-newsreader font-extralight text-[clamp(2rem,4vw,3.25rem)] text-dark-stone leading-none mb-4">
-          {headerHeading ?? "Vores Menukort"}
-        </h1>
-        <p className="text-warm-brown font-light leading-6 max-w-lg mb-8 text-base">
-          {headerDescription ?? "Fra klassisk dansk smørrebrød til aftenmenu..."}
-        </p>
-
-        {servingTimes.length > 0 && (
-          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-8">
-            {servingTimes.map((st, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-brand shrink-0" />
-                <span className="text-[11px] font-light text-dark-stone">
-                  <span className="font-light text-warm-brown/80 uppercase tracking-[0.5px] text-[10px] mr-1">
-                    {st.label}:
-                  </span>
-                  {st.time}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <Link href={finalBookingUrl} className={buttonVariants({ variant: "primary", size: "sm" })}>
-          {bookTableLabel ?? "Book bord"}
-        </Link>
-      </div>
-
-      <div className="relative hidden lg:block overflow-hidden bg-warm-gray">
-        <div
-          className="absolute inset-0"
-          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].headerImage`)}
-        >
-          {headerImageUrl ? (
-            <Image src={headerImageUrl} alt={headerHeading ?? "Menukort"} fill sizes="40vw" className="object-cover" priority />
-          ) : (
-            <div className="absolute inset-0 bg-warm-gray" />
-          )}
-        </div>
-      </div>
-    </section>
+    <BaseHeroSection
+      documentId={documentId}
+      documentType={documentType}
+      sectionKey={_key}
+      imageFieldPath="headerImage"
+      breadcrumbLabel={breadcrumbLabel ?? "Menukort"}
+      breadcrumbHomeLabel={breadcrumbHomeLabel}
+      heading={headerHeading ?? "Vores Menukort"}
+      description={
+        headerDescription ??
+        "Fra klassisk dansk smørrebrød til aftenmenu..."
+      }
+      imageUrl={headerImageUrl}
+      imageAlt={headerHeading ?? "Menukort"}
+      imageSizes="40vw"
+      servingTimes={headerServingTimes}
+      primaryCta={{
+        label: bookTableLabel ?? "Book bord",
+        href: finalBookingUrl,
+      }}
+      gridClassName="grid lg:grid-cols-[3fr_2fr]"
+      minHeightClassName="min-h-[30vh]"
+      headingSize="sm"
+    />
   );
 }

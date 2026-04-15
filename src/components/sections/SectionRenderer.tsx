@@ -1,7 +1,4 @@
-"use client";
-
-import { createDataAttribute, useOptimistic } from "@sanity/visual-editing";
-import type { SanityDocument } from "@sanity/client";
+import { createDataAttribute } from "@sanity/visual-editing";
 import TextImageSection from "@/components/TextImageSection";
 import BannerSection from "./BannerSection";
 import RichTextSection from "./RichTextSection";
@@ -42,6 +39,13 @@ import TeamSection from "./TeamSection";
 import OffersSection from "./OffersSection";
 import JobListingSection from "./JobListingSection";
 import ContactSection from "./ContactSection";
+
+// NOTE: This is intentionally a server component.
+// Previously it was "use client" to host useOptimistic for visual editing
+// latency; that made every imported section a client module and inflated the
+// production bundle. Live updates from Sanity Studio now flow through
+// <SanityLive /> via defineLive's revalidation channel, so the optimistic
+// indirection was redundant here.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SectionBlock = { _key: string; _type: string; [key: string]: any };
@@ -93,12 +97,18 @@ type SectionRendererProps = {
   documentId: string;
   documentType: string;
   sections?: SectionBlock[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   events?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rooms?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   menus?: any[];
   occasionLabels?: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   upcomingEvents?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   pastEvents?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   featuredEvent?: any;
   globalBookTableUrl?: string;
   breadcrumbHomeLabel?: string;
@@ -110,10 +120,73 @@ const dataAttrConfig = {
   baseUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333",
 };
 
+function buildExtraProps(
+  section: SectionBlock,
+  ctx: Omit<SectionRendererProps, "sections">,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Record<string, any> {
+  const {
+    documentId,
+    documentType,
+    events,
+    rooms,
+    menus,
+    occasionLabels,
+    upcomingEvents,
+    pastEvents,
+    featuredEvent,
+    globalBookTableUrl,
+    breadcrumbHomeLabel,
+  } = ctx;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const extraProps: Record<string, any> = { documentId, documentType };
+
+  if (section._type === "eventsTeaserSection") {
+    extraProps.events = events;
+  }
+  if (
+    [
+      "homeHeroSection",
+      "restaurantHeroSection",
+      "hotelHeroSection",
+      "selskaberHeroSection",
+      "menuHeroSection",
+    ].includes(section._type)
+  ) {
+    extraProps.ctaPrimaryUrl = section.ctaPrimaryUrl || globalBookTableUrl;
+    extraProps.backgroundVideoUrl = section.backgroundVideo?.asset?.url;
+    extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
+    extraProps.globalBookTableUrl = globalBookTableUrl;
+    extraProps.bookingCtaUrl = section.bookingCtaUrl || globalBookTableUrl;
+  }
+  if (section._type === "hotelRoomShowcaseSection") {
+    extraProps.rooms = rooms;
+    extraProps.bookingCtaUrl = globalBookTableUrl;
+  }
+  if (section._type === "selskaberFormSection") {
+    extraProps.occasionLabels = occasionLabels;
+  }
+  if (section._type === "menuTabsSection") {
+    extraProps.menus = menus;
+    extraProps.globalBookTableUrl = globalBookTableUrl;
+  }
+  if (section._type === "eventsHeroSection") {
+    extraProps.featuredEvent = featuredEvent;
+    extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
+  }
+  if (section._type === "eventsListSection") {
+    extraProps.upcomingEvents = upcomingEvents;
+  }
+  if (section._type === "eventsArchiveSection") {
+    extraProps.pastEvents = pastEvents;
+  }
+  return extraProps;
+}
+
 export default function SectionRenderer({
   documentId,
   documentType,
-  sections: initialSections,
+  sections,
   events,
   rooms,
   menus,
@@ -124,20 +197,21 @@ export default function SectionRenderer({
   globalBookTableUrl,
   breadcrumbHomeLabel,
 }: SectionRendererProps) {
-  const sections = useOptimistic<
-    SectionBlock[] | undefined,
-    SanityDocument<{ sections?: SectionBlock[] }>
-  >(initialSections, (currentSections, action) => {
-    if (action.id === documentId && action.document.sections) {
-      return action.document.sections.map(
-        (section) =>
-          currentSections?.find((s) => s._key === section?._key) || section,
-      );
-    }
-    return currentSections;
-  });
-
   if (!sections || sections.length === 0) return null;
+
+  const ctx = {
+    documentId,
+    documentType,
+    events,
+    rooms,
+    menus,
+    occasionLabels,
+    upcomingEvents,
+    pastEvents,
+    featuredEvent,
+    globalBookTableUrl,
+    breadcrumbHomeLabel,
+  };
 
   return (
     <div
@@ -149,7 +223,7 @@ export default function SectionRenderer({
       }).toString()}
     >
       {sections.map((section) => {
-        // Handle reusable block references — render nested content sections
+        // Reusable block references — render nested sections inline.
         if (section._type === "reusableBlockReferenceSection") {
           const blockContent = section.block?.content;
           if (!blockContent || !Array.isArray(blockContent)) return null;
@@ -158,6 +232,7 @@ export default function SectionRenderer({
               {blockContent.map((nestedSection: SectionBlock) => {
                 const NestedComponent = sectionComponents[nestedSection._type];
                 if (!NestedComponent) return null;
+                const nestedExtra = buildExtraProps(nestedSection, ctx);
                 return (
                   <div
                     key={nestedSection._key}
@@ -168,7 +243,7 @@ export default function SectionRenderer({
                       path: `sections[_key=="${section._key}"].block->content[_key=="${nestedSection._key}"]`,
                     }).toString()}
                   >
-                    <NestedComponent {...nestedSection} documentId={documentId} documentType={documentType} />
+                    <NestedComponent {...nestedSection} {...nestedExtra} />
                   </div>
                 );
               })}
@@ -182,38 +257,7 @@ export default function SectionRenderer({
           return null;
         }
 
-        const extraProps: Record<string, any> = { documentId, documentType };
-        if (section._type === "eventsTeaserSection") {
-          extraProps.events = events;
-        }
-        if (["homeHeroSection", "restaurantHeroSection", "hotelHeroSection", "selskaberHeroSection", "menuHeroSection"].includes(section._type)) {
-          extraProps.ctaPrimaryUrl = section.ctaPrimaryUrl || globalBookTableUrl;
-          extraProps.backgroundVideoUrl = section.backgroundVideo?.asset?.url;
-          extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
-          extraProps.globalBookTableUrl = globalBookTableUrl;
-          extraProps.bookingCtaUrl = section.bookingCtaUrl || globalBookTableUrl;
-        }
-        if (section._type === "hotelRoomShowcaseSection") {
-          extraProps.rooms = rooms;
-          extraProps.bookingCtaUrl = globalBookTableUrl;
-        }
-        if (section._type === "selskaberFormSection") {
-          extraProps.occasionLabels = occasionLabels;
-        }
-        if (section._type === "menuTabsSection") {
-          extraProps.menus = menus;
-          extraProps.globalBookTableUrl = globalBookTableUrl;
-        }
-        if (section._type === "eventsHeroSection") {
-          extraProps.featuredEvent = featuredEvent;
-          extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
-        }
-        if (section._type === "eventsListSection") {
-          extraProps.upcomingEvents = upcomingEvents;
-        }
-        if (section._type === "eventsArchiveSection") {
-          extraProps.pastEvents = pastEvents;
-        }
+        const extraProps = buildExtraProps(section, ctx);
 
         return (
           <div

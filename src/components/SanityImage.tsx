@@ -1,9 +1,9 @@
 import Image, { type ImageProps } from "next/image";
 import type { SanityImageSource } from "@sanity/image-url";
-import { dimensionsFromRef, urlFor } from "@/sanity/lib/image";
+import { dimensionsFromRef, lqipFromImage, urlFor } from "@/sanity/lib/image";
 
 type AnySanitySource = SanityImageSource & {
-  asset?: { _ref?: string; _id?: string } | null;
+  asset?: { _ref?: string; _id?: string; metadata?: { lqip?: string } } | null;
 };
 
 type BaseProps = {
@@ -40,13 +40,15 @@ export function SanityImage(props: Props) {
   if (!image) return null;
 
   const dims = dimensionsFromRef(getRef(image));
+  const lqip = lqipFromImage(image);
 
-  const common = {
+  const common: Partial<ImageProps> = {
     alt: alt ?? "",
     className,
     sizes: sizes ?? (props.fill ? "100vw" : undefined),
     priority,
     quality: quality ?? 80,
+    ...(lqip ? { placeholder: "blur" as const, blurDataURL: lqip } : {}),
   };
 
   // Custom loader: lets next/image pick the width from the device's srcset and
@@ -55,7 +57,7 @@ export function SanityImage(props: Props) {
     urlFor(image).width(width).quality(q ?? 80).url();
 
   if (props.fill) {
-    return <Image {...common} loader={loader} src={urlFor(image).url()} fill />;
+    return <Image {...(common as ImageProps)} loader={loader} src={urlFor(image).url()} fill alt={common.alt ?? ""} />;
   }
 
   const width = props.width;
@@ -65,11 +67,12 @@ export function SanityImage(props: Props) {
 
   return (
     <Image
-      {...common}
+      {...(common as ImageProps)}
       loader={loader}
       src={urlFor(image).width(width).url()}
       width={width}
       height={height}
+      alt={common.alt ?? ""}
     />
   );
 }
