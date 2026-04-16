@@ -1,3 +1,5 @@
+"use client";
+
 import Image, { type ImageProps } from "next/image";
 import type { SanityImageSource } from "@sanity/image-url";
 import { dimensionsFromRef, lqipFromImage, urlFor } from "@/sanity/lib/image";
