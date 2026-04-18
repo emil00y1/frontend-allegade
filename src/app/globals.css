@@ -161,9 +161,9 @@ html {
 }
 
 @layer utilities {
-  /* Matches the exact height of MobileBookingBar (border 1px + py-4×2 + icon h-4 = 49px)
+  /* Matches the exact height of MobileBookingBar (border 1px + py-5×2 + icon h-4 = 57px)
      plus the device safe-area-inset-bottom so notched phones aren't clipped either. */
   .pb-mobile-bar {
-    padding-bottom: calc(49px + env(safe-area-inset-bottom));
+    padding-bottom: calc(57px + env(safe-area-inset-bottom));
   }
 }
