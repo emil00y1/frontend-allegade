@@ -129,7 +129,7 @@ export default function GallerySection({
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(initialCount);
 
-  const validImages = (images ?? []).filter((img) => img?.asset);
+  const validImages = useMemo(() => (images ?? []).filter((img) => img?.asset), [images]);
 
   const openLightbox = useCallback((idx: number) => setLightboxIndex(idx), []);
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
