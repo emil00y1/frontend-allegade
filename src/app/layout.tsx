@@ -132,7 +132,7 @@ export default async function RootLayout({
           </Script>
         </>
       )}
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden pb-[72px] lg:pb-0`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden pb-mobile-bar lg:pb-0`}>
         <StructuredData data={{
           "@context": "https://schema.org",
           "@type": "Organization",

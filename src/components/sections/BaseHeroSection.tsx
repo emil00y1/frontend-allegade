@@ -116,7 +116,7 @@ export default function BaseHeroSection({
 
         <div className="mb-8">
           <h1 className={cn(headingClass, "leading-none")}>
-            <span className="font-newsreader font-extralight text-dark-stone block">
+            <span className="font-newsreader font-light text-dark-stone block">
               {heading}
             </span>
             {headingItalic && (
@@ -128,7 +128,7 @@ export default function BaseHeroSection({
         </div>
 
         {description && (
-          <p className="text-warm-brown font-light leading-7 text-base max-w-md mb-10">
+          <p className="text-warm-brown font-normal leading-7 text-base max-w-md mb-10">
             {description}
           </p>
         )}
@@ -140,7 +140,7 @@ export default function BaseHeroSection({
                 <span className="text-[10px] tracking-[1px] uppercase text-warm-brown/60">
                   {stat.label}
                 </span>
-                <span className="font-newsreader font-extralight text-xl text-dark-stone">
+                <span className="font-newsreader font-light text-xl text-dark-stone">
                   {stat.value}
                 </span>
               </div>

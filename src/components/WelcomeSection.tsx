@@ -37,18 +37,18 @@ export default function WelcomeSection({
             {eyebrow}
           </span>
 
-          <h2 className="text-dark-stone text-5xl leading-tight font-newsreader font-extralight">
+          <h2 className="text-dark-stone text-[clamp(1.75rem,4vw,3rem)] leading-tight font-newsreader font-light">
             {heading}
           </h2>
 
           <div className="flex flex-col gap-6 max-w-2xl">
             {paragraph1 && (
-              <p className="text-warm-brown text-base font-light leading-[26px]">
+              <p className="text-warm-brown text-base font-normal leading-[26px]">
                 {paragraph1}
               </p>
             )}
             {paragraph2 && (
-              <p className="text-warm-brown text-base font-light leading-[26px]">
+              <p className="text-warm-brown text-base font-normal leading-[26px]">
                 {paragraph2}
               </p>
             )}

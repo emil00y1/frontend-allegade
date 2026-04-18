@@ -136,7 +136,7 @@ export default async function Footer() {
                 )}
               </Link>
 
-              <p className="text-[#78716c] text-sm font-light leading-[22px] tracking-[0.35px]">
+              <p className="text-[#78716c] text-sm font-normal leading-[22px] tracking-[0.35px]">
                 {siteSettings?.footerDescription ||
                   "Heritage & Hospitality since 1797. En Frederiksberg institution dedikeret til kvalitet og tradition."}
               </p>
@@ -174,10 +174,10 @@ export default async function Footer() {
                       key={i}
                       className="flex items-center justify-between gap-4"
                     >
-                      <span className="text-[#78716c] text-sm font-light">
+                      <span className="text-[#78716c] text-sm font-normal">
                         {entry.days || entry.label}
                       </span>
-                      <span className="text-[#78716c] text-sm font-light shrink-0">
+                      <span className="text-[#78716c] text-sm font-normal shrink-0">
                         {entry.hours}
                       </span>
                     </li>
@@ -198,7 +198,7 @@ export default async function Footer() {
               <h4 className="text-[#292524] text-[12px] tracking-[1.2px] uppercase font-light">
                 {siteSettings?.footerContactLabel ?? "Kontakt"}
               </h4>
-              <div className="flex flex-col gap-4 text-[#78716c] text-sm font-light">
+              <div className="flex flex-col gap-4 text-[#78716c] text-sm font-normal">
                 {siteSettings?.address ? (
                   <p className="leading-5 whitespace-pre-line">
                     {siteSettings.address}
