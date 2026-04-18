@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ZoomIn } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import { SanityImage } from "@/components/SanityImage";
