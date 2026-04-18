@@ -37,7 +37,7 @@ export default function Lightbox({ images, initialIndex, onClose }: LightboxProp
       setTimeout(() => {
         setIndex(next);
         setFadingIn(true);
-      }, 120);
+      }, 200);
     },
     [],
   );
