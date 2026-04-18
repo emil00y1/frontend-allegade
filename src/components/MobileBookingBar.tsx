@@ -54,7 +54,7 @@ export default function MobileBookingBar({
           href={ctaBookTableUrl}
           target={isExternal(ctaBookTableUrl) ? "_blank" : undefined}
           rel={isExternal(ctaBookTableUrl) ? "noopener noreferrer" : undefined}
-          className="flex items-center justify-center gap-2 py-4 text-[11px] tracking-[1.2px] uppercase font-light text-dark-stone border-r border-border-warm hover:bg-warm-gray/60 transition-colors"
+          className="flex items-center justify-center gap-2 py-5 text-[11px] tracking-[1.2px] uppercase font-light text-dark-stone border-r border-border-warm hover:bg-warm-gray/60 transition-colors"
         >
           <Calendar className="w-4 h-4 text-brand" strokeWidth={1.5} />
           {ctaBookTableLabel}
@@ -63,7 +63,7 @@ export default function MobileBookingBar({
           href={ctaBookStayUrl}
           target={isExternal(ctaBookStayUrl) ? "_blank" : undefined}
           rel={isExternal(ctaBookStayUrl) ? "noopener noreferrer" : undefined}
-          className="flex items-center justify-center gap-2 py-4 text-[11px] tracking-[1.2px] uppercase font-light text-white bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)] hover:opacity-95 transition-opacity"
+          className="flex items-center justify-center gap-2 py-5 text-[11px] tracking-[1.2px] uppercase font-light text-white bg-[linear-gradient(165deg,var(--brand)_0%,var(--brand-mid)_100%)] hover:opacity-95 transition-opacity"
         >
           <BedDouble className="w-4 h-4" strokeWidth={1.5} />
           {ctaBookStayLabel}

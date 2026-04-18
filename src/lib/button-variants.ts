@@ -11,9 +11,9 @@ export const buttonVariants = cva(
         dark: "text-white bg-dark-stone hover:opacity-80",
       },
       size: {
-        default: "px-8 py-5",
-        sm: "px-8 py-4",
-        lg: "px-10 py-5",
+        default: "px-8 py-4",
+        sm: "px-8 py-3.5",
+        lg: "px-10 py-4",
       },
     },
     defaultVariants: {
