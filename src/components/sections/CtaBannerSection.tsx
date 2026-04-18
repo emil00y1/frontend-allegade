@@ -52,7 +52,7 @@ export default function CtaBannerSection({
   const s = styleConfig[style];
 
   return (
-    <section className={`${s.bg} py-20 lg:py-28`}>
+    <section className={`${s.bg} py-24 lg:py-32`}>
       <div className="max-w-4xl mx-auto px-6 lg:px-16 text-center">
         {heading && (
           <h2 className={`font-serif text-3xl md:text-4xl lg:text-5xl font-light leading-[1.1] mb-5 ${s.heading}`}>
@@ -70,7 +70,7 @@ export default function CtaBannerSection({
           {ctaLabel && ctaUrl && (
             <Link
               href={ctaUrl}
-              className={`inline-flex items-center gap-3 border px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium transition-all duration-300 group ${s.primaryBtn}`}
+              className={`inline-flex items-center gap-3 border px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium transition-all duration-300 group ${s.primaryBtn}`}
             >
               {ctaLabel}
               <span className="transition-transform duration-300 group-hover:translate-x-1.5">

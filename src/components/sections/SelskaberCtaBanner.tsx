@@ -17,7 +17,7 @@ export default function SelskaberCtaBanner({
     : null;
 
   return (
-    <section className="relative w-full py-24 md:py-32 overflow-hidden flex items-center justify-center">
+    <section className="relative w-full py-28 md:py-36 overflow-hidden flex items-center justify-center">
       {imageUrl ? (
         <Image src={imageUrl} alt={ctaBannerHeading ?? "CTA"} fill className="object-cover" />
       ) : (
@@ -26,7 +26,7 @@ export default function SelskaberCtaBanner({
       <div className="absolute inset-0 bg-black/40 z-10" />
       <div className="relative z-20 text-center px-6">
         <h2 className="text-white text-[clamp(2rem,5vw,3.5rem)] font-newsreader font-extralight mb-10">{ctaBannerHeading}</h2>
-        <a href="#foresporgsel" className="bg-white text-dark-stone text-[12px] tracking-[1.4px] uppercase font-light px-10 py-4 hover:bg-warm-white transition-colors duration-300">
+        <a href="#foresporgsel" className="bg-white text-dark-stone text-[12px] tracking-[1.4px] uppercase font-light px-10 py-5 hover:bg-warm-white transition-colors duration-300">
           {ctaBannerButtonLabel ?? "Kontakt os"}
         </a>
       </div>

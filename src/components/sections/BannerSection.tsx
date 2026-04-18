@@ -75,7 +75,7 @@ export default function BannerSection({
         {ctaLabel && ctaUrl && (
           <Link
             href={ctaUrl}
-            className="inline-flex items-center gap-3 border border-white/80 px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium text-white transition-all duration-300 hover:bg-white hover:text-stone-900 group"
+            className="inline-flex items-center gap-3 border border-white/80 px-8 py-4 text-xs tracking-[0.2em] uppercase font-medium text-white transition-all duration-300 hover:bg-white hover:text-stone-900 group"
           >
             {ctaLabel}
             <span className="transition-transform duration-300 group-hover:translate-x-1.5">
