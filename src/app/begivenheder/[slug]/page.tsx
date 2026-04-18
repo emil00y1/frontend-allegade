@@ -118,6 +118,8 @@ export default async function EventDetailPage({
     ...(event.endDate && { endDate: event.endDate }),
     ...(event.excerpt && { description: event.excerpt }),
     ...(heroImageUrl && { image: heroImageUrl }),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     ...(event.price != null && {
       offers: {
         "@type": "Offer",
@@ -125,6 +127,7 @@ export default async function EventDetailPage({
         priceCurrency: "DKK",
         url: BOOKING_URL,
         availability: "https://schema.org/InStock",
+        ...(event.startDate && { validFrom: event.startDate }),
       },
     }),
     location: {
@@ -142,6 +145,10 @@ export default async function EventDetailPage({
       "@type": "Organization",
       name: "Allégade 10",
       url: "https://allegade10.dk",
+    },
+    performer: {
+      "@type": "Organization",
+      name: "Allégade 10",
     },
   };
 

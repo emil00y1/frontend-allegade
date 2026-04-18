@@ -19,6 +19,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { getThemeVars } from "@/lib/themes";
 import { getFontVars, generateFontFaceCSS } from "@/lib/fonts";
 import CookieConsent from "@/components/CookieConsent";
+import MobileBookingBar from "@/components/MobileBookingBar";
 import StructuredData from "@/components/StructuredData";
 
 // ─── Fonts ────────────────────────────────────────────────────────────────────
@@ -127,11 +128,11 @@ export default async function RootLayout({
             strategy="afterInteractive"
           />
           <Script id="gtag-init" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${siteInfo.googleAnalyticsId}');`}
+            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});gtag('js',new Date());gtag('config','${siteInfo.googleAnalyticsId}');`}
           </Script>
         </>
       )}
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden pb-[72px] lg:pb-0`}>
         <StructuredData data={{
           "@context": "https://schema.org",
           "@type": "Organization",
@@ -166,6 +167,12 @@ export default async function RootLayout({
         />
         {children}
         <Footer />
+        <MobileBookingBar
+          ctaBookTableLabel={navSettings?.ctaBookTableLabel}
+          ctaBookTableUrl={navSettings?.ctaBookTableUrl}
+          ctaBookStayLabel={navSettings?.ctaBookStayLabel}
+          ctaBookStayUrl={navSettings?.ctaBookStayUrl}
+        />
         <CookieConsent />
         <SanityLive />
         {(await draftMode()).isEnabled && (

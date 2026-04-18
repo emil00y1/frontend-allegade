@@ -122,12 +122,27 @@ export default async function RoomPage({
         price: room.pricePerNight,
         priceCurrency: "DKK",
         url: bookingUrl,
+        availability: "https://schema.org/InStock",
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: room.pricePerNight,
+          priceCurrency: "DKK",
+          unitCode: "NIG",
+          unitText: "night",
+        },
       },
     }),
     containedInPlace: {
       "@type": "Hotel",
       name: "Hotel Allégade 10",
       url: "https://allegade10.dk/hotel",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Allégade 10",
+        addressLocality: "Frederiksberg",
+        postalCode: "2000",
+        addressCountry: "DK",
+      },
     },
   };
 

@@ -1,10 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
-import Breadcrumb from "@/components/Breadcrumb";
 import { urlFor } from "@/sanity/lib/image";
-import { buttonVariants } from "@/lib/button-variants";
 import { type SanityImage } from "@/types/sanity";
-import { dataAttr } from "@/sanity/lib/visual-editing";
+import BaseHeroSection from "./BaseHeroSection";
 
 interface RestaurantHeroProps {
   _key?: string;
@@ -41,47 +37,30 @@ export default function RestaurantHero({
     ? urlFor(heroImage).width(1200).height(1600).auto("format").url()
     : null;
 
-  const bookingUrl = heroBookCtaUrl ?? globalBookTableUrl ?? "#";
-
   return (
-    <section className="grid lg:grid-cols-2 min-h-[calc(100vh-80px)] bg-warm-white">
-      <div className="flex flex-col justify-center px-10 lg:px-16 py-20">
-        <Breadcrumb current="Restaurant" homeLabel={breadcrumbHomeLabel} />
-        <div className="mb-8">
-          <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] leading-none">
-            <span className="font-newsreader font-extralight text-dark-stone block">
-              {heroHeading ?? "Mad, atmosfære og"}
-            </span>
-            <span className="font-cormorant font-light italic text-brand block">
-              {heroHeadingItalic ?? "gode øjeblikke"}
-            </span>
-          </h1>
-        </div>
-        <p className="text-warm-brown font-light leading-7 text-base max-w-md mb-10">
-          {heroDescription ??
-            "I de historiske stuer på Allégade 10 serverer vi klassisk dansk køkken..."}
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <Link href={bookingUrl} className={buttonVariants({ variant: "primary" })}>
-            {heroBookCtaLabel ?? "Book bord"}
-          </Link>
-          <Link href={heroMenuCtaUrl ?? "/menukort"} className={buttonVariants({ variant: "secondary" })}>
-            {heroMenuCtaLabel ?? "Se menukort"}
-          </Link>
-        </div>
-      </div>
-      <div className="relative hidden lg:block overflow-hidden bg-warm-gray min-h-[calc(100vh-80px)]">
-        <div
-          className="absolute inset-0"
-          data-sanity={dataAttr(documentId, documentType, `sections[_key=="${_key}"].heroImage`)}
-        >
-          {heroImageUrl ? (
-            <Image src={heroImageUrl} alt="Restaurant Allégade 10" fill sizes="50vw" className="object-cover" priority />
-          ) : (
-            <div className="absolute inset-0 bg-warm-gray" />
-          )}
-        </div>
-      </div>
-    </section>
+    <BaseHeroSection
+      documentId={documentId}
+      documentType={documentType}
+      sectionKey={_key}
+      imageFieldPath="heroImage"
+      breadcrumbLabel="Restaurant"
+      breadcrumbHomeLabel={breadcrumbHomeLabel}
+      heading={heroHeading ?? "Mad, atmosfære og"}
+      headingItalic={heroHeadingItalic ?? "gode øjeblikke"}
+      description={
+        heroDescription ??
+        "I de historiske stuer på Allégade 10 serverer vi klassisk dansk køkken..."
+      }
+      imageUrl={heroImageUrl}
+      imageAlt="Restaurant Allégade 10"
+      primaryCta={{
+        label: heroBookCtaLabel ?? "Book bord",
+        href: heroBookCtaUrl ?? globalBookTableUrl ?? "#",
+      }}
+      secondaryCta={{
+        label: heroMenuCtaLabel ?? "Se menukort",
+        href: heroMenuCtaUrl ?? "/menukort",
+      }}
+    />
   );
 }

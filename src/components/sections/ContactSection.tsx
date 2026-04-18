@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { FormField, Input, Textarea, SubmitButton } from "@/components/ui/FormField";
+import { EMAIL_RE } from "@/components/ui/form-styles";
 
 interface ContactSectionProps {
   eyebrow?: string;
@@ -37,11 +38,6 @@ interface ContactSectionProps {
 type FormState = "idle" | "submitting" | "success" | "error";
 type FieldKey = "name" | "email" | "message";
 
-const inputBase =
-  "w-full bg-transparent border px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none transition-colors";
-const labelClass = "block text-[10px] tracking-[1.5px] uppercase text-[#78716c] mb-2";
-const errorClass = "text-[11px] text-red-500 font-light mt-1.5";
-
 export default function ContactSection({
   eyebrow = "Kom i kontakt",
   heading = "Kontakt Os",
@@ -72,9 +68,6 @@ export default function ContactSection({
   const [errorMessage, setErrorMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({});
 
-  const inputClass = (field?: FieldKey) =>
-    cn(inputBase, fieldErrors[field!] ? "border-red-400 focus:border-red-500" : "border-[#e0dbd8] focus:border-[#8b6f47]");
-
   const set =
     (key: keyof typeof fields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -89,7 +82,7 @@ export default function ContactSection({
     if (!fields.name.trim()) errors.name = nameRequiredMessage;
     if (!fields.email.trim()) {
       errors.email = emailRequiredMessage;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+    } else if (!EMAIL_RE.test(fields.email)) {
       errors.email = emailInvalidMessage;
     }
     if (!fields.message.trim()) errors.message = messageRequiredMessage;
@@ -206,59 +199,48 @@ export default function ContactSection({
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <label className={labelClass}>{nameLabel}</label>
-                  <input
+                <FormField label={nameLabel} error={fieldErrors.name}>
+                  <Input
                     type="text"
                     value={fields.name}
                     onChange={set("name")}
                     placeholder={namePlaceholder}
-                    className={inputClass("name")}
+                    invalid={!!fieldErrors.name}
+                    autoComplete="name"
                   />
-                  {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
-                </div>
-                <div>
-                  <label className={labelClass}>{emailLabel}</label>
-                  <input
+                </FormField>
+                <FormField label={emailLabel} error={fieldErrors.email}>
+                  <Input
                     type="email"
                     value={fields.email}
                     onChange={set("email")}
                     placeholder={emailPlaceholder}
-                    className={inputClass("email")}
+                    invalid={!!fieldErrors.email}
+                    autoComplete="email"
                   />
-                  {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
-                </div>
+                </FormField>
               </div>
 
-              <div>
-                <label className={labelClass}>{messageLabel}</label>
-                <textarea
+              <FormField label={messageLabel} error={fieldErrors.message}>
+                <Textarea
                   value={fields.message}
                   onChange={set("message")}
                   placeholder={messagePlaceholder}
                   rows={5}
-                  className={cn(inputClass("message"), "resize-none")}
+                  invalid={!!fieldErrors.message}
                 />
-                {fieldErrors.message && <p className={errorClass}>{fieldErrors.message}</p>}
-              </div>
+              </FormField>
 
               {formState === "error" && (
                 <p className="text-sm text-red-600 font-light">{errorMessage}</p>
               )}
 
-              <button
-                type="submit"
-                disabled={formState === "submitting"}
-                className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-[#8b6f47] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              <SubmitButton
+                loading={formState === "submitting"}
+                loadingLabel={submittingLabel}
               >
-                {formState === "submitting" && (
-                  <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                )}
-                {formState === "submitting" ? submittingLabel : submitLabel}
-              </button>
+                {submitLabel}
+              </SubmitButton>
             </form>
           )}
         </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { FormField, Input, Textarea, Select, SubmitButton } from "@/components/ui/FormField";
+import { EMAIL_RE } from "@/components/ui/form-styles";
 
 interface SelskaberInquiryFormProps {
   occasionOptions?: string[];
@@ -79,6 +80,8 @@ export default function SelskaberInquiryForm({
   successBody = "Vi vender tilbage hurtigst muligt med et uforpligtende forslag. I kan også kontakte os direkte på",
 }: SelskaberInquiryFormProps) {
   const options = occasionOptions && occasionOptions.length > 0 ? occasionOptions : DEFAULT_OCCASIONS;
+  // Restrict date picker to today onward — Selskab bookings can't be backdated.
+  const minDate = new Date().toISOString().slice(0, 10);
 
   const [fields, setFields] = useState({
     name: "",
@@ -106,7 +109,7 @@ export default function SelskaberInquiryForm({
     if (!fields.name.trim()) errors.name = nameRequiredMessage;
     if (!fields.email.trim()) {
       errors.email = emailRequiredMessage;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
+    } else if (!EMAIL_RE.test(fields.email)) {
       errors.email = emailInvalidMessage;
     }
     if (!fields.message.trim()) errors.message = messageRequiredMessage;
@@ -138,13 +141,6 @@ export default function SelskaberInquiryForm({
       setFormState("error");
     }
   };
-
-  const inputBase =
-    "w-full bg-transparent border px-4 py-3 text-sm text-[#292524] placeholder-[#292524]/30 focus:outline-none transition-colors";
-  const inputClass = (field?: keyof typeof fields) =>
-    cn(inputBase, fieldErrors[field!] ? "border-red-400 focus:border-red-500" : "border-border-warm focus:border-warm-brown");
-  const labelClass = "block text-[10px] tracking-[1.5px] uppercase text-[#78716c] mb-2";
-  const errorClass = "text-[11px] text-red-500 font-light mt-1.5";
 
   if (formState === "success") {
     return (
@@ -219,39 +215,32 @@ export default function SelskaberInquiryForm({
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {/* Row 1: Navn + Email */}
             <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <label className={labelClass}>{nameLabel}</label>
-                <input
+              <FormField label={nameLabel} error={fieldErrors.name}>
+                <Input
                   type="text"
                   value={fields.name}
                   onChange={set("name")}
                   placeholder={namePlaceholder}
-                  className={inputClass("name")}
+                  invalid={!!fieldErrors.name}
+                  autoComplete="name"
                 />
-                {fieldErrors.name && <p className={errorClass}>{fieldErrors.name}</p>}
-              </div>
-              <div>
-                <label className={labelClass}>{emailLabel}</label>
-                <input
+              </FormField>
+              <FormField label={emailLabel} error={fieldErrors.email}>
+                <Input
                   type="email"
                   value={fields.email}
                   onChange={set("email")}
                   placeholder={emailPlaceholder}
-                  className={inputClass("email")}
+                  invalid={!!fieldErrors.email}
+                  autoComplete="email"
                 />
-                {fieldErrors.email && <p className={errorClass}>{fieldErrors.email}</p>}
-              </div>
+              </FormField>
             </div>
 
             {/* Row 2: Anledning + Antal gæster */}
             <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <label className={labelClass}>{occasionLabel}</label>
-                <select
-                  value={fields.occasion}
-                  onChange={set("occasion")}
-                  className={cn(inputClass(), "appearance-none cursor-pointer")}
-                >
+              <FormField label={occasionLabel}>
+                <Select value={fields.occasion} onChange={set("occasion")}>
                   <option value="" className="bg-warm-gray">
                     {occasionPlaceholder}
                   </option>
@@ -260,44 +249,41 @@ export default function SelskaberInquiryForm({
                       {o}
                     </option>
                   ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>{guestCountLabel}</label>
-                <input
+                </Select>
+              </FormField>
+              <FormField label={guestCountLabel}>
+                <Input
                   type="number"
                   min={1}
+                  max={500}
                   value={fields.guestCount}
                   onChange={set("guestCount")}
                   placeholder={guestCountPlaceholder}
-                  className={inputClass()}
                 />
-              </div>
+              </FormField>
             </div>
 
             {/* Row 3: Dato */}
-            <div>
-              <label className={labelClass}>{dateLabel}</label>
-              <input
+            <FormField label={dateLabel}>
+              <Input
                 type="date"
+                min={minDate}
                 value={fields.desiredDate}
                 onChange={set("desiredDate")}
-                className={cn(inputClass(), "cursor-pointer [color-scheme:light]")}
+                className="cursor-pointer [color-scheme:light]"
               />
-            </div>
+            </FormField>
 
             {/* Row 4: Besked */}
-            <div>
-              <label className={labelClass}>{messageLabel}</label>
-              <textarea
+            <FormField label={messageLabel} error={fieldErrors.message}>
+              <Textarea
                 value={fields.message}
                 onChange={set("message")}
                 placeholder={messagePlaceholder}
                 rows={5}
-                className={cn(inputClass("message"), "resize-none")}
+                invalid={!!fieldErrors.message}
               />
-              {fieldErrors.message && <p className={errorClass}>{fieldErrors.message}</p>}
-            </div>
+            </FormField>
 
             {/* Error */}
             {formState === "error" && (
@@ -305,19 +291,12 @@ export default function SelskaberInquiryForm({
             )}
 
             {/* Submit */}
-            <button
-              type="submit"
-              disabled={formState === "submitting"}
-              className="w-full py-4 text-[12px] tracking-[2px] uppercase font-light text-white bg-brand hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            <SubmitButton
+              loading={formState === "submitting"}
+              loadingLabel={submittingLabel}
             >
-              {formState === "submitting" && (
-                <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              )}
-              {formState === "submitting" ? submittingLabel : submitLabel}
-            </button>
+              {submitLabel}
+            </SubmitButton>
           </form>
         </div>
       </div>

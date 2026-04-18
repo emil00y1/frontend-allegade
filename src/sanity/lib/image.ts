@@ -20,3 +20,13 @@ export function dimensionsFromRef(ref?: string | null): { width: number; height:
   if (!m) return null;
   return { width: Number(m[1]), height: Number(m[2]) };
 }
+
+// Pull a pre-computed low-quality image placeholder (data URI) from a Sanity
+// image asset. Sanity generates this for free on upload (asset.metadata.lqip);
+// we just need to request it in the GROQ query. Feeds next/image's
+// placeholder="blur".
+export function lqipFromImage(image: unknown): string | undefined {
+  if (!image || typeof image !== "object") return undefined;
+  const asset = (image as { asset?: { metadata?: { lqip?: string } } }).asset;
+  return asset?.metadata?.lqip;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Input } from "@/components/ui/FormField";
 
 interface NewsletterSectionProps {
   label?: string;
@@ -66,28 +67,34 @@ export default function NewsletterSection({
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0">
-            <input
+            <Input
               type="text"
               placeholder={firstNameLabel}
               required
+              dark
               value={form.firstName}
               onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-              className="bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-sm font-light px-4 py-2.5 flex-1 min-w-0 focus:outline-none focus:border-brand transition-colors"
+              className="flex-1 min-w-0 py-2.5"
+              autoComplete="given-name"
             />
-            <input
+            <Input
               type="text"
               placeholder={lastNameLabel}
+              dark
               value={form.lastName}
               onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-              className="bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-sm font-light px-4 py-2.5 flex-1 min-w-0 focus:outline-none focus:border-brand transition-colors"
+              className="flex-1 min-w-0 py-2.5"
+              autoComplete="family-name"
             />
-            <input
+            <Input
               type="email"
               placeholder={emailLabel}
               required
+              dark
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              className="bg-white/10 border border-white/15 text-white placeholder:text-white/40 text-sm font-light px-4 py-2.5 flex-1 min-w-0 focus:outline-none focus:border-brand transition-colors"
+              className="flex-1 min-w-0 py-2.5"
+              autoComplete="email"
             />
             <button
               type="submit"

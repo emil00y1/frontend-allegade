@@ -164,12 +164,19 @@ export default async function HotelPage() {
         containsPlace: rooms.map((room: any) => ({
           "@type": "HotelRoom",
           name: room.title,
-          description: room.description,
+          ...(room.description && { description: room.description }),
+          ...(room.slug?.current && {
+            url: `https://allegade10.dk/hotel/vaerelser/${room.slug.current}`,
+          }),
+          ...(room.image?.asset && {
+            image: urlFor(room.image).width(1200).height(800).url(),
+          }),
           ...(room.pricePerNight && {
             offers: {
               "@type": "Offer",
               price: room.pricePerNight,
               priceCurrency: "DKK",
+              availability: "https://schema.org/InStock",
             },
           }),
         })),
