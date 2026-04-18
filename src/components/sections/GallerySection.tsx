@@ -139,11 +139,11 @@ export default function GallerySection({
   const shownImages = validImages.slice(0, visibleCount);
   const hasMore = visibleCount < validImages.length;
 
-  const lightboxImages = validImages.map((img) => ({
+  const lightboxImages = useMemo(() => validImages.map((img) => ({
     src: urlFor(img).width(1600).auto("format").url(),
     alt: img.alt,
     caption: img.caption,
-  }));
+  })), [validImages]);
 
   return (
     <section className="bg-warm-white py-16 md:py-24 lg:py-32">
