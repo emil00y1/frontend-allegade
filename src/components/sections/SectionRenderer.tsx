@@ -153,7 +153,13 @@ function buildExtraProps(
       "menuHeroSection",
     ].includes(section._type)
   ) {
-    extraProps.ctaPrimaryUrl = section.ctaPrimaryUrl || globalBookTableUrl;
+    if (section._type === "homeHeroSection") {
+      extraProps.cta = {
+        label: section.cta?.label,
+        url: section.cta?.url || globalBookTableUrl,
+      };
+      extraProps.ctaSecondary = section.ctaSecondary;
+    }
     extraProps.backgroundVideoUrl = section.backgroundVideo?.asset?.url;
     extraProps.breadcrumbHomeLabel = breadcrumbHomeLabel;
     extraProps.globalBookTableUrl = globalBookTableUrl;

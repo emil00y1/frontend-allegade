@@ -1,5 +1,6 @@
 import { draftMode } from "next/headers";
 import type { Metadata } from "next";
+import type { TypedObject } from "sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 import { urlFor } from "@/sanity/lib/image";
 import HotelHero from "@/components/sections/HotelHero";
@@ -40,7 +41,7 @@ interface HotelPageData {
   roomShowcaseHeading?: string;
   practicalInfoHeading?: string;
   practicalInfoHeadingItalic?: string;
-  faqItems?: Array<{ _key: string; question?: string; answer?: string }>;
+  faqItems?: Array<{ _key: string; question?: string; answer?: TypedObject[] | string }>;
   neighborhoodHeading?: string;
   neighborhoodHeadingItalic?: string;
   neighborhoodAddress?: string;
@@ -188,14 +189,18 @@ export default async function HotelPage() {
     structuredData.push({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      mainEntity: faqItems.map((item: any) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
-        },
-      })),
+      mainEntity: faqItems.map((item: any) => {
+        const answerText = Array.isArray(item.answer)
+          ? (item.answer as TypedObject[])
+              .flatMap((block: any) => block.children?.map((span: any) => span.text) ?? [])
+              .join(" ")
+          : (item.answer as string | undefined) ?? "";
+        return {
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: answerText },
+        };
+      }),
     });
   }
 

@@ -179,10 +179,8 @@ export default async function IndexPage() {
           tagline={hero?.tagline}
           heading={hero?.heading}
           headingItalic={hero?.headingItalic}
-          ctaPrimaryLabel={hero?.ctaPrimaryLabel}
-          ctaPrimaryUrl={hero?.ctaPrimaryUrl || globalBookTableUrl}
-          ctaSecondaryLabel={hero?.ctaSecondaryLabel}
-          ctaSecondaryUrl={hero?.ctaSecondaryUrl}
+          cta={{ label: hero?.ctaPrimaryLabel, url: hero?.ctaPrimaryUrl || globalBookTableUrl }}
+          ctaSecondary={{ label: hero?.ctaSecondaryLabel, url: hero?.ctaSecondaryUrl }}
           sideText={hero?.sideText}
           backgroundVideoUrl={hero?.backgroundVideo?.asset?.url}
           backgroundImage={hero?.backgroundImage}
