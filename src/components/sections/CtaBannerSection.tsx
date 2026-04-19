@@ -3,10 +3,8 @@ import Link from "next/link";
 type CtaBannerSectionProps = {
   heading?: string;
   description?: string;
-  ctaLabel?: string;
-  ctaUrl?: string;
-  ctaSecondaryLabel?: string;
-  ctaSecondaryUrl?: string;
+  cta?: { label?: string; url?: string };
+  ctaSecondary?: { label?: string; url?: string };
   style?: "dark" | "brand" | "light";
 };
 
@@ -43,10 +41,8 @@ const styleConfig = {
 export default function CtaBannerSection({
   heading,
   description,
-  ctaLabel,
-  ctaUrl,
-  ctaSecondaryLabel,
-  ctaSecondaryUrl,
+  cta,
+  ctaSecondary,
   style = "dark",
 }: CtaBannerSectionProps) {
   const s = styleConfig[style];
@@ -67,24 +63,24 @@ export default function CtaBannerSection({
         )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
-          {ctaLabel && ctaUrl && (
+          {cta?.label && cta?.url && (
             <Link
-              href={ctaUrl}
+              href={cta.url}
               className={`inline-flex items-center gap-3 border px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium transition-all duration-300 group ${s.primaryBtn}`}
             >
-              {ctaLabel}
+              {cta.label}
               <span className="transition-transform duration-300 group-hover:translate-x-1.5">
                 →
               </span>
             </Link>
           )}
 
-          {ctaSecondaryLabel && ctaSecondaryUrl && (
+          {ctaSecondary?.label && ctaSecondary?.url && (
             <Link
-              href={ctaSecondaryUrl}
+              href={ctaSecondary.url}
               className={`text-xs tracking-[0.2em] uppercase font-medium transition-colors duration-300 underline underline-offset-4 ${s.secondaryBtn}`}
             >
-              {ctaSecondaryLabel}
+              {ctaSecondary.label}
             </Link>
           )}
         </div>

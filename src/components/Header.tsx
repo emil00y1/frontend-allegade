@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
 interface NavChildLink {
   name: string;
   href: string;
-  pageReference?: { slug?: string };
+  pageReference?: { _type?: string; slug?: string };
 }
 
 interface NavLink {
   name: string;
   href: string;
-  pageReference?: { slug?: string };
+  pageReference?: { _type?: string; slug?: string };
   children?: NavChildLink[];
 }
 
@@ -34,6 +34,25 @@ interface HeaderProps {
 
 function isExternal(url: string) {
   return url.startsWith("http://") || url.startsWith("https://");
+}
+
+const SINGLETON_ROUTES: Record<string, string> = {
+  homePage: "/",
+  hotelPage: "/hotel",
+  restaurantPage: "/restaurant",
+  menuPage: "/menukort",
+  eventsPage: "/begivenheder",
+  selskaberPage: "/selskaber",
+};
+
+function resolvePageReferenceHref(
+  pageRef: { _type?: string; slug?: string } | undefined,
+  fallback: string,
+): string {
+  if (!pageRef) return fallback;
+  if (pageRef._type && SINGLETON_ROUTES[pageRef._type]) return SINGLETON_ROUTES[pageRef._type];
+  if (pageRef.slug) return `/${pageRef.slug}`;
+  return fallback;
 }
 
 const DEFAULT_NAV_LINKS: NavLink[] = [
@@ -65,10 +84,10 @@ export default function Header({
     navLinks && navLinks.length > 0
       ? navLinks.map((l) => ({
           ...l,
-          href: l.pageReference?.slug ? `/${l.pageReference.slug}` : l.href,
+          href: resolvePageReferenceHref(l.pageReference, l.href),
           children: l.children?.map((c) => ({
             ...c,
-            href: c.pageReference?.slug ? `/${c.pageReference.slug}` : c.href,
+            href: resolvePageReferenceHref(c.pageReference, c.href),
           })),
         }))
       : DEFAULT_NAV_LINKS;

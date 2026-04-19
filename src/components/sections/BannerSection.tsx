@@ -8,8 +8,7 @@ type BannerSectionProps = {
   documentType?: string;
   heading?: string;
   subheading?: string;
-  ctaLabel?: string;
-  ctaUrl?: string;
+  cta?: { label?: string; url?: string };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   backgroundImage?: any;
   overlay?: "light" | "medium" | "dark";
@@ -34,8 +33,7 @@ export default function BannerSection({
   documentType,
   heading,
   subheading,
-  ctaLabel,
-  ctaUrl,
+  cta,
   backgroundImage,
   overlay = "medium",
   size = "medium",
@@ -72,12 +70,12 @@ export default function BannerSection({
           </p>
         )}
 
-        {ctaLabel && ctaUrl && (
+        {cta?.label && cta?.url && (
           <Link
-            href={ctaUrl}
+            href={cta.url}
             className="inline-flex items-center gap-3 border border-white/80 px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium text-white transition-all duration-300 hover:bg-white hover:text-stone-900 group"
           >
-            {ctaLabel}
+            {cta.label}
             <span className="transition-transform duration-300 group-hover:translate-x-1.5">
               →
             </span>

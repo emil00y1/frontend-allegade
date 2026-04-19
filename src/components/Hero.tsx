@@ -14,10 +14,8 @@ interface HeroProps {
   tagline?: string;
   heading?: string;
   headingItalic?: string;
-  ctaPrimaryLabel?: string;
-  ctaPrimaryUrl?: string;
-  ctaSecondaryLabel?: string;
-  ctaSecondaryUrl?: string;
+  cta?: { label?: string; url?: string };
+  ctaSecondary?: { label?: string; url?: string };
   sideText?: string;
   backgroundVideoUrl?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,14 +29,16 @@ export default function Hero({
   tagline = "Kulturel perle i Frederiksbergs centrum",
   heading = "Velkommen til",
   headingItalic = "Allégade 10",
-  ctaPrimaryLabel = "Find dit bord",
-  ctaPrimaryUrl = "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10",
-  ctaSecondaryLabel = "Se vores værelser",
-  ctaSecondaryUrl = "/hotel",
+  cta,
+  ctaSecondary,
   sideText = "Siden 1780 — Frederiksberg",
   backgroundVideoUrl = "https://cdn.sanity.io/files/b0bkhf04/production/bf5322023ca71a37f92e42f0607cfba31b760e04.mp4",
   backgroundImage,
 }: HeroProps) {
+  const ctaPrimaryLabel = cta?.label ?? "Find dit bord";
+  const ctaPrimaryUrl = cta?.url ?? "https://dinnerbooking.com/dk/da-DK/eventbooking/event/4155/allegade-10";
+  const ctaSecondaryLabel = ctaSecondary?.label ?? "Se vores værelser";
+  const ctaSecondaryUrl = ctaSecondary?.url ?? "/hotel";
   const videoRef = useRef<HTMLVideoElement>(null);
   const startTimeRef = useRef<number>(Date.now());
   const [videoReady, setVideoReady] = useState(false);

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { PortableText } from "next-sanity";
+import type { TypedObject } from "sanity";
 import { cn } from "@/lib/utils";
 
 interface FaqItem {
   _key: string;
   question?: string;
-  answer?: string;
+  answer?: TypedObject[] | string;
 }
 
 interface HotelFaqAccordionProps {
@@ -66,9 +68,13 @@ export function HotelFaqAccordion({ items }: HotelFaqAccordionProps) {
               )}
             >
               <div className="overflow-hidden">
-                <p className="text-warm-brown text-base leading-relaxed pr-12 pb-8">
-                  {item.answer}
-                </p>
+                <div className="prose prose-base max-w-none font-light leading-relaxed prose-p:text-warm-brown [&_p]:text-warm-brown pr-12 pb-8">
+                  {Array.isArray(item.answer) ? (
+                    <PortableText value={item.answer} />
+                  ) : (
+                    <p>{item.answer}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -11,8 +11,7 @@ type TextImageSectionProps = {
   heading?: string;
   subheading?: string;
   body?: TypedObject[];
-  ctaLabel?: string;
-  ctaUrl?: string;
+  cta?: { label?: string; url?: string };
   imagePosition?: "left" | "right";
   backgroundColor?: "white" | "beige" | "dark";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,8 +61,7 @@ export default function TextImageSection({
   heading,
   subheading,
   body,
-  ctaLabel,
-  ctaUrl,
+  cta,
   imagePosition = "right",
   backgroundColor = "white",
   image,
@@ -136,13 +134,13 @@ export default function TextImageSection({
         </div>
       )}
 
-      {ctaLabel && ctaUrl && (
+      {cta?.label && cta?.url && (
         <div className="mt-10">
           <Link
-            href={ctaUrl}
+            href={cta.url}
             className={`inline-flex items-center gap-3 border px-8 py-3.5 text-xs tracking-[0.2em] uppercase font-medium transition-all duration-300 group ${ctaStyle}`}
           >
-            {ctaLabel}
+            {cta.label}
             <span className="transition-transform duration-300 group-hover:translate-x-1.5">
               →
             </span>

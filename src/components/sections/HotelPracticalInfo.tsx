@@ -1,9 +1,10 @@
+import type { TypedObject } from "sanity";
 import { HotelFaqAccordion } from "@/components/HotelFaqAccordion";
 
 interface HotelPracticalInfoProps {
   practicalInfoHeading?: string;
   practicalInfoHeadingItalic?: string;
-  faqItems?: Array<{ _key: string; question?: string; answer?: string }>;
+  faqItems?: Array<{ _key: string; question?: string; answer?: TypedObject[] | string }>;
 }
 
 export default function HotelPracticalInfo({
